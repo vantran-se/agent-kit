@@ -18,8 +18,8 @@ Two-layer setup:
 ### 1. Global install (once per machine)
 
 ```bash
-git clone git@github.com:vantran-se/agent-kit.git ~/workspace/agent-kit
-cd ~/workspace/agent-kit
+git clone git@github.com:vantran-se/agent-kit.git
+cd agent-kit
 ./scripts/install.sh
 ```
 
