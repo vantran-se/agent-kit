@@ -1,0 +1,238 @@
+[
+  {
+    "name": "auto-format-prettier",
+    "description": "Auto-format JS/TS/JSON/CSS files with Prettier after every edit",
+    "stacks": ["typescript", "javascript", "nextjs", "react", "vue", "svelte"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Edit|Write|MultiEdit",
+      "command": "npx prettier --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "auto-format-eslint",
+    "description": "Auto-fix ESLint issues after every edit",
+    "stacks": ["typescript", "javascript", "nextjs", "react"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Edit|Write|MultiEdit",
+      "command": "npx eslint --fix \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "auto-format-biome",
+    "description": "Auto-format with Biome after every edit",
+    "stacks": ["typescript", "javascript", "nextjs", "react"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Edit|Write|MultiEdit",
+      "command": "npx biome format --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "auto-format-ruff",
+    "description": "Auto-format Python files with Ruff after every edit",
+    "stacks": ["python", "fastapi", "django", "flask"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Edit|Write|MultiEdit",
+      "command": "ruff format \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "auto-format-gofmt",
+    "description": "Auto-format Go files with gofmt after every edit",
+    "stacks": ["go"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Edit|Write|MultiEdit",
+      "command": "gofmt -w \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "auto-format-rustfmt",
+    "description": "Auto-format Rust files with rustfmt after every edit",
+    "stacks": ["rust"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Edit|Write|MultiEdit",
+      "command": "rustfmt \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "notify-on-stop",
+    "description": "Desktop notification when Claude finishes a task, showing current project name",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "Stop",
+      "command": "PROJECT=$(basename \"$PWD\"); MSG=\"Done in $PROJECT\"; osascript -e \"display notification \\\"$MSG\\\" with title \\\"Claude Code\\\" sound name \\\"Glass\\\"\" 2>/dev/null || notify-send 'Claude Code' \"$MSG\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "block-dangerous-bash",
+    "description": "Block dangerous bash commands (destructive deletes, force push, DROP TABLE, kill, chmod 777)",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "PreToolUse",
+      "matcher": "Bash",
+      "command": "CMD=\"$CLAUDE_TOOL_INPUT_COMMAND\"; if echo \"$CMD\" | grep -qiE '(rm\\s+-[rf]{1,2}\\s+/|rm\\s+-rf|DROP\\s+(TABLE|DATABASE|SCHEMA)|TRUNCATE\\s+TABLE|git\\s+push\\s+(--force|-f)|git\\s+reset\\s+--hard|pkill|kill\\s+-9|chmod\\s+777|mkfs\\.|dd\\s+if=.*of=/dev/)'; then echo \"BLOCK: Dangerous command detected — confirm with user before running: $CMD\" >&2; exit 2; fi"
+    }
+  },
+  {
+    "name": "check-secrets",
+    "description": "Block writing files that contain hardcoded secrets, API keys, or private keys",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "PreToolUse",
+      "matcher": "Write|Edit|MultiEdit",
+      "command": "CONTENT=\"${CLAUDE_TOOL_INPUT_NEW_STRING:-}${CLAUDE_TOOL_INPUT_CONTENT:-}\"; if echo \"$CONTENT\" | grep -qE '(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36,}|ghs_[a-zA-Z0-9]{36,}|-----BEGIN (RSA|EC|DSA|OPENSSH) PRIVATE KEY|AIza[0-9A-Za-z-_]{35}|xox[baprs]-[0-9A-Za-z]{10,})'; then echo \"BLOCK: Potential hardcoded secret detected. Use environment variables instead.\" >&2; exit 2; fi"
+    }
+  },
+  {
+    "name": "prevent-test-skip",
+    "description": "Warn when .skip() or .only() test modifiers are added, which can exclude tests from CI",
+    "stacks": ["typescript", "javascript", "nextjs", "react", "vue"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Write|Edit|MultiEdit",
+      "command": "FILE=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; if echo \"$FILE\" | grep -qE '\\.(test|spec)\\.(ts|tsx|js|jsx)$'; then if grep -qE '\\.(skip|only)\\s*\\(' \"$FILE\" 2>/dev/null; then echo \"WARNING: .skip() or .only() found in $FILE — remove before committing to avoid skipping CI tests\" >&2; fi; fi"
+    }
+  },
+  {
+    "name": "file-guard",
+    "description": "Block access to sensitive files (.env, private keys, credentials) based on .claudeignore patterns — standalone clone of claudekit file-guard",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "PreToolUse",
+      "matcher": "Read|Edit|MultiEdit|Write|Bash",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/file-guard.py\""
+    }
+  },
+  {
+    "name": "lint-changed",
+    "description": "Run Biome or ESLint on the changed file after every edit — standalone clone of claudekit lint-changed",
+    "stacks": ["typescript", "javascript", "nextjs", "react", "vue", "svelte"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Write|Edit|MultiEdit",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/lint-changed.py\""
+    }
+  },
+  {
+    "name": "typecheck-changed",
+    "description": "Run tsc --noEmit when a TypeScript file changes — standalone clone of claudekit typecheck-changed",
+    "stacks": ["typescript", "nextjs", "react"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Write|Edit|MultiEdit",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/typecheck-changed.py\""
+    }
+  },
+  {
+    "name": "check-any-changed",
+    "description": "Forbid explicit `any` types in changed TypeScript files — standalone clone of claudekit check-any-changed",
+    "stacks": ["typescript", "nextjs", "react"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Write|Edit|MultiEdit",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/check-any-changed.py\""
+    }
+  },
+  {
+    "name": "test-changed",
+    "description": "Find and run tests related to the changed file — standalone clone of claudekit test-changed",
+    "stacks": ["typescript", "javascript", "nextjs", "react"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Write|Edit|MultiEdit",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/test-changed.py\""
+    }
+  },
+  {
+    "name": "check-comment-replacement",
+    "description": "Block edits that replace real code with explanatory comments — standalone clone of claudekit check-comment-replacement",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "PreToolUse",
+      "matcher": "Edit|MultiEdit",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/check-comment-replacement.py\""
+    }
+  },
+  {
+    "name": "check-unused-parameters",
+    "description": "Block underscore-prefixed parameters that indicate lazy refactoring — standalone clone of claudekit check-unused-parameters",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "PreToolUse",
+      "matcher": "Edit|MultiEdit",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/check-unused-parameters.py\""
+    }
+  },
+  {
+    "name": "typecheck-project",
+    "description": "Run tsc --noEmit on the entire project at Stop — standalone clone of claudekit typecheck-project",
+    "stacks": ["typescript", "nextjs", "react"],
+    "scope": "project",
+    "hook": {
+      "event": "Stop",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/typecheck-project.py\""
+    }
+  },
+  {
+    "name": "lint-project",
+    "description": "Run Biome or ESLint on the entire project at Stop — standalone clone of claudekit lint-project",
+    "stacks": ["typescript", "javascript", "nextjs", "react", "vue"],
+    "scope": "project",
+    "hook": {
+      "event": "Stop",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/lint-project.py\""
+    }
+  },
+  {
+    "name": "test-project",
+    "description": "Run the full test suite at Stop — standalone clone of claudekit test-project",
+    "stacks": ["typescript", "javascript", "nextjs", "react"],
+    "scope": "project",
+    "hook": {
+      "event": "Stop",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/test-project.py\""
+    }
+  },
+  {
+    "name": "check-todos",
+    "description": "Block Stop if there are incomplete TodoWrite items in the session — standalone clone of claudekit check-todos",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "Stop",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/check-todos.py\""
+    }
+  },
+  {
+    "name": "self-review",
+    "description": "Prompt Claude to critically self-review before stopping — standalone clone of claudekit self-review",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "Stop",
+      "command": "python3 \"$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/self-review.py\""
+    }
+  }
+]
