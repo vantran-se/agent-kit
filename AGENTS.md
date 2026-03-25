@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-Agent Kit is a shared toolkit for bootstrapping AI agent configuration across multiple projects. Install once globally via `./scripts/install.sh`, then use `/ak:init-project` in any project.
+Agent Kit is a shared toolkit for bootstrapping AI agent configuration across multiple projects. Install once globally via `python3 scripts/install.py`, then use `/ak:init-project` in any project.
 
 ## Tech Stack
 
@@ -15,15 +15,15 @@ Agent Kit is a shared toolkit for bootstrapping AI agent configuration across mu
 ## Commands
 
 ```bash
-./scripts/install.sh          # Install globally (once per machine)
-./scripts/install.sh --check  # Verify installation status
+python3 scripts/install.py          # Install globally (once per machine)
+python3 scripts/install.py --check  # Verify installation status
 ```
 
 ## Directory Structure
 
 ```
 global/commands/        Source of truth for slash commands (deployed to ~/.claude/commands/)
-global/settings.json    MCP server definitions (merged into ~/.claude/settings.json)
+global/settings.json    MCP server definitions (read by install.py, registered via claude mcp add)
 custom/skills/          Private skills offered during /ak:setup-custom
 custom/commands/        Private slash commands offered during /ak:setup-custom
 custom/hooks/           Hook definitions (hooks.json) and scripts (scripts/*.py)
@@ -34,12 +34,14 @@ scripts/                Installer and utilities
 ## Conventions
 
 - Always edit source in `global/` or `custom/` — never in `~/.claude/` directly
-- Re-run `install.sh` after changing `global/` to deploy
+- Re-run `install.py` after changing `global/` to deploy
 - Run `/ak:sync-docs` after adding skills, commands, or hooks
 - Hook scripts must be Python 3 — place in `custom/hooks/scripts/*.py`
+- Hook input arrives as JSON via stdin — parse with `json.load(sys.stdin)` or `jq`; never use `$CLAUDE_TOOL_INPUT_*` env vars
+- MCP servers are defined in `global/settings.json` — `install.py` registers them via `claude mcp add --scope user`
 - Templates/prompts are plain Markdown — file content is the prompt sent to Claude
 
-## MCP Servers (installed globally by install.sh)
+## MCP Servers (defined in global/settings.json)
 
 | Server | Purpose |
 |--------|---------|
@@ -54,6 +56,6 @@ scripts/                Installer and utilities
 
 ## Do Not Modify
 
-- `~/.claude/commands/` — managed by `install.sh`, always edit source in `global/commands/`
+- `~/.claude/commands/` — managed by `install.py`, always edit source in `global/commands/`
 - `custom/skills/*/LICENSE.txt` — third-party licenses
 - `.claude/skills/skill-creator/` — do not edit, sourced from anthropics/skills

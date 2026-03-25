@@ -40,7 +40,12 @@ def find_test_file(path: str) -> Optional[str]:
 
 
 def main() -> None:
-    path = os.environ.get('CLAUDE_TOOL_INPUT_FILE_PATH', '')
+    try:
+        payload = json.load(sys.stdin)
+    except (json.JSONDecodeError, EOFError):
+        sys.exit(0)
+
+    path = payload.get('tool_input', {}).get('file_path', '')
     if not path:
         sys.exit(0)
 

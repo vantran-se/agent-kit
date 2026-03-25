@@ -3,13 +3,19 @@
 typecheck-changed: Run tsc --noEmit when a TypeScript file is modified.
 PostToolUse — Write|Edit|MultiEdit
 """
+import json
 import os
 import subprocess
 import sys
 
 
 def main() -> None:
-    path = os.environ.get('CLAUDE_TOOL_INPUT_FILE_PATH', '')
+    try:
+        payload = json.load(sys.stdin)
+    except (json.JSONDecodeError, EOFError):
+        sys.exit(0)
+
+    path = payload.get('tool_input', {}).get('file_path', '')
     if not path:
         sys.exit(0)
 

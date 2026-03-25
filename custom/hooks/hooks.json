@@ -7,7 +7,7 @@
     "hook": {
       "event": "PostToolUse",
       "matcher": "Edit|Write|MultiEdit",
-      "command": "npx prettier --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && npx prettier --write \"$FILE\" 2>/dev/null || true"
     }
   },
   {
@@ -18,7 +18,7 @@
     "hook": {
       "event": "PostToolUse",
       "matcher": "Edit|Write|MultiEdit",
-      "command": "npx eslint --fix \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && npx eslint --fix \"$FILE\" 2>/dev/null || true"
     }
   },
   {
@@ -29,7 +29,7 @@
     "hook": {
       "event": "PostToolUse",
       "matcher": "Edit|Write|MultiEdit",
-      "command": "npx biome format --write \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && npx biome format --write \"$FILE\" 2>/dev/null || true"
     }
   },
   {
@@ -40,7 +40,7 @@
     "hook": {
       "event": "PostToolUse",
       "matcher": "Edit|Write|MultiEdit",
-      "command": "ruff format \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && ruff format \"$FILE\" 2>/dev/null || true"
     }
   },
   {
@@ -51,7 +51,7 @@
     "hook": {
       "event": "PostToolUse",
       "matcher": "Edit|Write|MultiEdit",
-      "command": "gofmt -w \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && gofmt -w \"$FILE\" 2>/dev/null || true"
     }
   },
   {
@@ -62,7 +62,29 @@
     "hook": {
       "event": "PostToolUse",
       "matcher": "Edit|Write|MultiEdit",
-      "command": "rustfmt \"$CLAUDE_TOOL_INPUT_FILE_PATH\" 2>/dev/null || true"
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && rustfmt \"$FILE\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "auto-format-standardrb",
+    "description": "Auto-format Ruby files with StandardRB after every edit",
+    "stacks": ["ruby", "rails"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Edit|Write|MultiEdit",
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && bundle exec standardrb --fix \"$FILE\" 2>/dev/null || true"
+    }
+  },
+  {
+    "name": "auto-format-rubocop",
+    "description": "Auto-format Ruby files with RuboCop after every edit",
+    "stacks": ["ruby", "rails"],
+    "scope": "project",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Edit|Write|MultiEdit",
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); [ -n \"$FILE\" ] && bundle exec rubocop --autocorrect \"$FILE\" 2>/dev/null || true"
     }
   },
   {
@@ -83,7 +105,7 @@
     "hook": {
       "event": "PreToolUse",
       "matcher": "Bash",
-      "command": "CMD=\"$CLAUDE_TOOL_INPUT_COMMAND\"; if echo \"$CMD\" | grep -qiE '(rm\\s+-[rf]{1,2}\\s+/|rm\\s+-rf|DROP\\s+(TABLE|DATABASE|SCHEMA)|TRUNCATE\\s+TABLE|git\\s+push\\s+(--force|-f)|git\\s+reset\\s+--hard|pkill|kill\\s+-9|chmod\\s+777|mkfs\\.|dd\\s+if=.*of=/dev/)'; then echo \"BLOCK: Dangerous command detected — confirm with user before running: $CMD\" >&2; exit 2; fi"
+      "command": "CMD=$(jq -r '.tool_input.command // empty'); if [ -n \"$CMD\" ] && echo \"$CMD\" | grep -qiE '(rm\\s+-[rf]{1,2}\\s+/|rm\\s+-rf|DROP\\s+(TABLE|DATABASE|SCHEMA)|TRUNCATE\\s+TABLE|git\\s+push\\s+(--force|-f)|git\\s+reset\\s+--hard|pkill|kill\\s+-9|chmod\\s+777|mkfs\\.|dd\\s+if=.*of=/dev/)'; then echo \"BLOCK: Dangerous command detected — confirm with user before running: $CMD\" >&2; exit 2; fi"
     }
   },
   {
@@ -94,7 +116,7 @@
     "hook": {
       "event": "PreToolUse",
       "matcher": "Write|Edit|MultiEdit",
-      "command": "CONTENT=\"${CLAUDE_TOOL_INPUT_NEW_STRING:-}${CLAUDE_TOOL_INPUT_CONTENT:-}\"; if echo \"$CONTENT\" | grep -qE '(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36,}|ghs_[a-zA-Z0-9]{36,}|-----BEGIN (RSA|EC|DSA|OPENSSH) PRIVATE KEY|AIza[0-9A-Za-z-_]{35}|xox[baprs]-[0-9A-Za-z]{10,})'; then echo \"BLOCK: Potential hardcoded secret detected. Use environment variables instead.\" >&2; exit 2; fi"
+      "command": "INPUT=$(cat); CONTENT=$(echo \"$INPUT\" | jq -r '(.tool_input.new_string // \"\") + (.tool_input.content // \"\")'); if echo \"$CONTENT\" | grep -qE '(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36,}|ghs_[a-zA-Z0-9]{36,}|-----BEGIN (RSA|EC|DSA|OPENSSH) PRIVATE KEY|AIza[0-9A-Za-z-_]{35}|xox[baprs]-[0-9A-Za-z]{10,})'; then echo \"BLOCK: Potential hardcoded secret detected. Use environment variables instead.\" >&2; exit 2; fi"
     }
   },
   {
@@ -105,7 +127,7 @@
     "hook": {
       "event": "PostToolUse",
       "matcher": "Write|Edit|MultiEdit",
-      "command": "FILE=\"$CLAUDE_TOOL_INPUT_FILE_PATH\"; if echo \"$FILE\" | grep -qE '\\.(test|spec)\\.(ts|tsx|js|jsx)$'; then if grep -qE '\\.(skip|only)\\s*\\(' \"$FILE\" 2>/dev/null; then echo \"WARNING: .skip() or .only() found in $FILE — remove before committing to avoid skipping CI tests\" >&2; fi; fi"
+      "command": "FILE=$(jq -r '.tool_input.file_path // empty'); if [ -n \"$FILE\" ] && echo \"$FILE\" | grep -qE '\\.(test|spec)\\.(ts|tsx|js|jsx)$'; then if grep -qE '\\.(skip|only)\\s*\\(' \"$FILE\" 2>/dev/null; then echo \"WARNING: .skip() or .only() found in $FILE — remove before committing to avoid skipping CI tests\" >&2; fi; fi"
     }
   },
   {

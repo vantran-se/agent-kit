@@ -178,19 +178,29 @@ Same rules as CLAUDE.md: only non-obvious, project-specific info. Keep it under 
 
 Ask the user: "Set up auto-format hooks? (Recommended — runs formatter after every file edit, prevents CI failures)"
 
-If yes, detect the formatter:
-- TypeScript/JS with Prettier → `npx prettier --write $FILE`
-- TypeScript/JS with ESLint → `npx eslint --fix $FILE`
-- TypeScript/JS with Biome → `npx biome format --write $FILE`
-- Python with Ruff → `ruff format $FILE`
-- Python with Black → `black $FILE`
-- Go → `gofmt -w $FILE`
-- Rust → `rustfmt $FILE`
+If yes, detect the formatter. Hook input arrives as JSON on stdin — extract `tool_input.file_path` using `jq`:
+- TypeScript/JS with Prettier → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && npx prettier --write "$FILE" 2>/dev/null || true`
+- TypeScript/JS with ESLint → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && npx eslint --fix "$FILE" 2>/dev/null || true`
+- TypeScript/JS with Biome → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && npx biome format --write "$FILE" 2>/dev/null || true`
+- Python with Ruff → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && ruff format "$FILE" 2>/dev/null || true`
+- Python with Black → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && black "$FILE" 2>/dev/null || true`
+- Go → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && gofmt -w "$FILE" 2>/dev/null || true`
+- Rust → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && rustfmt "$FILE" 2>/dev/null || true`
+- Ruby with StandardRB → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && bundle exec standardrb --fix "$FILE" 2>/dev/null || true`
+- Ruby with RuboCop → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && bundle exec rubocop --autocorrect "$FILE" 2>/dev/null || true`
 
 Add to `.claude/settings.json` (merge with existing):
 
 ```json
 {
+  "permissions": {
+    "allow": [
+      "mcp__context7__*",
+      "mcp__gitnexus__*",
+      "mcp__sequential-thinking__*",
+      "mcp__memory__*"
+    ]
+  },
   "hooks": {
     "PostToolUse": [
       {
@@ -217,7 +227,9 @@ Add to `.claude/settings.json` (merge with existing):
 }
 ```
 
-The Stop hook sends a desktop notification when Claude finishes a task — works on macOS (osascript) and Linux (notify-send), silently skips if neither is available.
+The MCP permissions allow all tools from the 4 standard servers without prompting. The Stop hook sends a desktop notification — works on macOS (osascript) and Linux (notify-send), silently skips if neither is available.
+
+Read the `mcpPermissions` array from `~/.claude/agent-kit-path` → `global/settings.json` to get the authoritative list. If the file is not found, use the defaults above.
 
 ---
 

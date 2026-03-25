@@ -4,216 +4,160 @@ Shared AI agent setup toolkit for Claude Code. Install once globally, then boots
 
 ## How It Works
 
-Two-layer setup:
-
-| Layer | Command | When | Where |
-|-------|---------|------|-------|
-| **Global** | `./scripts/install.sh` | Once per machine | `~/.claude/` |
-| **Per-project** | `/ak:init-project` | Once per project | project root |
-
----
+| Layer | What it does |
+|-------|-------------|
+| **Global** (`~/.claude/`) | Commands + user-scoped MCP servers — installed once via `python3 scripts/install.py` |
+| **Per-project** (`.claude/`) | Hooks, skills, custom commands — set up per project via `/ak:init-project` |
 
 ## Quick Start
 
-### 1. Global install (once per machine)
-
 ```bash
-git clone git@github.com:vantran-se/agent-kit.git
-cd agent-kit
-./scripts/install.sh
-```
+# 1. Clone and install globally (once per machine)
+git clone <repo-url> ~/workspace/agent-kit
+cd ~/workspace/agent-kit
+python3 scripts/install.py
 
-Installs:
-- 3 slash commands → `~/.claude/commands/`
-- 4 MCP servers → `~/.claude/settings.json`
-- Saves agent-kit path → `~/.claude/agent-kit-path`
-
-Verify:
-```bash
-./scripts/install.sh --check
-```
-
-### 2. Initialize a project
-
-Open any project in Claude Code:
-
-```
+# 2. In any project, run the setup wizard
 /ak:init-project
+
+# 3. Optional: install skills and custom assets
+/ak:setup-skills
+/ak:setup-custom
 ```
 
-Generates: `CLAUDE.md`, `AGENTS.md`, auto-format hooks, indexes with GitNexus, offers custom assets.
+## Global Commands
 
-### 3. Install skills (optional)
+Installed to `~/.claude/commands/` and available in every project:
 
-```
-/ak:setup-skills    # discover & install from skills.sh
-/ak:setup-custom    # install from custom/ in this repo
-```
+| Command | Purpose |
+|---------|---------|
+| `/ak:init-project` | Full project setup wizard — generates CLAUDE.md, AGENTS.md, hooks, GitNexus index |
+| `/ak:setup-skills` | Install skills from `skills.sh` for the current stack |
+| `/ak:setup-custom` | Install custom skills, commands, and hooks from `custom/` |
+| `/ak:update` | Sync latest MCP permissions from agent-kit into an existing project's `.claude/settings.json` |
 
----
+This repo also has a local command:
 
-## Commands
+| Command | Purpose |
+|---------|---------|
+| `/ak:sync-docs` | Regenerate README.md, CLAUDE.md, AGENTS.md (agent-kit repo only) |
 
-| Command | What it does |
-|---------|-------------|
-| `/ak:init-project` | Full project setup — detects stack, generates CLAUDE.md + AGENTS.md, configures hooks, indexes with GitNexus, offers custom assets |
-| `/ak:setup-skills` | Search skills.sh for stack-relevant skills, pick and install |
-| `/ak:setup-custom` | Install custom skills, commands, and hooks from this repo |
+## MCP Servers
 
----
-
-## MCP Servers (global, no API key required)
+Defined in `global/settings.json`, registered as user-scoped by `install.py` (`claude mcp add --scope user`), available across all projects:
 
 | Server | Package | Purpose |
 |--------|---------|---------|
-| `context7` | `@upstash/context7-mcp` | Up-to-date library docs — `resolve-library-id` → `get-library-docs` |
-| `gitnexus` | `gitnexus@latest` | Semantic code search across indexed repos |
-| `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Better reasoning for complex/multi-step problems |
-| `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge graph across sessions |
+| `context7` | `@upstash/context7-mcp` | Up-to-date library docs |
+| `gitnexus` | `gitnexus@latest` | Semantic code search |
+| `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
+| `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
 
----
+To add a server, add it to `global/settings.json` and re-run `python3 scripts/install.py`.
 
 ## Custom Assets
 
-Assets in `custom/` are offered during `/ak:setup-custom` and `/ak:init-project`. Install globally or per-project.
-
 ### Skills (`custom/skills/`)
 
-| Skill | Description |
-|-------|-------------|
-| `docx` | Create/read/edit Word documents (.docx) |
-| `frontend-design` | Production-grade UI — React, landing pages, dashboards |
-| `internal-comms` | Status reports, newsletters, incident reports |
-| `pdf` | Read/merge/split/OCR PDF files |
-| `pptx` | Create/edit PowerPoint presentations |
-| `xlsx` | Create/read/edit spreadsheets (.xlsx, .csv) |
+| Skill | Purpose |
+|-------|---------|
+| `docx` | Word document creation and manipulation |
+| `frontend-design` | Production-grade UI with high design quality |
+| `internal-comms` | Internal communications (status reports, updates, newsletters) |
+| `pdf` | PDF reading, merging, splitting, OCR, and creation |
+| `pptx` | PowerPoint slide deck creation and editing |
+| `xlsx` | Spreadsheet reading, editing, and creation |
 
 ### Hooks (`custom/hooks/hooks.json`)
 
-22 hooks total. Install per-project or globally via `/ak:setup-custom`.
-
-#### Auto-format (project scope)
-
-| Hook | Trigger | Stacks |
-|------|---------|--------|
-| `auto-format-prettier` | PostToolUse | TS, JS, Next.js, React, Vue, Svelte |
-| `auto-format-eslint` | PostToolUse | TS, JS, Next.js, React |
-| `auto-format-biome` | PostToolUse | TS, JS, Next.js, React |
-| `auto-format-ruff` | PostToolUse | Python, FastAPI, Django, Flask |
-| `auto-format-gofmt` | PostToolUse | Go |
-| `auto-format-rustfmt` | PostToolUse | Rust |
-
-#### Safety (global scope)
+24 hooks total:
 
 | Hook | Trigger | Description |
 |------|---------|-------------|
-| `block-dangerous-bash` | PreToolUse | Block `rm -rf`, `DROP TABLE`, force push, `kill -9` |
-| `check-secrets` | PreToolUse | Block hardcoded API keys and private keys |
-| `file-guard` | PreToolUse | Block access to `.env`, private keys, `.claudeignore` patterns |
-| `check-comment-replacement` | PreToolUse | Block replacing real code with comments |
-| `check-unused-parameters` | PreToolUse | Block underscore-prefixed parameters |
+| `auto-format-prettier` | PostToolUse | Auto-format JS/TS/JSON/CSS with Prettier |
+| `auto-format-eslint` | PostToolUse | Auto-fix ESLint issues |
+| `auto-format-biome` | PostToolUse | Auto-format with Biome |
+| `auto-format-ruff` | PostToolUse | Auto-format Python with Ruff |
+| `auto-format-gofmt` | PostToolUse | Auto-format Go with gofmt |
+| `auto-format-rustfmt` | PostToolUse | Auto-format Rust with rustfmt |
+| `auto-format-standardrb` | PostToolUse | Auto-format Ruby with StandardRB |
+| `auto-format-rubocop` | PostToolUse | Auto-format Ruby with RuboCop |
+| `notify-on-stop` | Stop | Desktop notification when task completes |
+| `block-dangerous-bash` | PreToolUse | Block destructive shell commands |
+| `check-secrets` | PreToolUse | Block hardcoded secrets in files |
+| `prevent-test-skip` | PostToolUse | Warn on `.skip()` / `.only()` in tests |
+| `file-guard` | PreToolUse | Block access to sensitive files |
+| `lint-changed` | PostToolUse | Lint the changed file (Biome or ESLint) |
+| `typecheck-changed` | PostToolUse | Run `tsc --noEmit` on changed TypeScript files |
+| `check-any-changed` | PostToolUse | Forbid explicit `any` in TypeScript |
+| `test-changed` | PostToolUse | Run tests related to the changed file |
+| `check-comment-replacement` | PreToolUse | Block edits that replace code with comments |
+| `check-unused-parameters` | PreToolUse | Block underscore-prefixed lazy refactoring |
+| `typecheck-project` | Stop | Run `tsc --noEmit` on entire project |
+| `lint-project` | Stop | Lint entire project at Stop |
+| `test-project` | Stop | Run full test suite at Stop |
+| `check-todos` | Stop | Block Stop if TodoWrite items are incomplete |
+| `self-review` | Stop | Prompt Claude to self-review before stopping |
 
-#### Code quality (project scope)
+Hooks with complex logic use standalone Python scripts in `custom/hooks/scripts/`.
 
-| Hook | Trigger | Description |
-|------|---------|-------------|
-| `lint-changed` | PostToolUse | Run Biome or ESLint on the changed file |
-| `typecheck-changed` | PostToolUse | Run `tsc --noEmit` on TypeScript changes |
-| `check-any-changed` | PostToolUse | Forbid explicit `any` types in TypeScript |
-| `test-changed` | PostToolUse | Find and run tests for the changed file |
-| `prevent-test-skip` | PostToolUse | Warn on `.skip()` / `.only()` in test files |
-
-#### Project-wide checks at Stop (project scope)
-
-| Hook | Trigger | Description |
-|------|---------|-------------|
-| `typecheck-project` | Stop | `tsc --noEmit` on entire project |
-| `lint-project` | Stop | Biome or ESLint on entire project |
-| `test-project` | Stop | Run full test suite |
-
-#### Session quality (global scope)
-
-| Hook | Trigger | Description |
-|------|---------|-------------|
-| `check-todos` | Stop | Block if incomplete TodoWrite items exist |
-| `self-review` | Stop | Prompt self-review before stopping |
-| `notify-on-stop` | Stop | Desktop notification with project name |
-
-> All hooks in `custom/hooks/scripts/` are standalone Python 3 scripts.
-
----
+Hook input is provided as JSON via stdin. Scripts parse with `json.load(sys.stdin)`; inline bash commands use `jq`.
 
 ## Project Structure
 
 ```
 agent-kit/
-├── global/                          # Installed into ~/.claude/ by install.sh
+├── global/                          # Installed into ~/.claude/ by install.py
 │   ├── commands/
-│   │   ├── ak:init-project.md       # /ak:init-project
-│   │   ├── ak:setup-skills.md       # /ak:setup-skills
-│   │   └── ak:setup-custom.md       # /ak:setup-custom
-│   └── settings.json                # MCP server definitions
+│   │   ├── ak:init-project.md       # /ak:init-project — full project setup
+│   │   ├── ak:setup-custom.md       # /ak:setup-custom — install from custom/
+│   │   ├── ak:setup-skills.md       # /ak:setup-skills — install from skills.sh
+│   │   └── ak:update.md             # /ak:update — sync MCP permissions to existing project
+│   └── settings.json                # MCP server definitions (read by install.py)
 ├── custom/                          # User-managed private assets
 │   ├── skills/                      # 6 skills (docx, frontend-design, internal-comms, pdf, pptx, xlsx)
 │   ├── commands/                    # Optional private slash commands
 │   └── hooks/
-│       ├── hooks.json               # 22 hook definitions
+│       ├── hooks.json               # 24 hook definitions
 │       ├── scripts/                 # Standalone Python 3 hook scripts (12 files)
-│       └── tests/                   # Hook test suite — run: python3 tests/test_hooks.py
-│           ├── file-guard.py
-│           ├── lint-changed.py
-│           ├── typecheck-changed.py
-│           ├── check-any-changed.py
-│           ├── test-changed.py
-│           ├── typecheck-project.py
-│           ├── lint-project.py
-│           ├── test-project.py
-│           ├── check-comment-replacement.py
-│           ├── check-unused-parameters.py
-│           ├── check-todos.py
-│           └── self-review.py
+│       └── tests/                   # Hook test suite (test_hooks.py)
 ├── tests/
-│   ├── run_all.py                   # Run all tests: python3 tests/run_all.py
-│   └── test_kit.py                  # Project integrity tests
+│   ├── run_all.py                   # Run all test suites: python3 tests/run_all.py
+│   └── test_kit.py                  # Project integrity tests (structure, schema, docs sync)
 ├── scripts/
-│   └── install.sh                   # Global installer
+│   └── install.py                   # Global installer
 └── .claude/
-    ├── settings.json                # MCP config + doc-sync reminder hook
+    ├── settings.json                # MCP config + doc-sync hook
     ├── commands/
-    │   └── ak:sync-docs.md          # /ak:sync-docs (agent-kit only)
+    │   └── ak:sync-docs.md          # /ak:sync-docs — regenerate docs (this repo only)
     └── skills/
-        └── skill-creator/           # Meta-skill: create & evaluate new skills
+        └── skill-creator/           # Meta-skill: create & evaluate skills
 ```
-
----
 
 ## Extending
 
-### Add a new MCP server
-1. Add to `global/settings.json`
-2. Run `./scripts/install.sh`
+**Add an MCP server** — add to `global/settings.json`, then re-run `python3 scripts/install.py`:
+```json
+"my-server": { "command": "npx", "args": ["-y", "my-mcp-package"] }
+```
 
-### Add a new global command
-1. Create `global/commands/my-command.md`
-2. Run `./scripts/install.sh`
+**Add a global command** — create `global/commands/my-command.md`, then re-run `python3 scripts/install.py`.
 
-### Add a custom skill
-1. Create `custom/skills/my-skill/SKILL.md`
-2. Available via `/ak:setup-custom` immediately
+**Add a custom skill** — add a directory with `SKILL.md` to `custom/skills/`.
 
-### Add a hook
-1. Add entry to `custom/hooks/hooks.json`
-2. For complex logic, add a Python script to `custom/hooks/scripts/` and reference it via `python3 "$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/your-script.py"`
-3. Available via `/ak:setup-custom` immediately
+**Add a hook** — add an entry to `custom/hooks/hooks.json`. For complex logic, add a Python script to `custom/hooks/scripts/`.
 
-### Update docs after any change
+**After any change** — run `/ak:sync-docs` to update README.md, CLAUDE.md, and AGENTS.md.
 
-Run `/ak:sync-docs` — available when working inside agent-kit (`.claude/commands/ak:sync-docs.md`).
+## Running Tests
 
----
+```bash
+python3 tests/run_all.py                          # all suites
+python3 tests/test_kit.py                         # integrity only (structure, schema, docs sync)
+python3 custom/hooks/tests/test_hooks.py          # hook behavior only
+```
 
 ## Requirements
 
-- [Node.js](https://nodejs.org) — for `npx` (runs MCP servers and skills CLI)
-- [Python 3.7+](https://python.org) — for hook scripts in `custom/hooks/scripts/`
-- [Claude Code](https://claude.ai/code) CLI
+- [Node.js](https://nodejs.org) (for `npx` MCP servers)
+- [Claude Code](https://claude.ai/code)

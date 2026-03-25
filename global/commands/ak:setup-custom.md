@@ -7,7 +7,7 @@ You are installing custom assets from the user's agent-kit repository into the c
 Read the agent-kit path from `~/.claude/agent-kit-path`.
 
 If the file does not exist, tell the user:
-> agent-kit path not found. Run `./scripts/install.sh` from your agent-kit directory first.
+> agent-kit path not found. Run `python3 scripts/install.py` from your agent-kit directory first.
 
 Then stop.
 

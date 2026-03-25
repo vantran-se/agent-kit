@@ -16,5 +16,11 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-memory"]
     }
-  }
+  },
+  "mcpPermissions": [
+    "mcp__context7__*",
+    "mcp__gitnexus__*",
+    "mcp__sequential-thinking__*",
+    "mcp__memory__*"
+  ]
 }

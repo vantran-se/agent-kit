@@ -3,6 +3,7 @@
 check-any-changed: Forbid explicit `any` types in changed TypeScript files.
 PostToolUse — Write|Edit|MultiEdit
 """
+import json
 import os
 import re
 import sys
@@ -14,7 +15,12 @@ ALLOWED_PATTERN = re.compile(r'expect\.any\(|\.any\(')
 
 
 def main() -> None:
-    path = os.environ.get('CLAUDE_TOOL_INPUT_FILE_PATH', '')
+    try:
+        payload = json.load(sys.stdin)
+    except (json.JSONDecodeError, EOFError):
+        sys.exit(0)
+
+    path = payload.get('tool_input', {}).get('file_path', '')
     if not path or not path.endswith(('.ts', '.tsx')):
         sys.exit(0)
     if not os.path.exists(path):

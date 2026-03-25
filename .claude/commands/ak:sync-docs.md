@@ -36,7 +36,7 @@ Rewrite `README.md` completely using the data from Step 1. Follow this structure
 
 1. **Header** — project name and one-line description
 2. **How It Works** — two-layer table (global / per-project)
-3. **Quick Start** — install.sh steps, /ak:init-project, /ak:setup-skills, /ak:setup-custom
+3. **Quick Start** — install.py steps, /ak:init-project, /ak:setup-skills, /ak:setup-custom
 4. **Commands table** — all commands from `global/commands/` with descriptions
 5. **MCP Servers table** — from `global/settings.json`
 6. **Custom Assets** — Skills table (name + description), Hooks table (name + trigger + description)
@@ -61,7 +61,7 @@ Structure:
    - "After adding/removing skills, commands, or hooks — run `/ak:sync-docs` immediately"
    - Reminder that `.claude/settings.json` has a hook that will remind automatically
    - Edit source in global/ or custom/, never in ~/.claude/ directly
-   - Re-run install.sh after changing global/
+   - Re-run install.py after changing global/
 
 Keep it short — target 60-80 lines total.
 
@@ -72,7 +72,7 @@ Rewrite `AGENTS.md` completely. This is the universal AI config for non-Claude a
 Structure:
 1. Project overview (2 sentences)
 2. Tech stack
-3. Commands (install.sh usage)
+3. Commands (install.py usage)
 4. Directory structure (brief)
 5. Conventions
 6. **MCP Servers** table — from global/settings.json

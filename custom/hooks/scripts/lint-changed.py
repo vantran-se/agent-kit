@@ -4,6 +4,7 @@ lint-changed: Run Biome or ESLint on the changed file after every edit.
 PostToolUse — Write|Edit|MultiEdit
 """
 import glob
+import json
 import os
 import subprocess
 import sys
@@ -18,7 +19,12 @@ def run(cmd: List[str], cwd: str) -> int:
 
 
 def main() -> None:
-    path = os.environ.get('CLAUDE_TOOL_INPUT_FILE_PATH', '')
+    try:
+        payload = json.load(sys.stdin)
+    except (json.JSONDecodeError, EOFError):
+        sys.exit(0)
+
+    path = payload.get('tool_input', {}).get('file_path', '')
     if not path:
         sys.exit(0)
 
