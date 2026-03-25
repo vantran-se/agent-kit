@@ -19,41 +19,32 @@ Read `<agent-kit-path>/global/settings.json` to get the current `mcpPermissions`
 
 ---
 
-## Step 2: Read Current Project Settings
+## Step 2: Read Current Settings
 
-Read `.claude/settings.json` if it exists, otherwise start with `{}`.
+Read both:
+- `~/.claude/settings.json` — global permissions (apply to all projects)
+- `.claude/settings.json` — project-level permissions (create as `{}` if missing)
 
 ---
 
 ## Step 3: Merge MCP Permissions
 
-Merge the `mcpPermissions` from `global/settings.json` into `.claude/settings.json` under `permissions.allow`.
+For each permission in `mcpPermissions` from `global/settings.json`:
 
-- Add any permissions from the agent-kit list that are not already present
-- Never remove existing permissions
-- Deduplicate
+- **Skip** if already present in `~/.claude/settings.json` `permissions.allow` (already covered globally)
+- **Skip** if already present in `.claude/settings.json` `permissions.allow`
+- **Add** to `.claude/settings.json` only if missing from both
 
-Example result:
-```json
-{
-  "permissions": {
-    "allow": [
-      "mcp__context7__*",
-      "mcp__gitnexus__*",
-      "mcp__sequential-thinking__*",
-      "mcp__memory__*"
-    ]
-  }
-}
-```
+Never remove existing permissions. Deduplicate.
 
-Write the merged result back to `.claude/settings.json`.
+If all permissions are covered globally, skip writing `.claude/settings.json` entirely and note that global permissions already cover everything.
 
 ---
 
 ## Step 4: Report
 
 Show a brief summary:
-- Permissions added (list new ones only)
-- Permissions already present (skipped)
-- Path updated: `.claude/settings.json`
+- Permissions added to project settings (list new ones only)
+- Permissions skipped — already in global `~/.claude/settings.json`
+- Permissions skipped — already in project `.claude/settings.json`
+- Path updated: `.claude/settings.json` (or "no changes needed")
