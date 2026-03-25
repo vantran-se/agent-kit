@@ -251,7 +251,7 @@ class TestSkills(unittest.TestCase):
 class TestGlobalCommands(unittest.TestCase):
     """global/commands/ — command files exist, are non-empty, and have titles."""
 
-    EXPECTED_COMMANDS = {'init-project.md', 'setup-skills.md', 'setup-custom.md'}
+    EXPECTED_COMMANDS = {'ak:init-project.md', 'ak:setup-skills.md', 'ak:setup-custom.md'}
 
     def test_command_files_exist(self):
         actual = {f.name for f in GLOBAL_COMMANDS_DIR.glob('*.md')}
@@ -317,8 +317,8 @@ class TestDocumentationSync(unittest.TestCase):
                           f"AGENTS.md missing skill: {name}")
 
     def test_sync_docs_rule_in_claude_md(self):
-        self.assertIn('/sync-docs', self.claude_md,
-                      "CLAUDE.md must mention /sync-docs rule")
+        self.assertIn('/ak:sync-docs', self.claude_md,
+                      "CLAUDE.md must mention /ak:sync-docs rule")
 
     def test_python_requirement_in_readme(self):
         self.assertIn('Python', self.readme,
@@ -404,7 +404,7 @@ class TestProjectStructure(unittest.TestCase):
             ROOT / 'global' / 'settings.json',
             ROOT / 'custom' / 'hooks' / 'hooks.json',
             ROOT / '.claude' / 'settings.json',
-            ROOT / '.claude' / 'commands' / 'sync-docs.md',
+            ROOT / '.claude' / 'commands' / 'ak:sync-docs.md',
         ]
         for f in files:
             self.assertTrue(f.exists(), f"File missing: {f.relative_to(ROOT)}")

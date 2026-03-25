@@ -9,7 +9,7 @@ Two-layer setup:
 | Layer | Command | When | Where |
 |-------|---------|------|-------|
 | **Global** | `./scripts/install.sh` | Once per machine | `~/.claude/` |
-| **Per-project** | `/init-project` | Once per project | project root |
+| **Per-project** | `/ak:init-project` | Once per project | project root |
 
 ---
 
@@ -38,7 +38,7 @@ Verify:
 Open any project in Claude Code:
 
 ```
-/init-project
+/ak:init-project
 ```
 
 Generates: `CLAUDE.md`, `AGENTS.md`, auto-format hooks, indexes with GitNexus, offers custom assets.
@@ -46,8 +46,8 @@ Generates: `CLAUDE.md`, `AGENTS.md`, auto-format hooks, indexes with GitNexus, o
 ### 3. Install skills (optional)
 
 ```
-/setup-skills    # discover & install from skills.sh
-/setup-custom    # install from custom/ in this repo
+/ak:setup-skills    # discover & install from skills.sh
+/ak:setup-custom    # install from custom/ in this repo
 ```
 
 ---
@@ -56,9 +56,9 @@ Generates: `CLAUDE.md`, `AGENTS.md`, auto-format hooks, indexes with GitNexus, o
 
 | Command | What it does |
 |---------|-------------|
-| `/init-project` | Full project setup — detects stack, generates CLAUDE.md + AGENTS.md, configures hooks, indexes with GitNexus, offers custom assets |
-| `/setup-skills` | Search skills.sh for stack-relevant skills, pick and install |
-| `/setup-custom` | Install custom skills, commands, and hooks from this repo |
+| `/ak:init-project` | Full project setup — detects stack, generates CLAUDE.md + AGENTS.md, configures hooks, indexes with GitNexus, offers custom assets |
+| `/ak:setup-skills` | Search skills.sh for stack-relevant skills, pick and install |
+| `/ak:setup-custom` | Install custom skills, commands, and hooks from this repo |
 
 ---
 
@@ -75,7 +75,7 @@ Generates: `CLAUDE.md`, `AGENTS.md`, auto-format hooks, indexes with GitNexus, o
 
 ## Custom Assets
 
-Assets in `custom/` are offered during `/setup-custom` and `/init-project`. Install globally or per-project.
+Assets in `custom/` are offered during `/ak:setup-custom` and `/ak:init-project`. Install globally or per-project.
 
 ### Skills (`custom/skills/`)
 
@@ -90,7 +90,7 @@ Assets in `custom/` are offered during `/setup-custom` and `/init-project`. Inst
 
 ### Hooks (`custom/hooks/hooks.json`)
 
-22 hooks total. Install per-project or globally via `/setup-custom`.
+22 hooks total. Install per-project or globally via `/ak:setup-custom`.
 
 #### Auto-format (project scope)
 
@@ -149,9 +149,9 @@ Assets in `custom/` are offered during `/setup-custom` and `/init-project`. Inst
 agent-kit/
 ├── global/                          # Installed into ~/.claude/ by install.sh
 │   ├── commands/
-│   │   ├── init-project.md          # /init-project
-│   │   ├── setup-skills.md          # /setup-skills
-│   │   └── setup-custom.md          # /setup-custom
+│   │   ├── ak:init-project.md       # /ak:init-project
+│   │   ├── ak:setup-skills.md       # /ak:setup-skills
+│   │   └── ak:setup-custom.md       # /ak:setup-custom
 │   └── settings.json                # MCP server definitions
 ├── custom/                          # User-managed private assets
 │   ├── skills/                      # 6 skills (docx, frontend-design, internal-comms, pdf, pptx, xlsx)
@@ -180,7 +180,7 @@ agent-kit/
 └── .claude/
     ├── settings.json                # MCP config + doc-sync reminder hook
     ├── commands/
-    │   └── sync-docs.md             # /sync-docs (agent-kit only)
+    │   └── ak:sync-docs.md          # /ak:sync-docs (agent-kit only)
     └── skills/
         └── skill-creator/           # Meta-skill: create & evaluate new skills
 ```
@@ -199,16 +199,16 @@ agent-kit/
 
 ### Add a custom skill
 1. Create `custom/skills/my-skill/SKILL.md`
-2. Available via `/setup-custom` immediately
+2. Available via `/ak:setup-custom` immediately
 
 ### Add a hook
 1. Add entry to `custom/hooks/hooks.json`
 2. For complex logic, add a Python script to `custom/hooks/scripts/` and reference it via `python3 "$(cat ~/.claude/agent-kit-path)/custom/hooks/scripts/your-script.py"`
-3. Available via `/setup-custom` immediately
+3. Available via `/ak:setup-custom` immediately
 
 ### Update docs after any change
 
-Run `/sync-docs` — available when working inside agent-kit (`.claude/commands/sync-docs.md`).
+Run `/ak:sync-docs` — available when working inside agent-kit (`.claude/commands/ak:sync-docs.md`).
 
 ---
 

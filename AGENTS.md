@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-Agent Kit is a shared toolkit for bootstrapping AI agent configuration across multiple projects. Install once globally via `./scripts/install.sh`, then use `/init-project` in any project.
+Agent Kit is a shared toolkit for bootstrapping AI agent configuration across multiple projects. Install once globally via `./scripts/install.sh`, then use `/ak:init-project` in any project.
 
 ## Tech Stack
 
@@ -24,8 +24,8 @@ Agent Kit is a shared toolkit for bootstrapping AI agent configuration across mu
 ```
 global/commands/        Source of truth for slash commands (deployed to ~/.claude/commands/)
 global/settings.json    MCP server definitions (merged into ~/.claude/settings.json)
-custom/skills/          Private skills offered during /setup-custom
-custom/commands/        Private slash commands offered during /setup-custom
+custom/skills/          Private skills offered during /ak:setup-custom
+custom/commands/        Private slash commands offered during /ak:setup-custom
 custom/hooks/           Hook definitions (hooks.json) and scripts (scripts/*.py)
 scripts/                Installer and utilities
 .claude/                Settings and skills for agent-kit development only
@@ -35,7 +35,7 @@ scripts/                Installer and utilities
 
 - Always edit source in `global/` or `custom/` — never in `~/.claude/` directly
 - Re-run `install.sh` after changing `global/` to deploy
-- Run `/sync-docs` after adding skills, commands, or hooks
+- Run `/ak:sync-docs` after adding skills, commands, or hooks
 - Hook scripts must be Python 3 — place in `custom/hooks/scripts/*.py`
 - Templates/prompts are plain Markdown — file content is the prompt sent to Claude
 

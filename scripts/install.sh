@@ -88,6 +88,15 @@ echo ""
 echo "[1/3] Installing global Claude Code commands..."
 mkdir -p "$CLAUDE_COMMANDS_DIR"
 
+# Remove old unprefixed command names left over from before the ak: rename
+for old_name in init-project.md setup-skills.md setup-custom.md; do
+  old_path="$CLAUDE_COMMANDS_DIR/$old_name"
+  if [[ -f "$old_path" ]]; then
+    rm "$old_path"
+    echo "  - removed old command: /$old_name (replaced by ak: prefix)"
+  fi
+done
+
 installed=0
 for cmd_file in "$GLOBAL_DIR/commands/"*.md; do
   [[ -f "$cmd_file" ]] || continue
@@ -154,6 +163,6 @@ for cmd_file in "$GLOBAL_DIR/commands/"*.md; do
   echo "  /$(basename "$cmd_file" .md)"
 done
 echo ""
-echo "Next: open any project in Claude Code and run /init-project"
-echo "      /setup-custom  to install custom skills, commands, and hooks"
-echo "      /setup-skills  to install skills from skills.sh"
+echo "Next: open any project in Claude Code and run /ak:init-project"
+echo "      /ak:setup-custom  to install custom skills, commands, and hooks"
+echo "      /ak:setup-skills  to install skills from skills.sh"

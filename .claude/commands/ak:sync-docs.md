@@ -36,12 +36,12 @@ Rewrite `README.md` completely using the data from Step 1. Follow this structure
 
 1. **Header** — project name and one-line description
 2. **How It Works** — two-layer table (global / per-project)
-3. **Quick Start** — install.sh steps, /init-project, /setup-skills, /setup-custom
+3. **Quick Start** — install.sh steps, /ak:init-project, /ak:setup-skills, /ak:setup-custom
 4. **Commands table** — all commands from `global/commands/` with descriptions
 5. **MCP Servers table** — from `global/settings.json`
 6. **Custom Assets** — Skills table (name + description), Hooks table (name + trigger + description)
 7. **Project Structure** — accurate directory tree with current files
-8. **Extending** — how to add MCP servers, commands, skills, hooks; mention /sync-docs
+8. **Extending** — how to add MCP servers, commands, skills, hooks; mention /ak:sync-docs
 9. **Requirements** — Node.js, Claude Code
 
 Keep it concise. Every table must reflect the actual current files.
@@ -58,7 +58,7 @@ Structure:
 5. **Custom Skills** table — from custom/skills/
 6. **Custom Hooks** — comma-separated list of hook names
 7. **Development Rules** — must include:
-   - "After adding/removing skills, commands, or hooks — run `/sync-docs` immediately"
+   - "After adding/removing skills, commands, or hooks — run `/ak:sync-docs` immediately"
    - Reminder that `.claude/settings.json` has a hook that will remind automatically
    - Edit source in global/ or custom/, never in ~/.claude/ directly
    - Re-run install.sh after changing global/

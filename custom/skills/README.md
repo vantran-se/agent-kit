@@ -1,8 +1,8 @@
 # Custom Skills
 
-Skills stored here are offered to the user during `/setup-custom` and `/init-project`.
+Skills stored here are offered to the user during `/ak:setup-custom` and `/ak:init-project`.
 
-Run `/setup-custom` in any project to install them globally (`~/.claude/skills/`) or per-project (`.claude/skills/`).
+Run `/ak:setup-custom` in any project to install them globally (`~/.claude/skills/`) or per-project (`.claude/skills/`).
 
 ---
 
@@ -69,4 +69,4 @@ scope: global   # or: project (omit to ask user each time)
 |-------|-------------|
 | `global` | `~/.claude/skills/` — available in all projects |
 | `project` | `.claude/skills/` — current project only |
-| *(omitted)* | `/setup-custom` asks the user each time |
+| *(omitted)* | `/ak:setup-custom` asks the user each time |

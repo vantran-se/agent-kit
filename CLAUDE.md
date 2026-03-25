@@ -1,6 +1,6 @@
 # Agent Kit
 
-Shared AI agent setup toolkit. Run `./scripts/install.sh` once per machine — then `/init-project`, `/setup-skills`, `/setup-custom`, `/sync-docs` are available in every project.
+Shared AI agent setup toolkit. Run `./scripts/install.sh` once per machine — then `/ak:init-project`, `/ak:setup-skills`, `/ak:setup-custom`, `/ak:sync-docs` are available in every project.
 
 ## Structure
 
@@ -8,9 +8,9 @@ Shared AI agent setup toolkit. Run `./scripts/install.sh` once per machine — t
 agent-kit/
 ├── global/                          # Installed into ~/.claude/ by install.sh
 │   ├── commands/
-│   │   ├── init-project.md          # /init-project — full project setup
-│   │   ├── setup-skills.md          # /setup-skills — install from skills.sh
-│   │   └── setup-custom.md          # /setup-custom — install from custom/
+│   │   ├── ak:init-project.md       # /ak:init-project — full project setup
+│   │   ├── ak:setup-skills.md       # /ak:setup-skills — install from skills.sh
+│   │   └── ak:setup-custom.md       # /ak:setup-custom — install from custom/
 │   └── settings.json                # MCP server definitions (4 servers)
 ├── custom/                          # User-managed private assets
 │   ├── skills/                      # 6 skills (docx, frontend-design, internal-comms, pdf, pptx, xlsx)
@@ -27,7 +27,7 @@ agent-kit/
 └── .claude/
     ├── settings.json                # MCP config + doc-sync hook
     ├── commands/
-    │   └── sync-docs.md             # /sync-docs — regenerate docs (this repo only)
+    │   └── ak:sync-docs.md          # /ak:sync-docs — regenerate docs (this repo only)
     └── skills/
         └── skill-creator/           # Meta-skill: create & evaluate skills
 ```
@@ -36,15 +36,15 @@ agent-kit/
 
 | Command | File | Purpose |
 |---------|------|---------|
-| `/init-project` | `global/commands/init-project.md` | Per-project setup wizard |
-| `/setup-skills` | `global/commands/setup-skills.md` | Install skills from skills.sh |
-| `/setup-custom` | `global/commands/setup-custom.md` | Install from custom/ |
+| `/ak:init-project` | `global/commands/ak:init-project.md` | Per-project setup wizard |
+| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install skills from skills.sh |
+| `/ak:setup-custom` | `global/commands/ak:setup-custom.md` | Install from custom/ |
 
 ## Project Commands (this repo only, .claude/commands/)
 
 | Command | File | Purpose |
 |---------|------|---------|
-| `/sync-docs` | `.claude/commands/sync-docs.md` | Regenerate README, CLAUDE.md, AGENTS.md |
+| `/ak:sync-docs` | `.claude/commands/ak:sync-docs.md` | Regenerate README, CLAUDE.md, AGENTS.md |
 
 ## MCP Servers (global/settings.json)
 
@@ -82,7 +82,7 @@ python3 custom/hooks/tests/test_hooks.py          # hook behavior only
 
 ## Development Rules
 
-**After adding/removing skills, commands, or hooks — run `/sync-docs` immediately.**
+**After adding/removing skills, commands, or hooks — run `/ak:sync-docs` immediately.**
 
 This repo has a hook in `.claude/settings.json` that reminds you automatically whenever you edit files in `global/` or `custom/`.
 

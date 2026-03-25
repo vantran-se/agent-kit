@@ -28,8 +28,8 @@ scope: global   # or: project
 
 - `global` — offer to install to `~/.claude/commands/` (available in all projects)
 - `project` — offer to install to `.claude/commands/` in the current project only
-- omitted — `/setup-custom` will ask the user each time
+- omitted — `/ak:setup-custom` will ask the user each time
 
 ## Installation
 
-Run `/setup-custom` — it will discover commands here and ask which to install.
+Run `/ak:setup-custom` — it will discover commands here and ask which to install.

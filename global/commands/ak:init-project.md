@@ -252,7 +252,7 @@ Read the agent-kit path from `~/.claude/agent-kit-path` (a single line containin
 
 If the file does not exist, skip this step and note it in the summary.
 
-If it exists, run `/setup-custom` to offer the user custom skills, commands, and hooks stored in the agent-kit repo.
+If it exists, run `/ak:setup-custom` to offer the user custom skills, commands, and hooks stored in the agent-kit repo.
 
 ## Step 10: Summary
 
@@ -262,4 +262,4 @@ Final summary:
 - GitNexus status (indexed / skipped / failed)
 - MCP tools available (all 4: context7, gitnexus, sequential-thinking, memory)
 - Custom assets installed (from Step 9, if any)
-- Next: run `/setup-skills` to install skills from skills.sh for this stack
+- Next: run `/ak:setup-skills` to install skills from skills.sh for this stack
