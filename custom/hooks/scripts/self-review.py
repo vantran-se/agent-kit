@@ -6,6 +6,10 @@ Outputs a decision:block with targeted review questions.
 import json
 import sys
 
+data = json.load(sys.stdin)
+if data.get('stop_hook_active'):
+    sys.exit(0)
+
 REVIEW_PROMPT = """Before stopping, perform a critical self-review. Answer each question honestly:
 
 IMPLEMENTATION COMPLETENESS

@@ -193,14 +193,6 @@ Add to `.claude/settings.json` (merge with existing):
 
 ```json
 {
-  "permissions": {
-    "allow": [
-      "mcp__context7__*",
-      "mcp__gitnexus__*",
-      "mcp__sequential-thinking__*",
-      "mcp__memory__*"
-    ]
-  },
   "hooks": {
     "PostToolUse": [
       {
