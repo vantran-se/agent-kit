@@ -133,9 +133,53 @@ The merge logic — add under the correct event key (`PostToolUse`, `PreToolUse`
 
 Merge carefully — do not duplicate hooks already present with the same command.
 
-## Step 7: Summary
+## Step 7: Install claudekit-skills Plugin Bundles
+
+Install community skill bundles from the `claudekit-skills` marketplace at **project scope** (`--scope local`), selected based on the current project's stack.
+
+### Detect Stack
+
+Read these files (whichever exist):
+- `package.json` → framework (Next.js, React, Vue, NestJS, etc.)
+- `requirements.txt` / `pyproject.toml` → Python stack
+- `go.mod` → Go
+- `Cargo.toml` → Rust
+- `CLAUDE.md` / `AGENTS.md` → any stack hints already documented
+
+### Plugin Bundle Map
+
+| Bundle | Skills | Install when |
+|--------|--------|-------------|
+| `web-dev-tools` | aesthetic, frontend-design, frontend-development, threejs, ui-styling, web-frameworks, web-testing | Any frontend/web project |
+| `backend-tools` | backend-development, better-auth | Any backend or fullstack project |
+| `debugging-tools` | debugging | Always |
+| `devops-tools` | chrome-devtools, databases, devops | Projects with DB, Docker, or cloud deploy |
+| `ai-ml-tools` | ai-multimodal, context-engineering, google-adk-python | AI/ML projects |
+| `document-processing` | docx, pdf, pptx, xlsx | Projects dealing with documents |
+| `media-tools` | media-processing | Projects with video/image/audio |
+| `meta-tools` | code-review, skill-creator | Always |
+| `platform-tools` | mcp-builder, mcp-management, shopify, payment-integration | MCP, e-commerce, or payment projects |
+| `problem-solving-tools` | problem-solving | Always |
+| `research-tools` | docs-seeker, repomix | Always |
+| `specialized-tools` | mermaidjs-v11, sequential-thinking | Always |
+
+### Install Command
+
+For each selected bundle:
+```bash
+claude plugin install --scope local "{bundle-name}@claudekit-skills"
+```
+
+If `claude` CLI is not available, skip with a note.
+
+Check which bundles are already installed (exit code 0 even if already present — reinstall is idempotent).
+
+Present what will be installed and confirm before running.
+
+## Step 8: Summary
 
 After all installs:
 - List what was installed and where (global / project)
+- List claudekit plugin bundles installed for this project
 - Note any failures with the error
 - Tip: add new skills to `{AGENT_KIT_ROOT}/custom/skills/`, commands to `custom/commands/`, hooks to `custom/hooks/hooks.json`

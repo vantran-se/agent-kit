@@ -172,57 +172,26 @@ else:
     save_json(CLAUDE_SETTINGS, current)
     print(f"  {added} permission(s) added, {skipped} already present")
 
-# ── 4. Install claudekit-skills marketplace + plugins ────────────────────────
+# ── 4. Register claudekit-skills marketplace ─────────────────────────────────
 
 CLAUDEKIT_MARKETPLACE = "mrgoonie/claudekit-skills"
-CLAUDEKIT_PLUGINS = [
-    "ai-ml-tools",
-    "backend-tools",
-    "debugging-tools",
-    "devops-tools",
-    "document-processing",
-    "media-tools",
-    "meta-tools",
-    "platform-tools",
-    "problem-solving-tools",
-    "research-tools",
-    "specialized-tools",
-    "web-dev-tools",
-]
 
 print()
-print("[4/5] Installing claudekit-skills marketplace + plugins...")
+print("[4/5] Registering claudekit-skills marketplace...")
 
 if not claude_available():
-    print("  ✗ claude CLI not found — skipping plugin install")
+    print("  ✗ claude CLI not found — skipping marketplace setup")
 else:
-    # Step 1: add marketplace (idempotent — ok if already added)
     result = run(["claude", "plugin", "marketplace", "add", CLAUDEKIT_MARKETPLACE])
     if result.returncode == 0:
-        print(f"  + marketplace added: {CLAUDEKIT_MARKETPLACE}")
+        print(f"  + marketplace registered: {CLAUDEKIT_MARKETPLACE}")
     else:
         err = result.stderr.strip() or result.stdout.strip()
         if "already" in err.lower() or "exist" in err.lower():
             print(f"  = marketplace already configured: {CLAUDEKIT_MARKETPLACE}")
         else:
             print(f"  ! marketplace add failed: {err}")
-
-    # Step 2: install each plugin bundle
-    added = skipped = failed = 0
-    for plugin in CLAUDEKIT_PLUGINS:
-        slug = f"{plugin}@claudekit-skills"
-        result = run(["claude", "plugin", "install", "--scope", "user", slug])
-        if result.returncode == 0:
-            print(f"  + {slug}")
-            added += 1
-        else:
-            err = result.stderr.strip() or result.stdout.strip()
-            if "already" in err.lower() or "exist" in err.lower():
-                skipped += 1
-            else:
-                print(f"  ! {slug} failed: {err}")
-                failed += 1
-    print(f"  {added} plugin(s) installed, {skipped} already present, {failed} failed")
+    print("  → plugins will be installed per-project via /ak:setup-custom")
 
 # ── 5. Verify custom/ directory ───────────────────────────────────────────────
 
