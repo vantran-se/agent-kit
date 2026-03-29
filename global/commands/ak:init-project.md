@@ -4,37 +4,55 @@ You are setting up AI agent configuration for the current project. Follow these 
 
 ---
 
-## Step 1: Check Existing Setup
+## Step 1: Run Setup Script
 
-Before anything else:
-- If `CLAUDE.md` already exists, read it and ask: "CLAUDE.md already exists. Update it or skip?"
-- If `.claude/settings.json` already exists, read it — merge later, never overwrite
-- If `AGENTS.md` already exists, read it
+Read the agent-kit path from `~/.claude/agent-kit-path`. Then run the setup script:
+
+```bash
+python3 {AGENT_KIT_PATH}/scripts/init-project.py --cwd .
+```
+
+This script handles all mechanical setup in one shot:
+- Updates `.gitignore` with `.gitnexus/`
+- Runs `npx gitnexus analyze` to index the repo (so you can use gitnexus MCP immediately)
+- Scans existing files (CLAUDE.md, AGENTS.md, .claude/settings.json)
+- Detects the project's formatter and generates the hook command
+- Reads MCP permissions from agent-kit config
+
+**Parse the JSON output** and use it throughout the remaining steps. Store it as `SETUP_DATA`.
+
+If the agent-kit path file does not exist, tell the user:
+> agent-kit path not found. Run `python3 scripts/install.py` from your agent-kit directory first.
+
+Then stop.
 
 ---
 
-## Step 2: Detect Project Stack
+## Step 2: Handle Existing Files
 
-Read these files to understand the project:
+Using `SETUP_DATA.existing`:
 
-- `package.json` → Node.js/TypeScript, identify framework (Next.js, Express, NestJS, Vite, etc.)
-- `requirements.txt`, `pyproject.toml`, `setup.py` → Python (FastAPI, Django, Flask, ruff/black for formatting)
-- `go.mod` → Go (gofmt)
-- `Cargo.toml` → Rust (rustfmt)
-- `pom.xml`, `build.gradle` → Java/Kotlin
-- `.env.example` → required environment variables
-- `docker-compose.yml`, `Dockerfile` → infrastructure
-- `README.md` → project description
-- `.eslintrc*`, `.prettierrc*`, `biome.json` → formatter/linter config
-- `jest.config*`, `vitest.config*`, `pytest.ini` → test runner config
+- If `claude_md.exists` is true, show the user the existing content and ask: "CLAUDE.md already exists. Update it or skip?"
+- If `claude_settings.exists` is true, read the content — merge later, never overwrite
+- If `agents_md.exists` is true, read the content for context
+
+---
+
+## Step 3: Detect Project Stack
+
+GitNexus has already indexed the repo in Step 1. Use the gitnexus MCP tool `search_code` to understand the project:
+
+- Search for framework patterns, key dependencies, project structure
+- Identify the language, framework, package manager, test runner
+- Check for Docker, environment variables, CI/CD configuration
 
 Summarize the stack in 2-3 lines.
 
 ---
 
-## Step 3: Ask User for Missing Information
+## Step 4: Ask User for Missing Information
 
-Ask in a **single message**. Skip anything already clear from the files:
+Ask in a **single message**. Skip anything already clear from Step 3:
 
 1. **Project purpose** — What does this project do? (1-2 sentences)
 2. **Stack corrections** — Anything you got wrong?
@@ -47,7 +65,7 @@ Do NOT ask about things Claude can infer from code (standard language convention
 
 ---
 
-## Step 4: Generate `CLAUDE.md`
+## Step 5: Generate `CLAUDE.md`
 
 **Target: ~50-100 lines. Ruthlessly short.**
 
@@ -103,7 +121,7 @@ Rule of thumb for every line: *"Would removing this cause Claude to make mistake
 
 ## MCP Tools
 
-- **context7** — `resolve-library-id` → `get-library-docs` for up-to-date docs on: [libraries from Step 3]
+- **context7** — `resolve-library-id` → `get-library-docs` for up-to-date docs on: [libraries from Step 4]
 - **gitnexus** — `search_code` for semantic search across this repo and other indexed repos
 - **sequential-thinking** — use for complex architectural decisions, multi-step debugging
 - **memory** — store and retrieve persistent knowledge across sessions (conventions, decisions, context)
@@ -113,7 +131,7 @@ If any section would be empty or generic, omit it entirely.
 
 ---
 
-## Step 5: Generate `AGENTS.md`
+## Step 6: Generate `AGENTS.md`
 
 Write the full content — no lazy references. This file must work standalone for Cursor, Copilot, Gemini, and other AI assistants that don't have MCP.
 
@@ -174,22 +192,18 @@ Same rules as CLAUDE.md: only non-obvious, project-specific info. Keep it under 
 
 ---
 
-## Step 6: Setup Hooks
+## Step 7: Setup Hooks
 
-Ask the user: "Set up auto-format hooks? (Recommended — runs formatter after every file edit, prevents CI failures)"
+Using `SETUP_DATA.formatter`:
 
-If yes, detect the formatter. Hook input arrives as JSON on stdin — extract `tool_input.file_path` using `jq`:
-- TypeScript/JS with Prettier → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && npx prettier --write "$FILE" 2>/dev/null || true`
-- TypeScript/JS with ESLint → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && npx eslint --fix "$FILE" 2>/dev/null || true`
-- TypeScript/JS with Biome → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && npx biome format --write "$FILE" 2>/dev/null || true`
-- Python with Ruff → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && ruff format "$FILE" 2>/dev/null || true`
-- Python with Black → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && black "$FILE" 2>/dev/null || true`
-- Go → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && gofmt -w "$FILE" 2>/dev/null || true`
-- Rust → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && rustfmt "$FILE" 2>/dev/null || true`
-- Ruby with StandardRB → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && bundle exec standardrb --fix "$FILE" 2>/dev/null || true`
-- Ruby with RuboCop → `FILE=$(jq -r '.tool_input.file_path // empty'); [ -n "$FILE" ] && bundle exec rubocop --autocorrect "$FILE" 2>/dev/null || true`
+If a formatter was detected, ask the user: "Set up auto-format hooks? (Recommended — runs formatter after every file edit, prevents CI failures)"
 
-Add to `.claude/settings.json` (merge with existing):
+- Detected formatter: `SETUP_DATA.formatter.detected`
+- Hook command ready to use: `SETUP_DATA.formatter.hook_command`
+
+If no formatter was detected, ask the user which formatter they use.
+
+If yes, add to `.claude/settings.json` (merge with existing):
 
 ```json
 {
@@ -200,7 +214,7 @@ Add to `.claude/settings.json` (merge with existing):
         "hooks": [
           {
             "type": "command",
-            "command": "[formatter command]"
+            "command": "[SETUP_DATA.formatter.hook_command]"
           }
         ]
       }
@@ -219,51 +233,24 @@ Add to `.claude/settings.json` (merge with existing):
 }
 ```
 
-The MCP permissions allow all tools from the 4 standard servers without prompting. The Stop hook sends a desktop notification — works on macOS (osascript) and Linux (notify-send), silently skips if neither is available.
-
-Read the `mcpPermissions` array from `~/.claude/agent-kit-path` → `global/settings.json` to get the authoritative list. If the file is not found, use the defaults above.
+Read the `mcpPermissions` array from `SETUP_DATA.mcp_permissions` for the authoritative permission list.
 
 ---
 
-## Step 7: Update `.gitignore`
+## Step 8: Install Custom Assets
 
-Check if `.gitnexus/` is already in `.gitignore`. If not, append:
+If `SETUP_DATA.agent_kit_path` is not null, run `/ak:setup-custom` to offer the user custom skills, commands, and hooks stored in the agent-kit repo.
 
-```
-# GitNexus index
-.gitnexus/
-```
+If agent_kit_path is null, skip and note it in the summary.
 
 ---
 
-## Step 8: GitNexus — Analyze Project
+## Step 9: Summary
 
-Check that `.git/` exists. If not, warn and skip.
-
-If it is a git repo, run immediately:
-
-```bash
-npx gitnexus analyze
-```
-
-This indexes the repo so the `gitnexus` MCP tool can search it semantically.
-
----
-
-## Step 9: Install Custom Assets
-
-Read the agent-kit path from `~/.claude/agent-kit-path` (a single line containing the path, e.g. `/Users/you/workspace/agent-kit`).
-
-If the file does not exist, skip this step and note it in the summary.
-
-If it exists, run `/ak:setup-custom` to offer the user custom skills, commands, and hooks stored in the agent-kit repo.
-
-## Step 10: Summary
-
-Final summary:
+Final summary using data from `SETUP_DATA`:
 - Files created or updated (with paths)
 - Hooks configured (formatter detected + notification)
-- GitNexus status (indexed / skipped / failed)
+- GitNexus status: `SETUP_DATA.gitnexus.status`
 - MCP tools available (all 4: context7, gitnexus, sequential-thinking, memory)
-- Custom assets installed (from Step 9, if any)
+- Custom assets installed (from Step 8, if any)
 - Next: run `/ak:setup-skills` to install skills from skills.sh for this stack

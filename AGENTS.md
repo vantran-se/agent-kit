@@ -29,6 +29,7 @@ custom/skills/            # 1 private skill (internal-comms)
 custom/hooks/hooks.json   # 2 security hooks
 .claude/commands/         # repo-local commands (ak:sync-docs)
 .claude/skills/           # repo-local skills (skill-creator)
+scripts/init-project.py
 scripts/install.py
 tests/
 ```

@@ -87,8 +87,10 @@ agent-kit/
 │       └── scripts/                 # Python 3 hook scripts (if any)
 ├── tests/
 │   ├── run_all.py
+│   ├── test_init_project_script.py
 │   └── test_kit.py
 ├── scripts/
+│   ├── init-project.py
 │   └── install.py
 └── .claude/
     ├── settings.json

@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).parent.parent
 SUITES = [
     ROOT / 'tests' / 'test_kit.py',
+    ROOT / 'tests' / 'test_init_project_script.py',
     ROOT / 'custom' / 'hooks' / 'tests' / 'test_hooks.py',
 ]
 
