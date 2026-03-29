@@ -4,58 +4,59 @@
 
 ## Project Overview
 
-Agent Kit is a shared toolkit for bootstrapping AI agent configuration across multiple projects. Install once globally via `python3 scripts/install.py`, then use `/ak:init-project` in any project.
+Agent Kit is a shared AI agent setup toolkit for Claude Code. Install once globally with `python3 scripts/install.py`, then bootstrap any project using `/ak:init-project`.
 
 ## Tech Stack
 
-- **Languages**: Markdown, JSON, Python 3 (hook scripts), Bash (installer)
-- **Runtime**: Node.js / npx (for MCP servers and skills CLI)
-- **Target**: Claude Code CLI
+- **Language**: Python 3 (scripts), Markdown (commands/skills)
+- **Runtime**: Node.js 18+ (MCP servers via npx)
+- **Tool**: Claude Code
 
 ## Commands
 
 ```bash
-python3 scripts/install.py          # Install globally (once per machine)
-python3 scripts/install.py --check  # Verify installation status
+python3 scripts/install.py    # install global commands, MCP servers, claudekit-skills plugin (once per machine)
+python3 tests/run_all.py      # run all test suites
+python3 tests/test_kit.py     # integrity tests only
 ```
 
 ## Directory Structure
 
 ```
-global/commands/        Source of truth for slash commands (deployed to ~/.claude/commands/)
-global/settings.json    MCP server definitions (read by install.py, registered via claude mcp add)
-custom/skills/          Private skills offered during /ak:setup-custom
-custom/commands/        Private slash commands offered during /ak:setup-custom
-custom/hooks/           Hook definitions (hooks.json) and scripts (scripts/*.py)
-scripts/                Installer and utilities
-.claude/                Settings and skills for agent-kit development only
+global/commands/          # slash commands installed to ~/.claude/commands/
+global/settings.json      # MCP server definitions
+custom/skills/            # 1 private skill (internal-comms)
+custom/hooks/hooks.json   # 2 security hooks
+.claude/commands/         # repo-local commands (ak:sync-docs)
+.claude/skills/           # repo-local skills (skill-creator)
+scripts/install.py
+tests/
 ```
 
 ## Conventions
 
-- Always edit source in `global/` or `custom/` — never in `~/.claude/` directly
-- Re-run `install.py` after changing `global/` to deploy
-- Run `/ak:sync-docs` after adding skills, commands, or hooks
-- Hook scripts must be Python 3 — place in `custom/hooks/scripts/*.py`
-- Hook input arrives as JSON via stdin — parse with `json.load(sys.stdin)` or `jq`; never use `$CLAUDE_TOOL_INPUT_*` env vars
-- MCP servers are defined in `global/settings.json` — `install.py` registers them via `claude mcp add --scope user`
-- Templates/prompts are plain Markdown — file content is the prompt sent to Claude
+- Edit in `global/` or `custom/` — never edit `~/.claude/` directly
+- Hook scripts must be Python 3 — no shell scripts in `custom/hooks/scripts/`
+- After adding/removing skills, commands, or hooks: run `/ak:sync-docs`
+- Re-run `python3 scripts/install.py` after any change to `global/`
 
-## MCP Servers (defined in global/settings.json)
+## MCP Servers
 
-| Server | Purpose |
-|--------|---------|
-| `context7` | Up-to-date library docs — `resolve-library-id` → `get-library-docs` |
-| `gitnexus` | Semantic code search — `search_code` |
-| `sequential-thinking` | Structured reasoning for complex decisions |
-| `memory` | Persistent knowledge graph across sessions |
+| Server | Package | Purpose |
+|--------|---------|---------|
+| `context7` | `@upstash/context7-mcp` | Up-to-date library docs |
+| `gitnexus` | `gitnexus@latest` | Semantic code search |
+| `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
+| `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
 
-## Custom Skills Available
+## Skills
 
-`docx`, `frontend-design`, `internal-comms`, `pdf`, `pptx`, `xlsx` — see README.md for details.
+**Private** (`custom/skills/`): `internal-comms` — installed per project via `/ak:setup-custom`.
+
+**Community** (34+): `mrgoonie/claudekit-skills` marketplace — installed globally by `install.py`, auto-activated by Claude based on task context. See README.md for details.
 
 ## Do Not Modify
 
-- `~/.claude/commands/` — managed by `install.py`, always edit source in `global/commands/`
-- `custom/skills/*/LICENSE.txt` — third-party licenses
-- `.claude/skills/skill-creator/` — do not edit, sourced from anthropics/skills
+- `~/.claude/commands/` — managed by `install.py`
+- `~/.claude/settings.json` — managed by `install.py`
+- Any `.gitnexus/` directories — auto-generated index

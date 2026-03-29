@@ -172,10 +172,62 @@ else:
     save_json(CLAUDE_SETTINGS, current)
     print(f"  {added} permission(s) added, {skipped} already present")
 
-# ── 4. Verify custom/ directory ───────────────────────────────────────────────
+# ── 4. Install claudekit-skills marketplace + plugins ────────────────────────
+
+CLAUDEKIT_MARKETPLACE = "mrgoonie/claudekit-skills"
+CLAUDEKIT_PLUGINS = [
+    "ai-ml-tools",
+    "backend-tools",
+    "debugging-tools",
+    "devops-tools",
+    "document-processing",
+    "media-tools",
+    "meta-tools",
+    "platform-tools",
+    "problem-solving-tools",
+    "research-tools",
+    "specialized-tools",
+    "web-dev-tools",
+]
 
 print()
-print("[4/4] Custom assets directory...")
+print("[4/5] Installing claudekit-skills marketplace + plugins...")
+
+if not claude_available():
+    print("  ✗ claude CLI not found — skipping plugin install")
+else:
+    # Step 1: add marketplace (idempotent — ok if already added)
+    result = run(["claude", "plugin", "marketplace", "add", CLAUDEKIT_MARKETPLACE])
+    if result.returncode == 0:
+        print(f"  + marketplace added: {CLAUDEKIT_MARKETPLACE}")
+    else:
+        err = result.stderr.strip() or result.stdout.strip()
+        if "already" in err.lower() or "exist" in err.lower():
+            print(f"  = marketplace already configured: {CLAUDEKIT_MARKETPLACE}")
+        else:
+            print(f"  ! marketplace add failed: {err}")
+
+    # Step 2: install each plugin bundle
+    added = skipped = failed = 0
+    for plugin in CLAUDEKIT_PLUGINS:
+        slug = f"{plugin}@claudekit-skills"
+        result = run(["claude", "plugin", "install", "--scope", "user", slug])
+        if result.returncode == 0:
+            print(f"  + {slug}")
+            added += 1
+        else:
+            err = result.stderr.strip() or result.stdout.strip()
+            if "already" in err.lower() or "exist" in err.lower():
+                skipped += 1
+            else:
+                print(f"  ! {slug} failed: {err}")
+                failed += 1
+    print(f"  {added} plugin(s) installed, {skipped} already present, {failed} failed")
+
+# ── 5. Verify custom/ directory ───────────────────────────────────────────────
+
+print()
+print("[5/5] Custom assets directory...")
 
 skill_count = len(list((CUSTOM_DIR / "skills").rglob("SKILL.md")))
 cmd_count = len([f for f in (CUSTOM_DIR / "commands").glob("*.md")
@@ -199,4 +251,6 @@ for src in sorted((GLOBAL_DIR / "commands").glob("*.md")):
 print()
 print("Next: open any project in Claude Code and run /ak:init-project")
 print("      /ak:setup-custom  to install custom skills, commands, and hooks")
-print("      /ak:setup-skills  to install skills from skills.sh")
+print("      /ak:setup-skills  to install additional skills from the skills.sh registry")
+print()
+print("Note: mrgoonie/claudekit-skills (34 community skills) installed globally — available in all projects.")

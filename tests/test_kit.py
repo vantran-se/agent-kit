@@ -23,7 +23,7 @@ CUSTOM_SKILLS_DIR = ROOT / 'custom' / 'skills'
 README = ROOT / 'README.md'
 CLAUDE_MD = ROOT / 'CLAUDE.md'
 AGENTS_MD = ROOT / 'AGENTS.md'
-INSTALL_SH = ROOT / 'scripts' / 'install.sh'
+INSTALL_PY = ROOT / 'scripts' / 'install.py'
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -98,6 +98,25 @@ class TestHooksJson(unittest.TestCase):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+class TestHookScripts(unittest.TestCase):
+    """custom/hooks/scripts/ — hooks use inline bash commands, no Python scripts."""
+
+    def test_scripts_directory_exists(self):
+        self.assertTrue(SCRIPTS_DIR.exists())
+
+    def test_no_python_scripts(self):
+        """All hooks use inline bash commands — no standalone scripts needed."""
+        scripts = list(SCRIPTS_DIR.glob('*.py'))
+        self.assertEqual(scripts, [],
+                         f"Unexpected Python scripts found: {[s.name for s in scripts]}")
+
+    def test_no_shell_scripts_exist(self):
+        sh_files = list(SCRIPTS_DIR.glob('*.sh'))
+        self.assertEqual(sh_files, [],
+                         f"Shell scripts found (not allowed): {[f.name for f in sh_files]}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 class TestGlobalSettings(unittest.TestCase):
     """global/settings.json — MCP server definitions."""
 
@@ -127,83 +146,10 @@ class TestGlobalSettings(unittest.TestCase):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-class TestHookScripts(unittest.TestCase):
-    """All Python scripts in custom/hooks/scripts/ are valid and well-formed."""
-
-    def setUp(self):
-        self.scripts = list(SCRIPTS_DIR.glob('*.py'))
-
-    def test_scripts_directory_exists(self):
-        self.assertTrue(SCRIPTS_DIR.exists())
-
-    def test_expected_script_count(self):
-        self.assertEqual(len(self.scripts), 12,
-                         f"Expected 12 hook scripts, found {len(self.scripts)}: {[s.name for s in self.scripts]}")
-
-    def test_all_scripts_are_valid_python(self):
-        for script in self.scripts:
-            with open(script) as f:
-                source = f.read()
-            try:
-                ast.parse(source)
-            except SyntaxError as e:
-                self.fail(f"{script.name} has syntax error: {e}")
-
-    def test_all_scripts_have_shebang(self):
-        for script in self.scripts:
-            first_line = script.read_text().split('\n')[0]
-            self.assertTrue(first_line.startswith('#!/usr/bin/env python3'),
-                            f"{script.name} missing shebang line")
-
-    def test_all_scripts_have_main_guard(self):
-        # Scripts with non-trivial logic require a main guard.
-        # Simple top-level scripts (e.g. self-review.py) are exempt.
-        exempt = {'self-review.py'}
-        for script in self.scripts:
-            if script.name in exempt:
-                continue
-            content = script.read_text()
-            self.assertIn("if __name__ == '__main__':", content,
-                          f"{script.name} missing main guard")
-
-    def test_all_scripts_have_docstring(self):
-        for script in self.scripts:
-            content = script.read_text()
-            self.assertIn('"""', content,
-                          f"{script.name} missing docstring")
-
-    def test_no_shell_scripts_exist(self):
-        sh_files = list(SCRIPTS_DIR.glob('*.sh'))
-        self.assertEqual(sh_files, [],
-                         f"Shell scripts found (should be Python only): {[f.name for f in sh_files]}")
-
-    def test_expected_scripts_exist(self):
-        expected = [
-            'file-guard.py', 'lint-changed.py', 'typecheck-changed.py',
-            'check-any-changed.py', 'test-changed.py', 'check-comment-replacement.py',
-            'check-unused-parameters.py', 'typecheck-project.py', 'lint-project.py',
-            'test-project.py', 'check-todos.py', 'self-review.py',
-        ]
-        for name in expected:
-            self.assertTrue((SCRIPTS_DIR / name).exists(), f"Missing script: {name}")
-
-    def test_no_python_310_only_syntax(self):
-        """Ensure scripts use Optional/List from typing, not X | Y union syntax."""
-        union_pattern = re.compile(r'\bdef \w+\([^)]*\) -> \w+ \| \w+')
-        param_union = re.compile(r':\s+\w+\s+\|\s+\w+')
-        for script in self.scripts:
-            content = script.read_text()
-            # Allow 'X | Y' only if typing imports are present for compat
-            if union_pattern.search(content) or param_union.search(content):
-                self.assertIn('from typing import', content,
-                              f"{script.name} uses X|Y union syntax without typing import (Python 3.10+ only)")
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 class TestSkills(unittest.TestCase):
     """custom/skills/ — each skill has valid SKILL.md with required frontmatter."""
 
-    EXPECTED_SKILLS = {'docx', 'frontend-design', 'internal-comms', 'pdf', 'pptx', 'xlsx'}
+    EXPECTED_SKILLS = {'internal-comms'}
 
     def setUp(self):
         self.skill_dirs = [
@@ -251,7 +197,12 @@ class TestSkills(unittest.TestCase):
 class TestGlobalCommands(unittest.TestCase):
     """global/commands/ — command files exist, are non-empty, and have titles."""
 
-    EXPECTED_COMMANDS = {'ak:init-project.md', 'ak:setup-skills.md', 'ak:setup-custom.md'}
+    EXPECTED_COMMANDS = {
+        'ak:init-project.md',
+        'ak:setup-skills.md',
+        'ak:setup-custom.md',
+        'ak:update.md',
+    }
 
     def test_command_files_exist(self):
         actual = {f.name for f in GLOBAL_COMMANDS_DIR.glob('*.md')}
@@ -320,15 +271,6 @@ class TestDocumentationSync(unittest.TestCase):
         self.assertIn('/ak:sync-docs', self.claude_md,
                       "CLAUDE.md must mention /ak:sync-docs rule")
 
-    def test_python_requirement_in_readme(self):
-        self.assertIn('Python', self.readme,
-                      "README.md must mention Python requirement (for hook scripts)")
-
-    def test_script_count_in_claude_md(self):
-        actual = len(list(SCRIPTS_DIR.glob('*.py')))
-        self.assertIn(str(actual), self.claude_md,
-                      f"CLAUDE.md should mention script count ({actual} files)")
-
     def test_hook_names_in_claude_md(self):
         """All hook names must appear in CLAUDE.md hooks list."""
         for h in self.hooks:
@@ -338,42 +280,44 @@ class TestDocumentationSync(unittest.TestCase):
 
 # ─────────────────────────────────────────────────────────────────────────────
 class TestInstallScript(unittest.TestCase):
-    """scripts/install.sh — exists, is executable, and contains key install targets."""
+    """scripts/install.py — exists and contains key install targets."""
 
-    def test_install_sh_exists(self):
-        self.assertTrue(INSTALL_SH.exists())
+    def test_install_py_exists(self):
+        self.assertTrue(INSTALL_PY.exists(), "scripts/install.py not found")
 
-    def test_install_sh_is_executable(self):
-        self.assertTrue(os.access(INSTALL_SH, os.X_OK),
-                        "install.sh is not executable")
+    def test_install_py_is_valid_python(self):
+        source = INSTALL_PY.read_text()
+        try:
+            ast.parse(source)
+        except SyntaxError as e:
+            self.fail(f"install.py has syntax error: {e}")
 
-    def test_install_sh_is_valid_bash(self):
-        result = subprocess.run(['bash', '-n', str(INSTALL_SH)], capture_output=True, text=True)
-        self.assertEqual(result.returncode, 0,
-                         f"install.sh has syntax errors: {result.stderr}")
-
-    def test_installs_agent_kit_path(self):
-        content = INSTALL_SH.read_text()
+    def test_saves_agent_kit_path(self):
+        content = INSTALL_PY.read_text()
         self.assertIn('agent-kit-path', content,
-                      "install.sh must save agent-kit-path")
+                      "install.py must save agent-kit-path")
 
     def test_installs_global_commands(self):
-        content = INSTALL_SH.read_text()
-        # install.sh uses a variable for the path, check the variable assignment
+        content = INSTALL_PY.read_text()
         self.assertTrue(
             '~/.claude/commands' in content or 'CLAUDE_COMMANDS_DIR' in content,
-            "install.sh must reference ~/.claude/commands or a variable for it"
+            "install.py must reference ~/.claude/commands or CLAUDE_COMMANDS_DIR"
         )
 
-    def test_installs_mcp_servers(self):
-        content = INSTALL_SH.read_text()
+    def test_registers_mcp_servers(self):
+        content = INSTALL_PY.read_text()
         self.assertIn('mcpServers', content,
-                      "install.sh must configure mcpServers")
+                      "install.py must configure mcpServers")
 
     def test_supports_check_flag(self):
-        content = INSTALL_SH.read_text()
+        content = INSTALL_PY.read_text()
         self.assertIn('--check', content,
-                      "install.sh must support --check flag")
+                      "install.py must support --check flag")
+
+    def test_installs_claudekit_plugin(self):
+        content = INSTALL_PY.read_text()
+        self.assertIn('mrgoonie/claudekit-skills', content,
+                      "install.py must install mrgoonie/claudekit-skills plugin")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -386,7 +330,6 @@ class TestProjectStructure(unittest.TestCase):
             ROOT / 'global',
             ROOT / 'custom' / 'skills',
             ROOT / 'custom' / 'hooks' / 'scripts',
-            ROOT / 'custom' / 'hooks' / 'tests',
             ROOT / 'scripts',
             ROOT / '.claude' / 'commands',
             ROOT / '.claude' / 'skills',
@@ -400,7 +343,7 @@ class TestProjectStructure(unittest.TestCase):
             ROOT / 'README.md',
             ROOT / 'CLAUDE.md',
             ROOT / 'AGENTS.md',
-            ROOT / 'scripts' / 'install.sh',
+            ROOT / 'scripts' / 'install.py',
             ROOT / 'global' / 'settings.json',
             ROOT / 'custom' / 'hooks' / 'hooks.json',
             ROOT / '.claude' / 'settings.json',
@@ -413,13 +356,6 @@ class TestProjectStructure(unittest.TestCase):
         sh_files = list((ROOT / 'custom' / 'hooks' / 'scripts').glob('*.sh'))
         self.assertEqual(sh_files, [],
                          f"Unexpected .sh files in scripts/: {[f.name for f in sh_files]}")
-
-    def test_test_files_in_correct_location(self):
-        self.assertTrue((ROOT / 'custom' / 'hooks' / 'tests' / 'test_hooks.py').exists())
-        self.assertTrue((ROOT / 'tests' / 'test_kit.py').exists())
-        # test_hooks.py must NOT be in scripts/
-        self.assertFalse((ROOT / 'custom' / 'hooks' / 'scripts' / 'test_hooks.py').exists(),
-                         "test_hooks.py should not be in scripts/ directory")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
