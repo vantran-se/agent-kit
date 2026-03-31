@@ -187,10 +187,10 @@ else:
             skipped += 1
     print(f"  {added} server(s) added, {skipped} skipped")
 
-# ── 3. Merge MCP permissions into ~/.claude/settings.json ─────────────────────
+# ── 3. Enable MCP permissions globally in ~/.claude/settings.json ─────────────
 
 print()
-print("[3/4] Merging MCP permissions into ~/.claude/settings.json...")
+print("[3/4] Enabling MCP permissions globally in ~/.claude/settings.json...")
 
 source = load_json(GLOBAL_DIR / "settings.json")
 incoming = source.get("mcpPermissions", [])
@@ -213,11 +213,12 @@ else:
 
     save_json(CLAUDE_SETTINGS, current)
     print(f"  {added} permission(s) added, {skipped} already present")
+    print("  → MCP permissions enabled globally for all projects")
 
 # ── 4. Initialize claudekit-skills submodule ──────────────────────────────────
 
 print()
-print("[4/5] Checking claudekit-skills submodule...")
+print("[4/6] Initializing claudekit-skills submodule...")
 
 CLAUDEKIT_SKILLS = SKILLS_DIR / "claudekit-skills"
 
@@ -225,14 +226,20 @@ if (CLAUDEKIT_SKILLS / ".git").exists() or (CLAUDEKIT_SKILLS / "README.md").exis
     print("  = claudekit-skills submodule already initialized")
     print(f"  → skills available at: {CLAUDEKIT_SKILLS}")
 else:
-    print("  — claudekit-skills submodule not initialized")
-    print("  → Run: python3 scripts/install.py --init-submodule")
-    print("  → Or manually: git submodule add https://github.com/mrgoonie/claudekit-skills.git skills/claudekit-skills")
+    # Auto-initialize submodule
+    print("  → Initializing submodule automatically...")
+    result = run(["git", "submodule", "add", "https://github.com/mrgoonie/claudekit-skills.git", "skills/claudekit-skills"], cwd=REPO_ROOT)
+    if result.returncode == 0:
+        print("  + claudekit-skills submodule added")
+        print(f"  → skills at: skills/claudekit-skills/.claude/skills/")
+    else:
+        print(f"  ! submodule add failed: {result.stderr.strip()}")
+        print(f"  → Run manually: git submodule add https://github.com/mrgoonie/claudekit-skills.git skills/claudekit-skills")
 
 # ── 5. Verify custom/ directory ───────────────────────────────────────────────
 
 print()
-print("[5/5] Custom assets directory...")
+print("[5/6] Custom assets directory...")
 
 skill_count = len(list((CUSTOM_DIR / "skills").rglob("SKILL.md")))
 cmd_count = len([f for f in (CUSTOM_DIR / "commands").glob("*.md")
@@ -255,7 +262,6 @@ for src in sorted((GLOBAL_DIR / "commands").glob("*.md")):
     print(f"  /{src.stem}")
 print()
 print("Next:")
-print("  - python3 scripts/install.py --init-submodule  (add claudekit-skills submodule)")
 print("  - Open any project and run /ak:init-project")
+print("  - /ak:setup-skills  to install community skills (mcp-management, debugging, etc.)")
 print("  - /ak:setup-custom  to install custom skills, commands, and hooks")
-print("  - /ak:setup-skills  to install skills from skills.sh registry")

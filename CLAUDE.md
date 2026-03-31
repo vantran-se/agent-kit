@@ -18,7 +18,7 @@ agent-kit/
 │   │   └── internal-comms/
 │   ├── commands/
 │   └── hooks/
-│       └── hooks.json               # 1 active hook (check-secrets)
+│       └── hooks.json               # 2 active hooks (check-secrets, block-dangerous-bash)
 ├── skills/
 │   └── claudekit-skills/            # Git submodule — 30+ community skills
 ├── tests/
@@ -41,9 +41,9 @@ agent-kit/
 | Command | File | Purpose |
 |---------|------|---------|
 | `/ak:init-project` | `global/commands/ak:init-project.md` | Per-project setup wizard |
-| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install skills from submodule + skills.sh |
-| `/ak:setup-custom` | `global/commands/ak:setup-custom.md` | Install from custom/ + submodule skills |
-| `/ak:update` | `global/commands/ak:update.md` | Sync MCP permissions to existing project |
+| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install community skills from submodule |
+| `/ak:setup-custom` | `global/commands/ak:setup-custom.md` | Install custom skills/commands/hooks from custom/ |
+| `/ak:update` | `global/commands/ak:update.md` | Sync MCP permissions to global settings |
 
 ## Project Commands (this repo only)
 
@@ -64,11 +64,13 @@ agent-kit/
 
 `internal-comms` — private skill for internal communications.
 
-Community skills (30+) in `skills/claudekit-skills/.claude/skills/` — installed per-project via `/ak:setup-custom`.
+Community skills (30+) in `skills/claudekit-skills/.claude/skills/` — installed per-project via `/ak:setup-skills`.
 
 ## Custom Hooks (custom/hooks/hooks.json)
 
-1 active hook: `check-secrets`
+2 active hooks:
+- `check-secrets` — Block writing hardcoded secrets/API keys
+- `block-dangerous-bash` — Block dangerous bash commands (rm -rf, force push, DROP TABLE, etc.)
 
 Hook input: JSON via stdin — use `jq -r '.tool_input.field_name'`.
 

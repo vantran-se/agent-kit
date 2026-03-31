@@ -1,81 +1,118 @@
+---
+description: Install community skills from claudekit-skills submodule and update docs
+category: workflow
+allowed-tools: Read, Write, Edit, Bash(ls:*, npx:*, python3:*)
+argument-hint: "[skill-names...]"
+---
+
 # Setup Skills for This Project
 
-You are helping the user discover and install AI agent skills from the local claudekit-skills submodule and https://skills.sh into the current project.
+Install community skills from the local `claudekit-skills` submodule. After installation, update CLAUDE.md and AGENTS.md so AI agents know about the newly installed tools.
 
-## Step 1: Check Submodule Skills
+---
 
-First, check if the claudekit-skills submodule is initialized:
+## Step 1: Locate Agent Kit
 
+Read the agent-kit path:
 ```bash
-ls {AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/
+AGENT_KIT_ROOT=$(cat ~/.claude/agent-kit-path 2>/dev/null)
+if [ -z "$AGENT_KIT_ROOT" ]; then
+  echo "agent-kit path not found. Run: python3 scripts/install.py"
+  exit 1
+fi
 ```
 
-If the directory doesn't exist or is empty, tell the user:
-> claudekit-skills submodule not initialized. Run this first:
+---
+
+## Step 2: Check Submodule
+
+```bash
+ls "$AGENT_KIT_ROOT/skills/claudekit-skills/.claude/skills/"
+```
+
+If empty/missing:
+> claudekit-skills submodule not initialized. Run first:
 > ```bash
-> python3 {AGENT_KIT_ROOT}/scripts/install.py --init-submodule
+> python3 "$AGENT_KIT_ROOT/scripts/install.py" --init-submodule
 > ```
 
-If submodule exists, list available plugin bundles with their skills.
+---
 
-## Step 2: Check Already-Installed Skills
-
-Run to see what's already installed (skip recommending these):
+## Step 3: Check Already Installed
 
 ```bash
 npx skills list -a claude-code
 ```
 
-## Step 3: Detect Project Stack
+Skip skills already in `.claude/skills/` or `~/.claude/skills/`.
 
-Read the following files if they exist:
-- `package.json` — framework, key dependencies
-- `requirements.txt`, `pyproject.toml` — Python stack
-- `go.mod`, `Cargo.toml` — Go / Rust
-- `CLAUDE.md`, `AGENTS.md` — already-documented stack info (prefer this if available)
+---
 
-Summarize the stack in 1-2 lines.
+## Step 4: Detect Stack
 
-## Step 4: Install from Submodule (Recommended)
+Read project files to understand stack:
+- `package.json` → Node.js/TypeScript
+- `requirements.txt` or `pyproject.toml` → Python
+- `go.mod` → Go
+- `Cargo.toml` → Rust
+- `CLAUDE.md` → existing conventions
 
-Based on the detected stack, recommend skills from `{AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/{bundle}/skills/`:
+---
+
+## Step 5: Recommend Skills
 
 **Always install** (every project):
-- `debugging` — Systematic debugging frameworks
-- `code-review` — Code review automation
-- `skill-creator` — Create and test new skills
-- `mcp-management` — MCP server lifecycle management via Gemini
-- `problem-solving` — Advanced thinking techniques
-- `docs-seeker` — Documentation discovery
-- `mermaidjs-v11` — Diagram generation
-- `sequential-thinking` — Complex reasoning
+- `debugging`, `code-review`, `skill-creator`
+- `mcp-management` (MCP server lifecycle via Gemini)
+- `problem-solving`, `docs-seeker`, `mermaidjs-v11`, `sequential-thinking`
 
-**Frontend projects**:
-- `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks`
+**Frontend**: `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks`
 
-**Backend projects**:
-- `backend-development`, `better-auth`, `databases`
+**Backend**: `backend-development`, `better-auth`, `databases`
 
-**AI/ML projects**:
-- `ai-multimodal`, `context-engineering`, `google-adk-python`
+**AI/ML**: `ai-multimodal`, `context-engineering`, `google-adk-python`
 
-Install selected skills:
+If arguments provided, install those specific skills. Otherwise, recommend based on stack.
 
+---
+
+## Step 6: Install Skills
+
+For each skill to install:
 ```bash
-npx skills add {AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/{bundle-name}/skills/{skill-name} -a claude-code -y
+npx skills add "$AGENT_KIT_ROOT/skills/claudekit-skills/.claude/skills/{skill-name}" -a claude-code -y
 ```
 
-## Step 5: Search Additional Skills (Optional)
+Install project-level by default. Ask user if they want global installation.
 
-For skills not in the submodule, run `npx skills find <keyword>` to discover more from skills.sh.
+---
 
-Present any additional findings and ask if the user wants to install them.
+## Step 7: Update CLAUDE.md and AGENTS.md
 
-## Step 6: Summary
+**After installing**, read CLAUDE.md and AGENTS.md if they exist.
 
-After all installs:
-- List successfully installed skills
-- Note any failures with the error
-- Submodule location: `{AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/`
-- Tip: run `python3 {AGENT_KIT_ROOT}/scripts/install.py --init-submodule` to initialize submodule
-- Tip: run `npx skills find <keyword>` anytime to discover more skills from skills.sh
+For each newly installed skill, add/update:
+
+**In CLAUDE.md** — "Skills Available" section:
+```markdown
+**skill-name** — WHEN to use it (1 line description)
+```
+
+**In AGENTS.md** — "### Skills" section:
+```markdown
+**skill-name** — description
+```
+
+If sections don't exist, create them.
+
+Tell user: "Updated CLAUDE.md and AGENTS.md with newly installed skills."
+
+---
+
+## Step 8: Summary
+
+Report:
+- Skills installed: list
+- Failures (if any)
+- Docs updated: CLAUDE.md, AGENTS.md
+- Tip: `npx skills find <keyword>` for more skills from skills.sh

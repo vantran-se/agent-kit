@@ -27,7 +27,7 @@ python3 tests/test_kit.py               # integrity tests only
 global/commands/          # slash commands installed to ~/.claude/commands/
 global/settings.json      # MCP server definitions
 custom/skills/            # 1 private skill (internal-comms)
-custom/hooks/hooks.json   # 1 security hook (check-secrets)
+custom/hooks/hooks.json   # 2 security hooks (check-secrets, block-dangerous-bash)
 skills/claudekit-skills/  # Git submodule — 30+ community skills
 .claude/commands/         # repo-local commands (ak:sync-docs)
 .claude/skills/           # repo-local skills (skill-creator)
@@ -56,7 +56,7 @@ tests/
 
 **Private** (`custom/skills/`): `internal-comms` — installed per project via `/ak:setup-custom`.
 
-**Community** (30+): `skills/claudekit-skills/.claude/skills/` — cloned via `--init-submodule`, installed per-project via `/ak:setup-custom`. Includes `mcp-management`, `debugging`, `code-review`, `skill-creator`, and more.
+**Community** (30+): `skills/claudekit-skills/.claude/skills/` — cloned via `--init-submodule`, installed per-project via `/ak:setup-skills`. Includes `mcp-management`, `debugging`, `code-review`, `skill-creator`, and more.
 
 ## Do Not Modify
 

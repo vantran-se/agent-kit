@@ -1,124 +1,124 @@
+---
+description: Install custom skills, commands, and hooks from agent-kit custom/ directory
+category: workflow
+allowed-tools: Read, Write, Edit, Bash(ls:*, cat:*, cp:*, npx:*, mkdir:*)
+argument-hint: "[asset-names...]"
+---
+
 # Install Custom Skills, Commands, and Hooks
 
-You are installing custom assets from the user's agent-kit repository into the current project or globally.
+Install custom assets from the user's agent-kit repository into the current project or globally. After installation, update CLAUDE.md and AGENTS.md.
+
+---
 
 ## Step 1: Locate Agent Kit
 
-Read the agent-kit path from `~/.claude/agent-kit-path`.
+Read the agent-kit path:
+```bash
+AGENT_KIT_ROOT=$(cat ~/.claude/agent-kit-path 2>/dev/null)
+if [ -z "$AGENT_KIT_ROOT" ]; then
+  echo "agent-kit path not found. Run: python3 scripts/install.py"
+  exit 1
+fi
+```
 
-If the file does not exist, tell the user:
-> agent-kit path not found. Run `python3 scripts/install.py` from your agent-kit directory first.
+Store as `AGENT_KIT_ROOT`.
 
-Then stop.
-
-Store the path as AGENT_KIT_ROOT for the rest of this command.
+---
 
 ## Step 2: Discover Available Assets
 
-Run these three operations in parallel:
+Run in parallel:
 
-**2a. Custom Skills** — list directories in `{AGENT_KIT_ROOT}/custom/skills/` (each directory with a `SKILL.md` is a skill):
+**2a. Custom Skills**:
 ```bash
-ls {AGENT_KIT_ROOT}/custom/skills/
+ls "$AGENT_KIT_ROOT/custom/skills/"
 ```
+For each directory with `SKILL.md`, read it to extract: name, description, scope (from frontmatter).
 
-For each skill directory found, read its `SKILL.md` to extract: name, description, scope (from frontmatter).
-
-**2b. Custom Commands** — list `.md` files in `{AGENT_KIT_ROOT}/custom/commands/` (excluding README.md):
+**2b. Custom Commands**:
 ```bash
-ls {AGENT_KIT_ROOT}/custom/commands/
+ls "$AGENT_KIT_ROOT/custom/commands/"
 ```
+For each `.md` file (excluding README.md), read first 5 lines for description.
 
-For each `.md` file, read first 5 lines to extract: description from frontmatter or first heading.
-
-**2c. Custom Hooks** — read `{AGENT_KIT_ROOT}/custom/hooks/hooks.json`:
+**2c. Custom Hooks**:
 ```bash
-cat {AGENT_KIT_ROOT}/custom/hooks/hooks.json
+cat "$AGENT_KIT_ROOT/custom/hooks/hooks.json"
 ```
+Check which hooks are already in `.claude/settings.json` or `~/.claude/settings.json` — skip those.
 
-Also check which hooks are already configured in `.claude/settings.json` (project) and `~/.claude/settings.json` (global) — skip those.
+---
 
 ## Step 3: Check Already Installed
 
-Before presenting options, check what is already installed:
+- Skills in `~/.claude/skills/` or `.claude/skills/` → mark as installed
+- Commands in `~/.claude/commands/` or `.claude/commands/` → mark as installed
+- Hooks in settings.json → mark as installed
 
-- Skills already in `~/.claude/skills/` or `.claude/skills/` → mark as installed
-- Commands already in `~/.claude/commands/` or `.claude/commands/` → mark as installed
-- Hooks already in `~/.claude/settings.json` or `.claude/settings.json` → mark as installed
+---
 
-## Step 4: Present Options to User
+## Step 4: Present Options
 
-If all three categories are empty (no custom assets found), tell the user:
-> No custom assets found in `{AGENT_KIT_ROOT}/custom/`. Add skills, commands, or hooks there to make them available here.
+If no custom assets found:
+> No custom assets in `$AGENT_KIT_ROOT/custom/`.
 
-Otherwise, present a single message with all available assets grouped by category. Mark already-installed items with `[installed]`.
-
-Example format:
+Otherwise present:
 ```
 CUSTOM SKILLS
   1. skill-name — description [scope: global/project]
-  2. another-skill — description
 
 CUSTOM COMMANDS
-  3. /command-name — description [scope: global/project]
-  4. /other-command — description
+  2. /command-name — description [scope: global/project]
 
 HOOKS
-  5. auto-format-prettier — Auto-format JS/TS with Prettier after every edit [scope: project]
-  6. notify-on-stop — Desktop notification when Claude finishes [scope: global]
-  7. block-dangerous-bash — Warn before dangerous commands [scope: global] [installed]
+  3. hook-name — description [scope: project]
 
-Enter numbers to install (e.g. "1 3 5"), "all", or "none".
-For items without a fixed scope, you'll be asked: global or project.
+Enter numbers to install (e.g. "1 3"), "all", or "none".
 ```
 
-Wait for the user's response.
+---
 
-## Step 5: Resolve Scope for Each Selected Item
+## Step 5: Resolve Scope
 
-For each selected item:
-- If it has `scope: global` in its definition → install globally
-- If it has `scope: project` → install to current project
-- If scope is not set → ask the user: "Install [name] globally (all projects) or for this project only?"
+- `scope: global` in definition → install globally
+- `scope: project` → install to project
+- If not set → ask user
 
-## Step 6: Install Selected Assets
+---
 
-### Installing a Skill
+## Step 6: Install
 
+### Skill
 ```bash
-# Project-level
-npx skills add {AGENT_KIT_ROOT}/custom/skills/{skill-name} -a claude-code -y
-
+# Project
+npx skills add "$AGENT_KIT_ROOT/custom/skills/{skill-name}" -a claude-code -y
 # Global
-npx skills add {AGENT_KIT_ROOT}/custom/skills/{skill-name} -a claude-code -g -y
+npx skills add "$AGENT_KIT_ROOT/custom/skills/{skill-name}" -a claude-code -g -y
 ```
 
-### Installing a Command
-
+### Command
 ```bash
-# Project-level
+# Project
 mkdir -p .claude/commands
-cp {AGENT_KIT_ROOT}/custom/commands/{command-name}.md .claude/commands/
-
+cp "$AGENT_KIT_ROOT/custom/commands/{name}.md" .claude/commands/
 # Global
-cp {AGENT_KIT_ROOT}/custom/commands/{command-name}.md ~/.claude/commands/
+cp "$AGENT_KIT_ROOT/custom/commands/{name}.md" ~/.claude/commands/
 ```
 
-### Installing a Hook
+### Hook
+Merge into `.claude/settings.json` or `~/.claude/settings.json` under correct event key:
+- `PreToolUse` — before tool execution
+- `PostToolUse` — after tool execution
+- `Stop` — when Claude stops
 
-Read the hook definition from `hooks.json` and merge it into the appropriate `settings.json`.
-
-**Project-level** → `.claude/settings.json`
-**Global** → `~/.claude/settings.json`
-
-The merge logic — add under the correct event key (`PostToolUse`, `PreToolUse`, `Stop`):
-
+Hook structure:
 ```json
 {
   "hooks": {
     "{event}": [
       {
-        "matcher": "{matcher}",   // omit if event is Stop
+        "matcher": "{matcher}",
         "hooks": [
           {
             "type": "command",
@@ -131,96 +131,36 @@ The merge logic — add under the correct event key (`PostToolUse`, `PreToolUse`
 }
 ```
 
-Merge carefully — do not duplicate hooks already present with the same command.
+Merge carefully — don't duplicate existing hooks.
 
-## Step 7: Install claudekit-skills from Local Submodule
+---
 
-Install skills from the local `claudekit-skills` submodule, selected based on the current project's stack.
+## Step 7: Update CLAUDE.md and AGENTS.md
 
-### Check Submodule Exists
+**After installing**, read CLAUDE.md and AGENTS.md if they exist.
 
-```bash
-ls {AGENT_KIT_ROOT}/skills/claudekit-skills/.claude/skills/
+For each newly installed skill, add/update:
+
+**In CLAUDE.md** — "Skills Available" section:
+```markdown
+**skill-name** — WHEN to use it (1 line description)
 ```
 
-If the directory doesn't exist or is empty, tell the user:
-> claudekit-skills submodule not initialized. Run this first:
-> ```bash
-> python3 {AGENT_KIT_ROOT}/scripts/install.py --init-submodule
-> ```
-Then stop.
-
-### Detect Stack
-
-Read these files (whichever exist):
-- `package.json` → framework (Next.js, React, Vue, NestJS, etc.)
-- `requirements.txt` / `pyproject.toml` → Python stack
-- `go.mod` → Go
-- `Cargo.toml` → Rust
-- `CLAUDE.md` / `AGENTS.md` → any stack hints already documented
-
-### Plugin Bundle Map
-
-Skills are organized into plugin bundles at `{AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/`.
-
-Each bundle contains skills in `skills/` subfolder:
-
-| Bundle | Skills | Install when |
-|--------|--------|-------------|
-| `platform-tools` | `mcp-management`, `mcp-builder`, `shopify`, `payment-integration` | Always (mcp-management is essential for MCP server management via Gemini) |
-| `debugging-tools` | `debugging` | Always |
-| `meta-tools` | `code-review`, `skill-creator` | Always |
-| `problem-solving-tools` | `problem-solving` | Always |
-| `research-tools` | `docs-seeker`, `repomix` | Always |
-| `specialized-tools` | `mermaidjs-v11`, `sequential-thinking` | Always |
-| `web-dev-tools` | `aesthetic`, `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks` | Any frontend/web project |
-| `backend-tools` | `backend-development`, `better-auth` | Any backend or fullstack project |
-| `devops-tools` | `chrome-devtools`, `databases`, `devops` | Projects with DB, Docker, or cloud deploy |
-| `ai-ml-tools` | `ai-multimodal`, `context-engineering`, `google-adk-python` | AI/ML projects |
-| `document-processing` | `docx`, `pdf`, `pptx`, `xlsx` | Projects dealing with documents |
-| `media-tools` | `media-processing` | Projects with video/image/audio |
-
-### Install Command
-
-Skills are installed from the bundle's `skills/` folder:
-
-```bash
-# Project-level (local)
-npx skills add {AGENT_KIT_ROOT}/skills/claudekit-skills/.claude/skills/{skill-name} -a claude-code -y
-
-# Global (all projects)
-npx skills add {AGENT_KIT_ROOT}/skills/claudekit-skills/.claude/skills/{skill-name} -a claude-code -g -y
+**In AGENTS.md** — "### Skills" section:
+```markdown
+**skill-name** — description
 ```
 
-### Skills to Install
+If sections don't exist, create them.
 
-Build the list based on detected stack:
+Tell user: "Updated CLAUDE.md and AGENTS.md with newly installed skills."
 
-**Always install** (every project):
-- `debugging` — Systematic debugging frameworks
-- `code-review` — Code review automation
-- `skill-creator` — Create and test new skills
-- `mcp-management` — MCP server lifecycle management via Gemini
-- `problem-solving` — Advanced thinking techniques
-- `docs-seeker` — Documentation discovery
-- `mermaidjs-v11` — Diagram generation
-- `sequential-thinking` — Complex reasoning
-
-**Conditional skills**:
-- `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks` — if `package.json` contains react/next/vue/angular/svelte
-- `backend-development`, `better-auth` — if `package.json` contains express/nestjs/fastify OR `requirements.txt`/`pyproject.toml` exists
-- `databases`, `devops`, `chrome-devtools` — if `Dockerfile`, `docker-compose.yml`, or DB config exists
-- `ai-multimodal`, `context-engineering`, `google-adk-python` — if `requirements.txt` contains torch/tensorflow/transformers OR package.json contains langchain/llama-index
-- `docx`, `pdf`, `pptx`, `xlsx` — if project deals with file processing
-- `media-processing` — if project deals with image/video/audio
-
-Present what will be installed and confirm before running.
+---
 
 ## Step 8: Summary
 
-After all installs:
-- List what was installed and where (global / project)
-- List claudekit skills installed from submodule
-- Note any failures with the error
-- Tip: add new skills to `{AGENT_KIT_ROOT}/custom/skills/`, commands to `custom/commands/`, hooks to `custom/hooks/hooks.json`
-- Submodule skills location: `{AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/`
+Report:
+- List what was installed (global/project)
+- Note any failures
+- Mention docs updated
+- For community skills: run `/ak:setup-skills`

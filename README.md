@@ -15,15 +15,14 @@ Shared AI agent setup toolkit for Claude Code. Install once globally, then boots
 ```bash
 git clone <this-repo>
 cd agent-kit
-python3 scripts/install.py              # installs global commands + MCP servers
-python3 scripts/install.py --init-submodule  # clones claudekit-skills submodule
+python3 scripts/install.py    # installs global commands + MCP servers + submodule skills
 ```
 
 Then in any project:
 ```
 /ak:init-project    # generate CLAUDE.md, AGENTS.md, hooks, GitNexus index
-/ak:setup-custom    # install custom skills/commands/hooks + submodule skills
-/ak:setup-skills    # install additional skills from skills.sh registry
+/ak:setup-skills    # install community skills (mcp-management, debugging, etc.)
+/ak:setup-custom    # install custom skills, commands, and hooks from custom/
 ```
 
 ## Commands
@@ -31,9 +30,9 @@ Then in any project:
 | Command | Purpose |
 |---------|---------|
 | `/ak:init-project` | Per-project setup wizard — CLAUDE.md, AGENTS.md, hooks, GitNexus |
-| `/ak:setup-skills` | Install skills from local submodule + skills.sh registry |
+| `/ak:setup-skills` | Install community skills from submodule |
 | `/ak:setup-custom` | Install custom skills, commands, and hooks from `custom/` |
-| `/ak:update` | Sync MCP permissions to an existing project |
+| `/ak:update` | Sync MCP permissions to global settings |
 | `/ak:sync-docs` | Regenerate README, CLAUDE.md, AGENTS.md (this repo only) |
 
 ## MCP Servers
@@ -51,13 +50,14 @@ Installed globally via `global/settings.json`:
 
 ### Community Skills (skills/claudekit-skills/)
 
-Cloned via `python3 scripts/install.py --init-submodule`. Installed per-project via `/ak:setup-custom`.
+Cloned via `python3 scripts/install.py --init-submodule`. Installed per-project via `/ak:setup-skills`.
 
 Key skills include:
 - **mcp-management** — MCP server lifecycle management via Gemini
 - **debugging**, **code-review**, **skill-creator**
-- **frontend-design**, **backend-development**, **databases**
-- **ai-multimodal**, **context-engineering**
+- **frontend-design**, **frontend-development**, **ui-styling**, **web-frameworks**
+- **backend-development**, **better-auth**, **databases**
+- **ai-multimodal**, **context-engineering**, **google-adk-python**
 - And 20+ more
 
 ### Custom Skills (custom/skills/)
@@ -70,11 +70,12 @@ Key skills include:
 
 ## Custom Hooks
 
-1 active hook in `custom/hooks/hooks.json`:
+2 hooks in `custom/hooks/hooks.json`:
 
 | Hook | Trigger | Description |
 |------|---------|-------------|
 | `check-secrets` | PreToolUse / Write\|Edit\|MultiEdit | Block writing hardcoded secrets or API keys |
+| `block-dangerous-bash` | PreToolUse / Bash | Block dangerous bash commands (rm -rf, force push, DROP TABLE, etc.) |
 
 ## Project Structure
 
@@ -90,9 +91,9 @@ agent-kit/
 ├── custom/                          # User-managed private assets
 │   ├── skills/
 │   │   └── internal-comms/          # Private skill
-│   ├── commands/                    # Optional private slash commands
+│   ├── commands/
 │   └── hooks/
-│       └── hooks.json               # 1 active hook (check-secrets)
+│       └── hooks.json               # 2 hooks (check-secrets, block-dangerous-bash)
 ├── skills/
 │   └── claudekit-skills/            # Git submodule — 30+ community skills
 ├── tests/
