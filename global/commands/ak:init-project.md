@@ -253,4 +253,4 @@ Final summary using data from `SETUP_DATA`:
 - GitNexus status: `SETUP_DATA.gitnexus.status`
 - MCP tools available (all 4: context7, gitnexus, sequential-thinking, memory)
 - Custom assets installed (from Step 8, if any)
-- Next: run `/ak:setup-skills` to install skills from skills.sh for this stack
+- Next: run `/ak:setup-skills` to install skills from the local claudekit-skills submodule

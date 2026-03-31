@@ -133,9 +133,22 @@ The merge logic — add under the correct event key (`PostToolUse`, `PreToolUse`
 
 Merge carefully — do not duplicate hooks already present with the same command.
 
-## Step 7: Install claudekit-skills Plugin Bundles
+## Step 7: Install claudekit-skills from Local Submodule
 
-Install community skill bundles from the `claudekit-skills` marketplace at **project scope** (`--scope local`), selected based on the current project's stack.
+Install skills from the local `claudekit-skills` submodule, selected based on the current project's stack.
+
+### Check Submodule Exists
+
+```bash
+ls {AGENT_KIT_ROOT}/skills/claudekit-skills/.claude/skills/
+```
+
+If the directory doesn't exist or is empty, tell the user:
+> claudekit-skills submodule not initialized. Run this first:
+> ```bash
+> python3 {AGENT_KIT_ROOT}/scripts/install.py --init-submodule
+> ```
+Then stop.
 
 ### Detect Stack
 
@@ -148,31 +161,58 @@ Read these files (whichever exist):
 
 ### Plugin Bundle Map
 
+Skills are organized into plugin bundles at `{AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/`.
+
+Each bundle contains skills in `skills/` subfolder:
+
 | Bundle | Skills | Install when |
 |--------|--------|-------------|
-| `web-dev-tools` | aesthetic, frontend-design, frontend-development, threejs, ui-styling, web-frameworks, web-testing | Any frontend/web project |
-| `backend-tools` | backend-development, better-auth | Any backend or fullstack project |
-| `debugging-tools` | debugging | Always |
-| `devops-tools` | chrome-devtools, databases, devops | Projects with DB, Docker, or cloud deploy |
-| `ai-ml-tools` | ai-multimodal, context-engineering, google-adk-python | AI/ML projects |
-| `document-processing` | docx, pdf, pptx, xlsx | Projects dealing with documents |
-| `media-tools` | media-processing | Projects with video/image/audio |
-| `meta-tools` | code-review, skill-creator | Always |
-| `platform-tools` | mcp-builder, mcp-management, shopify, payment-integration | MCP, e-commerce, or payment projects |
-| `problem-solving-tools` | problem-solving | Always |
-| `research-tools` | docs-seeker, repomix | Always |
-| `specialized-tools` | mermaidjs-v11, sequential-thinking | Always |
+| `platform-tools` | `mcp-management`, `mcp-builder`, `shopify`, `payment-integration` | Always (mcp-management is essential for MCP server management via Gemini) |
+| `debugging-tools` | `debugging` | Always |
+| `meta-tools` | `code-review`, `skill-creator` | Always |
+| `problem-solving-tools` | `problem-solving` | Always |
+| `research-tools` | `docs-seeker`, `repomix` | Always |
+| `specialized-tools` | `mermaidjs-v11`, `sequential-thinking` | Always |
+| `web-dev-tools` | `aesthetic`, `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks` | Any frontend/web project |
+| `backend-tools` | `backend-development`, `better-auth` | Any backend or fullstack project |
+| `devops-tools` | `chrome-devtools`, `databases`, `devops` | Projects with DB, Docker, or cloud deploy |
+| `ai-ml-tools` | `ai-multimodal`, `context-engineering`, `google-adk-python` | AI/ML projects |
+| `document-processing` | `docx`, `pdf`, `pptx`, `xlsx` | Projects dealing with documents |
+| `media-tools` | `media-processing` | Projects with video/image/audio |
 
 ### Install Command
 
-For each selected bundle:
+Skills are installed from the bundle's `skills/` folder:
+
 ```bash
-claude plugin install --scope local "{bundle-name}@claudekit-skills"
+# Project-level (local)
+npx skills add {AGENT_KIT_ROOT}/skills/claudekit-skills/.claude/skills/{skill-name} -a claude-code -y
+
+# Global (all projects)
+npx skills add {AGENT_KIT_ROOT}/skills/claudekit-skills/.claude/skills/{skill-name} -a claude-code -g -y
 ```
 
-If `claude` CLI is not available, skip with a note.
+### Skills to Install
 
-Check which bundles are already installed (exit code 0 even if already present — reinstall is idempotent).
+Build the list based on detected stack:
+
+**Always install** (every project):
+- `debugging` — Systematic debugging frameworks
+- `code-review` — Code review automation
+- `skill-creator` — Create and test new skills
+- `mcp-management` — MCP server lifecycle management via Gemini
+- `problem-solving` — Advanced thinking techniques
+- `docs-seeker` — Documentation discovery
+- `mermaidjs-v11` — Diagram generation
+- `sequential-thinking` — Complex reasoning
+
+**Conditional skills**:
+- `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks` — if `package.json` contains react/next/vue/angular/svelte
+- `backend-development`, `better-auth` — if `package.json` contains express/nestjs/fastify OR `requirements.txt`/`pyproject.toml` exists
+- `databases`, `devops`, `chrome-devtools` — if `Dockerfile`, `docker-compose.yml`, or DB config exists
+- `ai-multimodal`, `context-engineering`, `google-adk-python` — if `requirements.txt` contains torch/tensorflow/transformers OR package.json contains langchain/llama-index
+- `docx`, `pdf`, `pptx`, `xlsx` — if project deals with file processing
+- `media-processing` — if project deals with image/video/audio
 
 Present what will be installed and confirm before running.
 
@@ -180,6 +220,7 @@ Present what will be installed and confirm before running.
 
 After all installs:
 - List what was installed and where (global / project)
-- List claudekit plugin bundles installed for this project
+- List claudekit skills installed from submodule
 - Note any failures with the error
 - Tip: add new skills to `{AGENT_KIT_ROOT}/custom/skills/`, commands to `custom/commands/`, hooks to `custom/hooks/hooks.json`
+- Submodule skills location: `{AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/`

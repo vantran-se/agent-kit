@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-Agent Kit is a shared AI agent setup toolkit for Claude Code. Install once globally with `python3 scripts/install.py`, then bootstrap any project using `/ak:init-project`.
+Agent Kit is a shared AI agent setup toolkit for Claude Code. Install once globally with `python3 scripts/install.py`, clone skills submodule, then bootstrap any project using `/ak:init-project`.
 
 ## Tech Stack
 
@@ -15,9 +15,10 @@ Agent Kit is a shared AI agent setup toolkit for Claude Code. Install once globa
 ## Commands
 
 ```bash
-python3 scripts/install.py    # install global commands, MCP servers, claudekit-skills plugin (once per machine)
-python3 tests/run_all.py      # run all test suites
-python3 tests/test_kit.py     # integrity tests only
+python3 scripts/install.py              # install global commands + MCP servers
+python3 scripts/install.py --init-submodule  # clone claudekit-skills submodule
+python3 tests/run_all.py                # run all test suites
+python3 tests/test_kit.py               # integrity tests only
 ```
 
 ## Directory Structure
@@ -26,7 +27,8 @@ python3 tests/test_kit.py     # integrity tests only
 global/commands/          # slash commands installed to ~/.claude/commands/
 global/settings.json      # MCP server definitions
 custom/skills/            # 1 private skill (internal-comms)
-custom/hooks/hooks.json   # 2 security hooks
+custom/hooks/hooks.json   # 1 security hook (check-secrets)
+skills/claudekit-skills/  # Git submodule — 30+ community skills
 .claude/commands/         # repo-local commands (ak:sync-docs)
 .claude/skills/           # repo-local skills (skill-creator)
 scripts/init-project.py
@@ -54,10 +56,11 @@ tests/
 
 **Private** (`custom/skills/`): `internal-comms` — installed per project via `/ak:setup-custom`.
 
-**Community** (34+): `mrgoonie/claudekit-skills` marketplace — installed globally by `install.py`, auto-activated by Claude based on task context. See README.md for details.
+**Community** (30+): `skills/claudekit-skills/.claude/skills/` — cloned via `--init-submodule`, installed per-project via `/ak:setup-custom`. Includes `mcp-management`, `debugging`, `code-review`, `skill-creator`, and more.
 
 ## Do Not Modify
 
 - `~/.claude/commands/` — managed by `install.py`
 - `~/.claude/settings.json` — managed by `install.py`
 - Any `.gitnexus/` directories — auto-generated index
+- `skills/claudekit-skills/` — git submodule, update via `git submodule update`

@@ -18,8 +18,9 @@ agent-kit/
 │   │   └── internal-comms/
 │   ├── commands/
 │   └── hooks/
-│       ├── hooks.json               # 2 hook definitions
-│       └── scripts/
+│       └── hooks.json               # 1 active hook (check-secrets)
+├── skills/
+│   └── claudekit-skills/            # Git submodule — 30+ community skills
 ├── tests/
 │   ├── run_all.py
 │   ├── test_init_project_script.py
@@ -40,8 +41,8 @@ agent-kit/
 | Command | File | Purpose |
 |---------|------|---------|
 | `/ak:init-project` | `global/commands/ak:init-project.md` | Per-project setup wizard |
-| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install skills from skills.sh registry |
-| `/ak:setup-custom` | `global/commands/ak:setup-custom.md` | Install from custom/ |
+| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install skills from submodule + skills.sh |
+| `/ak:setup-custom` | `global/commands/ak:setup-custom.md` | Install from custom/ + submodule skills |
 | `/ak:update` | `global/commands/ak:update.md` | Sync MCP permissions to existing project |
 
 ## Project Commands (this repo only)
@@ -63,19 +64,17 @@ agent-kit/
 
 `internal-comms` — private skill for internal communications.
 
-Community skills (34+) provided via `mrgoonie/claudekit-skills` plugin installed globally by `install.py`.
+Community skills (30+) in `skills/claudekit-skills/.claude/skills/` — installed per-project via `/ak:setup-custom`.
 
 ## Custom Hooks (custom/hooks/hooks.json)
 
-2 hooks: `block-dangerous-bash`, `check-secrets`
+1 active hook: `check-secrets`
 
 Hook input: JSON via stdin — use `jq -r '.tool_input.field_name'`.
 
 ## Development Rules
 
 **After adding/removing skills, commands, or hooks — run `/ak:sync-docs` immediately.**
-
-This repo has a hook in `.claude/settings.json` that reminds you automatically when editing `global/` or `custom/`.
 
 - Edit source in `global/commands/` or `custom/` — never edit `~/.claude/` directly
 - Re-run `python3 scripts/install.py` after changing `global/` to deploy globally

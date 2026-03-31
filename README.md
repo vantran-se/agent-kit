@@ -6,21 +6,24 @@ Shared AI agent setup toolkit for Claude Code. Install once globally, then boots
 
 | Layer | What it does |
 |-------|-------------|
-| **Global** (`~/.claude/`) | Commands + MCP servers + claudekit-skills plugin — installed once via `python3 scripts/install.py` |
-| **Per-project** (`.claude/`) | Hooks, custom skills, commands — set up per project via `/ak:init-project` |
+| **Global** (`~/.claude/`) | Commands + MCP servers — installed via `python3 scripts/install.py` |
+| **Submodule** (`skills/claudekit-skills/`) | 30+ community skills — cloned via `--init-submodule`, installed per-project |
+| **Per-project** (`.claude/`) | Hooks, custom skills, commands — set up via `/ak:init-project`, `/ak:setup-custom` |
 
 ## Quick Start
 
 ```bash
 git clone <this-repo>
-python3 scripts/install.py        # installs global commands, MCP servers, claudekit-skills plugin
+cd agent-kit
+python3 scripts/install.py              # installs global commands + MCP servers
+python3 scripts/install.py --init-submodule  # clones claudekit-skills submodule
 ```
 
 Then in any project:
 ```
 /ak:init-project    # generate CLAUDE.md, AGENTS.md, hooks, GitNexus index
-/ak:setup-custom    # install custom skills, commands, hooks from this repo
-/ak:setup-skills    # install additional skills from the skills.sh registry
+/ak:setup-custom    # install custom skills/commands/hooks + submodule skills
+/ak:setup-skills    # install additional skills from skills.sh registry
 ```
 
 ## Commands
@@ -28,7 +31,7 @@ Then in any project:
 | Command | Purpose |
 |---------|---------|
 | `/ak:init-project` | Per-project setup wizard — CLAUDE.md, AGENTS.md, hooks, GitNexus |
-| `/ak:setup-skills` | Install additional skills from the skills.sh registry |
+| `/ak:setup-skills` | Install skills from local submodule + skills.sh registry |
 | `/ak:setup-custom` | Install custom skills, commands, and hooks from `custom/` |
 | `/ak:update` | Sync MCP permissions to an existing project |
 | `/ak:sync-docs` | Regenerate README, CLAUDE.md, AGENTS.md (this repo only) |
@@ -46,25 +49,31 @@ Installed globally via `global/settings.json`:
 
 ## Skills
 
-### Community Skills (claudekit-skills)
+### Community Skills (skills/claudekit-skills/)
 
-Installed globally via `install.py` (`claude plugin marketplace add mrgoonie/claudekit-skills` + 12 plugin bundles). Covers frontend, backend, AI/ML, devops, databases, debugging, testing, and more — **activated automatically** by Claude based on task context, no syntax needed.
+Cloned via `python3 scripts/install.py --init-submodule`. Installed per-project via `/ak:setup-custom`.
+
+Key skills include:
+- **mcp-management** — MCP server lifecycle management via Gemini
+- **debugging**, **code-review**, **skill-creator**
+- **frontend-design**, **backend-development**, **databases**
+- **ai-multimodal**, **context-engineering**
+- And 20+ more
 
 ### Custom Skills (custom/skills/)
 
-1 private skill installed per project via `/ak:setup-custom`:
+1 private skill:
 
 | Skill | Description |
 |-------|-------------|
-| `internal-comms` | Internal communications — status reports, leadership updates, newsletters, incident reports |
+| `internal-comms` | Internal communications — status reports, leadership updates, newsletters |
 
 ## Custom Hooks
 
-2 hooks in `custom/hooks/hooks.json` — installed per project via `/ak:setup-custom`:
+1 active hook in `custom/hooks/hooks.json`:
 
 | Hook | Trigger | Description |
 |------|---------|-------------|
-| `block-dangerous-bash` | PreToolUse / Bash | Block dangerous commands (rm -rf, force push, DROP TABLE, kill -9) |
 | `check-secrets` | PreToolUse / Write\|Edit\|MultiEdit | Block writing hardcoded secrets or API keys |
 
 ## Project Structure
@@ -83,8 +92,9 @@ agent-kit/
 │   │   └── internal-comms/          # Private skill
 │   ├── commands/                    # Optional private slash commands
 │   └── hooks/
-│       ├── hooks.json               # 2 hook definitions
-│       └── scripts/                 # Python 3 hook scripts (if any)
+│       └── hooks.json               # 1 active hook (check-secrets)
+├── skills/
+│   └── claudekit-skills/            # Git submodule — 30+ community skills
 ├── tests/
 │   ├── run_all.py
 │   ├── test_init_project_script.py
@@ -111,4 +121,6 @@ agent-kit/
 ## Requirements
 
 - Node.js 18+
+- Python 3
 - Claude Code
+- Git (for submodule)

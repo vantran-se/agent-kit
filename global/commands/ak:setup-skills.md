@@ -1,8 +1,24 @@
 # Setup Skills for This Project
 
-You are helping the user discover and install AI agent skills from https://skills.sh into the current project.
+You are helping the user discover and install AI agent skills from the local claudekit-skills submodule and https://skills.sh into the current project.
 
-## Step 1: Check Already-Installed Skills
+## Step 1: Check Submodule Skills
+
+First, check if the claudekit-skills submodule is initialized:
+
+```bash
+ls {AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/
+```
+
+If the directory doesn't exist or is empty, tell the user:
+> claudekit-skills submodule not initialized. Run this first:
+> ```bash
+> python3 {AGENT_KIT_ROOT}/scripts/install.py --init-submodule
+> ```
+
+If submodule exists, list available plugin bundles with their skills.
+
+## Step 2: Check Already-Installed Skills
 
 Run to see what's already installed (skip recommending these):
 
@@ -10,7 +26,7 @@ Run to see what's already installed (skip recommending these):
 npx skills list -a claude-code
 ```
 
-## Step 2: Detect Project Stack
+## Step 3: Detect Project Stack
 
 Read the following files if they exist:
 - `package.json` — framework, key dependencies
@@ -20,74 +36,46 @@ Read the following files if they exist:
 
 Summarize the stack in 1-2 lines.
 
-## Step 3: Search for Relevant Skills
+## Step 4: Install from Submodule (Recommended)
 
-Based on the detected stack, run `npx skills find <keyword>` in parallel for relevant keywords. Examples:
+Based on the detected stack, recommend skills from `{AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/{bundle}/skills/`:
 
-- Next.js project → `npx skills find nextjs`, `npx skills find react`
-- Python/FastAPI → `npx skills find python`, `npx skills find fastapi`
-- TypeScript → `npx skills find typescript`
-- General → `npx skills find claude-code`, `npx skills find agent`
-- Docker/infra → `npx skills find docker`
+**Always install** (every project):
+- `debugging` — Systematic debugging frameworks
+- `code-review` — Code review automation
+- `skill-creator` — Create and test new skills
+- `mcp-management` — MCP server lifecycle management via Gemini
+- `problem-solving` — Advanced thinking techniques
+- `docs-seeker` — Documentation discovery
+- `mermaidjs-v11` — Diagram generation
+- `sequential-thinking` — Complex reasoning
 
-Pick 3–5 relevant keywords for this project and run all searches in parallel.
+**Frontend projects**:
+- `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks`
 
-## Step 4: Build Recommendation List
+**Backend projects**:
+- `backend-development`, `better-auth`, `databases`
 
-Start with these **default recommendations** based on detected stack (filter out already-installed ones):
+**AI/ML projects**:
+- `ai-multimodal`, `context-engineering`, `google-adk-python`
 
-**Always recommend (universal):**
-- `vercel-labs/skills/find-skills` — meta-skill for discovering more skills
-- `anthropics/claude-code` — Claude Code-specific skills and workflows
-
-**TypeScript / JavaScript project:**
-- `vercel-labs/skills/typescript-docs` — TypeScript documentation lookup
-
-**Next.js / React / Vue / Svelte (frontend):**
-- `vercel-labs/next-skills` — Next.js best practices (if Next.js detected)
-- `vercel-labs/agent-skills/web-design-guidelines` — web design guidelines
-- `vercel-labs/agent-skills/frontend-design` — frontend design patterns
-
-**General agent / backend:**
-- `vercel-labs/agent-skills` — general agent capabilities
-
-Then supplement with results from `npx skills find` searches. Filter out already-installed skills and compile a ranked list. Prefer higher install counts and recognizable owners (vercel-labs, anthropics).
-
-Format each entry as:
-```
-[N]. owner/repo — description (X installs)
-```
-
-Aim for 5–10 total recommendations.
-
-## Step 5: Ask the User
-
-Present the list and ask in a single message:
-
-> Here are suggested skills for **[project name]** ([stack]):
->
-> [numbered list]
->
-> Enter numbers to install (e.g. `1 3 5`), `all`, or add custom slugs like `owner/repo`.
-> Type `none` to skip.
-
-Wait for the user's response.
-
-## Step 6: Install Selected Skills
-
-For each selected skill, run:
+Install selected skills:
 
 ```bash
-npx skills add <owner/repo> -a claude-code -y
+npx skills add {AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/{bundle-name}/skills/{skill-name} -a claude-code -y
 ```
 
-The `-y` flag skips confirmation prompts. Install one at a time and report success/failure after each.
+## Step 5: Search Additional Skills (Optional)
 
-If a custom slug fails, tell the user and continue with the rest.
+For skills not in the submodule, run `npx skills find <keyword>` to discover more from skills.sh.
 
-## Step 7: Summary
+Present any additional findings and ask if the user wants to install them.
+
+## Step 6: Summary
 
 After all installs:
-- List successfully installed skills and their command paths (`.claude/commands/`)
+- List successfully installed skills
 - Note any failures with the error
-- Tip: run `npx skills find <keyword>` anytime to discover more skills
+- Submodule location: `{AGENT_KIT_ROOT}/skills/claudekit-skills/plugins/`
+- Tip: run `python3 {AGENT_KIT_ROOT}/scripts/install.py --init-submodule` to initialize submodule
+- Tip: run `npx skills find <keyword>` anytime to discover more skills from skills.sh
