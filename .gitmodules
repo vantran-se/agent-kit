@@ -1,0 +1,6 @@
+[submodule "skills"]
+	path = skills
+	url = https://github.com/mrgoonie/claudekit-skills.git
+[submodule "skills/claudekit-skills"]
+	path = skills/claudekit-skills
+	url = https://github.com/mrgoonie/claudekit-skills.git
