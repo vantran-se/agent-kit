@@ -99,159 +99,36 @@ Note key skills: `mcp-management`, `debugging`, `code-review`, `skill-creator`, 
 
 ### Skills — When to Use
 
-#### Core Skills (Always Available)
+**Run `/ak:setup-skills`** to view available skills and install based on your project stack.
 
-**mcp-management** — Use when:
-- Adding/removing MCP servers from config
-- MCP server misbehaving or not responding
-- Need to discover available MCP tools/prompts
-- **Run via Gemini** to save tokens vs. running directly
+#### Core Skills (Recommended for All Projects)
 
-**debugging** — Use when:
-- Stuck on a bug after 2+ failed attempts
-- Need structured debugging workflow
-- Error messages are unclear or misleading
-- **Trigger:** User says "this doesn't work", "why is this broken"
-
-**code-review** — Use when:
-- Before committing significant changes (10+ lines)
-- After implementing a new feature
-- User asks for feedback on code quality
-- **Trigger:** Pre-commit, PR preparation, refactor complete
-
-**skill-creator** — Use when:
-- Creating a new skill from scratch
-- Optimizing an existing skill's performance
-- Running evals to test skill effectiveness
-- **Trigger:** User says "create a skill for...", "automate this workflow"
-
-**sequential-thinking** — Use when:
-- Complex reasoning with multiple steps
-- Architectural decisions and planning
-- Breaking down ambiguous problems
-- **Trigger:** "how should I approach...", "plan out..."
-
-**problem-solving** — Use when:
-- General problem-solving framework needed
-- Breaking down complex issues
-- Systematic analysis required
-
-**docs-seeker** — Use when:
-- Need to find documentation quickly
-- Looking for API references or guides
-- **Trigger:** "how do I...", "what's the way to..."
-
-**mermaidjs-v11** — Use when:
-- Need to create diagrams or flowcharts
-- Visualizing system architecture
-- **Trigger:** "draw a diagram...", "show the flow..."
+**debugging** — Stuck on a bug after 2+ failed attempts. **Trigger:** "this doesn't work"
+**code-review** — Before committing significant changes. **Trigger:** pre-commit, PR prep
+**skill-creator** — Creating or optimizing skills. **Trigger:** "create a skill for..."
+**mcp-management** — MCP server lifecycle. **Tip:** Run via Gemini to save tokens
+**sequential-thinking** — Complex reasoning, architectural planning. **Trigger:** "how should I approach..."
+**problem-solving** — General problem-solving framework
+**docs-seeker** — Finding documentation. **Trigger:** "how do I..."
+**mermaidjs-v11** — Creating diagrams. **Trigger:** "draw a diagram..."
 
 #### Anthropic Official Skills
 
-**claude-api** — Use when:
-- Building apps with Claude API or Anthropic SDK
-- Code imports `anthropic`, `@anthropic-ai/sdk`, `claude_agent_sdk`
-- **Trigger:** Working with Claude API, Agent SDK
+**claude-api** — Building with Claude API/Anthropic SDK. **Trigger:** imports `anthropic`, `@anthropic-ai/sdk`
+**mcp-builder** — Creating MCP servers for external APIs
+**pdf** / **docx** / **xlsx** / **pptx** — Working with documents
+**web-artifacts-builder** — Building interactive web apps. **Trigger:** "build a web app..."
+**frontend-design** — UI/UX design. **Trigger:** "make it look nice..."
+**canvas-design** / **theme-factory** / **brand-guidelines** — Design work
+**internal-comms** / **slack-gif-creator** — Team communications
 
-**mcp-builder** — Use when:
-- Building MCP servers to integrate external APIs/services
-- Creating FastMCP servers in Python
-- **Trigger:** "create an MCP server...", "integrate with..."
+#### Stack-Specific Skills
 
-**pdf** — Use when:
-- Reading or analyzing PDF documents
-- Extracting information from PDFs
-- **Trigger:** User uploads PDF, "read this PDF..."
+**Frontend:** `frontend-development`, `web-frameworks`, `ui-styling`, `webapp-testing`
+**Backend:** `backend-development`, `databases`, `better-auth`, `devops`
+**AI/ML:** `ai-multimodal`, `context-engineering`, `google-adk-python`
 
-**docx** — Use when:
-- Creating or editing Word documents
-- Working with .docx files programmatically
-
-**xlsx** — Use when:
-- Creating or editing Excel spreadsheets
-- Working with .xlsx files programmatically
-
-**pptx** — Use when:
-- Creating or editing PowerPoint presentations
-- Working with .pptx files programmatically
-
-**doc-coauthoring** — Use when:
-- Collaborative document writing
-- Iterative document improvement
-
-**web-artifacts-builder** — Use when:
-- Building interactive web artifacts
-- Creating React components for artifacts
-- **Trigger:** "build a web app...", "create an interactive..."
-
-**webapp-testing** — Use when:
-- Testing web applications
-- Browser automation and testing
-
-**canvas-design** — Use when:
-- Designing canvas-based visualizations
-- Working with HTML5 canvas or design tools
-
-**frontend-design** — Use when:
-- UI/UX design work
-- Creating visually appealing interfaces
-- **Trigger:** "make it look nice...", "design a..."
-
-**brand-guidelines** — Use when:
-- Ensuring brand consistency
-- Following corporate identity guidelines
-
-**theme-factory** — Use when:
-- Creating or applying themes
-- Styling variations for components
-
-**internal-comms** — Use when:
-- Internal team communications
-- Drafting announcements, updates
-
-**slack-gif-creator** — Use when:
-- Creating animated GIFs for Slack
-- Fun/engaging team communications
-
-#### Specialized Skills (Stack-Specific)
-
-**frontend-development** — Use when:
-- Building frontend features
-- React, Vue, Angular development
-- **Trigger:** Working on UI components
-
-**backend-development** — Use when:
-- Building backend services
-- API development, database work
-
-**ai-multimodal** — Use when:
-- Working with AI/ML features
-- Multimodal inputs (images, text)
-
-**context-engineering** — Use when:
-- Optimizing context window usage
-- Managing long conversations
-
-**better-auth** — Use when:
-- Implementing authentication
-- Working with Better-Auth library
-
-**databases** — Use when:
-- Database schema design
-- Query optimization
-
-**devops** — Use when:
-- CI/CD pipelines
-- Infrastructure automation
-- **Trigger:** Docker, Kubernetes, GitHub Actions
-
-**google-adk-python** — Use when:
-- Working with Google ADK
-- Python agent development
-
-**code-search** — Use when:
-- Searching codebases
-- Finding definitions and references
+See `global/commands/ak:setup-skills.md` for full list with detailed "When to Use" guides.
 
 ---
 
@@ -464,9 +341,11 @@ If `SETUP_DATA.agent_kit_path` exists, run `/ak:setup-custom`.
 
 ## Step 10: Install Submodule Skills
 
-Ask user: "Install community skills from claudekit-skills submodule? (Recommended: debugging, code-review, mcp-management)"
-
-If yes, run `/ak:setup-skills`.
+Run `/ak:setup-skills` to:
+1. Detect project stack automatically
+2. Recommend skills based on stack
+3. Let user select which skills to install
+4. Update CLAUDE.md and AGENTS.md with installed skills
 
 ---
 

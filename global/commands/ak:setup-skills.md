@@ -15,6 +15,17 @@ After installation, update CLAUDE.md and AGENTS.md so AI agents know about the n
 
 ---
 
+## ⚠️ CRITICAL RULE: ALWAYS ASK USER FIRST
+
+**You MUST ask user and get explicit confirmation before installing any skills.**
+
+- AI suggests skills based on stack detection
+- User decides which skills to install
+- **NEVER install automatically** — always wait for user confirmation
+- Even if user passes arguments, still confirm: "Install these? (y/n)"
+
+---
+
 ## Step 1: Locate Agent Kit
 
 Read the agent-kit path:
@@ -64,7 +75,7 @@ Skip skills already in `.claude/skills/` or `~/.claude/skills/`.
 
 ---
 
-## Step 4: Detect Stack
+## Step 5: Detect Stack & Recommend Skills
 
 Read project files to understand stack:
 - `package.json` → Node.js/TypeScript
@@ -73,68 +84,71 @@ Read project files to understand stack:
 - `Cargo.toml` → Rust
 - `CLAUDE.md` → existing conventions
 
----
+Based on detected stack, prepare recommendations:
 
-## Step 5: Recommended Skills
+**Core Skills** (recommend for all projects):
+- `debugging`, `code-review`, `skill-creator`, `mcp-management`
+- `sequential-thinking`, `problem-solving`
 
-### Always Install (Every Project)
-
-**From claudekit-skills:**
-- `debugging` — Structured debugging workflows
-- `code-review` — Pre-commit review automation
-- `skill-creator` — Create and optimize skills
-- `mcp-management` — MCP server lifecycle (run via Gemini to save tokens)
-- `problem-solving` — General problem-solving framework
-- `docs-seeker` — Find and read documentation
-- `mermaidjs-v11` — Create diagrams and flowcharts
-- `sequential-thinking` — Complex reasoning and planning
-
-**From anthropics/skills:**
-- `claude-api` — Build apps with Claude API / Anthropic SDK
-- `mcp-builder` — Create MCP servers for external APIs/services
-- `skill-creator` — Official Anthropic skill creator
-- `pdf` — Read and analyze PDF documents
-- `docx` / `xlsx` / `pptx` — Work with Office documents
-
-### Frontend Projects
-**claudekit-skills:** `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks`
-**anthropics/skills:** `frontend-design`, `web-artifacts-builder`, `canvas-design`, `brand-guidelines`, `theme-factory`
-
-### Backend Projects
-**claudekit-skills:** `backend-development`, `better-auth`, `databases`, `devops`
-**anthropics/skills:** `mcp-builder` (for API integrations)
-
-### AI/ML Projects
-**claudekit-skills:** `ai-multimodal`, `context-engineering`, `google-adk-python`
-**anthropics/skills:** `claude-api` (Anthropic SDK integration)
-
-### Data/Analysis
-**anthropics/skills:** `docx`, `xlsx`, `pdf`, `doc-coauthoring`
-
-### Internal/Business
-**anthropics/skills:** `internal-comms`, `slack-gif-creator`, `brand-guidelines`
-
-If arguments provided, install those specific skills. Otherwise, recommend based on stack.
+**Frontend**: `frontend-design`, `frontend-development`, `web-artifacts-builder`, `canvas-design`
+**Backend**: `backend-development`, `databases`, `mcp-builder`
+**AI/ML**: `claude-api`, `ai-multimodal`, `context-engineering`
+**Data/Docs**: `pdf`, `docx`, `xlsx`, `doc-coauthoring`
 
 ---
 
-## Step 6: Install Skills
+## Step 6: Ask User to Select Skills (REQUIRED — DO NOT SKIP)
 
-**From claudekit-skills:**
+**CRITICAL: You MUST ask user before installing any skills. Never install automatically.**
+
+Present recommendations and **wait for user confirmation**:
+
+> "Based on your project stack, here are recommended skills:
+>
+> **Core** (recommended for all):
+> - debugging, code-review, skill-creator, mcp-management, sequential-thinking
+>
+> **For your stack** [adjust based on detection]:
+> - [stack-specific skills]
+>
+> **Available from claudekit-skills**: [list 10-15 popular]
+> **Available from anthropics/skills**: [list 10-15 popular]
+>
+> Which skills would you like to install?
+> - Type skill names separated by space, or
+> - Type 'all-core' for core skills only, or
+> - Type 'all-recommended' for core + stack-specific, or
+> - Press Enter to skip
+>
+> ⚠️ I will not install anything until you confirm."
+
+**If arguments provided** (`ak:setup-skills debugging code-review`), still confirm:
+> "You requested: debugging, code-review. Install these now? (y/n)"
+
+**DO NOT proceed to Step 7 until user explicitly confirms.**
+
+---
+
+## Step 7: Install Selected Skills
+
+For each selected skill:
+
+**Check source:**
+- If from claudekit-skills: `"$AGENT_KIT_ROOT/skills/claudekit-skills/.claude/skills/{skill-name}"`
+- If from anthropics/skills: `"$AGENT_KIT_ROOT/skills/anthropics-skills/skills/{skill-name}"`
+
+**Install:**
 ```bash
-npx skills add "$AGENT_KIT_ROOT/skills/claudekit-skills/.claude/skills/{skill-name}" -a claude-code -y
+npx skills add "{source_path}" -a claude-code -y
 ```
 
-**From anthropics/skills:**
-```bash
-npx skills add "$AGENT_KIT_ROOT/skills/anthropics-skills/skills/{skill-name}" -a claude-code -y
-```
+Track which skills were successfully installed vs failed.
 
-Install project-level by default. Ask user if they want global installation.
+Ask: "Install globally (~/.claude/skills/) or project-only (.claude/skills/)?" Default: project-only.
 
 ---
 
-## Step 7: Update CLAUDE.md and AGENTS.md
+## Step 8: Update CLAUDE.md and AGENTS.md
 
 **After installing**, read CLAUDE.md and AGENTS.md if they exist.
 
@@ -156,7 +170,7 @@ Tell user: "Updated CLAUDE.md and AGENTS.md with newly installed skills."
 
 ---
 
-## Step 8: Summary
+## Step 9: Summary
 
 Report:
 - Skills installed: list

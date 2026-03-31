@@ -4,7 +4,7 @@
 
 ## Project Overview
 
-Agent Kit is a shared AI agent setup toolkit for Claude Code. Install once globally with `python3 scripts/install.py`, clone skills submodule, then bootstrap any project using `/ak:init-project`.
+Agent Kit is a shared AI agent setup toolkit for Claude Code. Install once globally with `python3 scripts/install.py`, then bootstrap any project using `/ak:init-project`.
 
 ## Tech Stack
 
@@ -16,7 +16,7 @@ Agent Kit is a shared AI agent setup toolkit for Claude Code. Install once globa
 
 ```bash
 python3 scripts/install.py              # install global commands + MCP servers
-python3 scripts/install.py --init-submodule  # clone claudekit-skills submodule
+python3 scripts/install.py --init-submodule  # clone skills submodules
 python3 tests/run_all.py                # run all test suites
 python3 tests/test_kit.py               # integrity tests only
 ```
@@ -26,9 +26,11 @@ python3 tests/test_kit.py               # integrity tests only
 ```
 global/commands/          # slash commands installed to ~/.claude/commands/
 global/settings.json      # MCP server definitions
-custom/skills/            # 1 private skill (internal-comms)
+custom/commands/          # 3 custom commands (code-review, research, validate-and-fix)
 custom/hooks/hooks.json   # 2 security hooks (check-secrets, block-dangerous-bash)
-skills/claudekit-skills/  # Git submodule — 30+ community skills
+skills/
+  claudekit-skills/       # Git submodule — 30+ community skills
+  anthropics-skills/      # Git submodule — 17 official Anthropic skills
 .claude/commands/         # repo-local commands (ak:sync-docs)
 .claude/skills/           # repo-local skills (skill-creator)
 scripts/init-project.py
@@ -54,13 +56,15 @@ tests/
 
 ## Skills
 
-**Private** (`custom/skills/`): `internal-comms` — installed per project via `/ak:setup-custom`.
+**Community Skills** (30+ from claudekit-skills): `debugging`, `code-review`, `skill-creator`, `mcp-management`, `frontend-development`, `backend-development`, `ai-multimodal`, `context-engineering`, `databases`, `devops`
 
-**Community** (30+): `skills/claudekit-skills/.claude/skills/` — cloned via `--init-submodule`, installed per-project via `/ak:setup-skills`. Includes `mcp-management`, `debugging`, `code-review`, `skill-creator`, and more.
+**Anthropic Official Skills** (17 from anthropics/skills): `claude-api`, `mcp-builder`, `pdf`, `docx`, `xlsx`, `pptx`, `web-artifacts-builder`, `frontend-design`, `canvas-design`, `internal-comms`
+
+Installed per-project via `/ak:setup-skills` with user selection.
 
 ## Do Not Modify
 
 - `~/.claude/commands/` — managed by `install.py`
 - `~/.claude/settings.json` — managed by `install.py`
 - Any `.gitnexus/` directories — auto-generated index
-- `skills/claudekit-skills/` — git submodule, update via `git submodule update`
+- `skills/claudekit-skills/` and `skills/anthropics-skills/` — git submodules

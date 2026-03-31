@@ -14,13 +14,15 @@ agent-kit/
 │   │   └── ak:update.md
 │   └── settings.json                # MCP server definitions (4 servers) + mcpPermissions
 ├── custom/
-│   ├── skills/
-│   │   └── internal-comms/
 │   ├── commands/
+│   │   ├── code-review.md
+│   │   ├── research.md
+│   │   └── validate-and-fix.md
 │   └── hooks/
 │       └── hooks.json               # 2 active hooks (check-secrets, block-dangerous-bash)
 ├── skills/
-│   └── claudekit-skills/            # Git submodule — 30+ community skills
+│   ├── claudekit-skills/            # Git submodule — 30+ community skills
+│   └── anthropics-skills/           # Git submodule — 17 official Anthropic skills
 ├── tests/
 │   ├── run_all.py
 │   ├── test_init_project_script.py
@@ -41,7 +43,7 @@ agent-kit/
 | Command | File | Purpose |
 |---------|------|---------|
 | `/ak:init-project` | `global/commands/ak:init-project.md` | Per-project setup wizard |
-| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install community skills from submodule |
+| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install from claudekit-skills + anthropics/skills |
 | `/ak:setup-custom` | `global/commands/ak:setup-custom.md` | Install custom skills/commands/hooks from custom/ |
 | `/ak:update` | `global/commands/ak:update.md` | Sync MCP permissions to global settings |
 
@@ -60,11 +62,13 @@ agent-kit/
 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
 | `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
 
-## Custom Skills (custom/skills/)
+## Custom Commands (custom/commands/)
 
-`internal-comms` — private skill for internal communications.
-
-Community skills (30+) in `skills/claudekit-skills/.claude/skills/` — installed per-project via `/ak:setup-skills`.
+| Command | Purpose |
+|---------|---------|
+| `code-review` | Multi-aspect code review using parallel code-review-expert agents |
+| `research` | Deep research with parallel subagents and automatic citations |
+| `validate-and-fix` | Run quality checks and automatically fix issues |
 
 ## Custom Hooks (custom/hooks/hooks.json)
 
