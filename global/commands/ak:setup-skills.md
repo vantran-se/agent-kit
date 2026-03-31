@@ -1,5 +1,5 @@
 ---
-description: Install community skills from claudekit-skills submodule and update docs
+description: Install community skills from claudekit-skills and anthropics/skills submodules
 category: workflow
 allowed-tools: Read, Write, Edit, Bash(ls:*, npx:*, python3:*)
 argument-hint: "[skill-names...]"
@@ -7,7 +7,11 @@ argument-hint: "[skill-names...]"
 
 # Setup Skills for This Project
 
-Install community skills from the local `claudekit-skills` submodule. After installation, update CLAUDE.md and AGENTS.md so AI agents know about the newly installed tools.
+Install community skills from **2 sources**:
+1. **claudekit-skills** (https://github.com/mrgoonie/claudekit-skills) — 30+ community skills
+2. **anthropics/skills** (https://github.com/anthropics/skills) — Official Anthropic skills
+
+After installation, update CLAUDE.md and AGENTS.md so AI agents know about the newly installed tools.
 
 ---
 
@@ -24,8 +28,9 @@ fi
 
 ---
 
-## Step 2: Check Submodule
+## Step 2: Check Submodules
 
+**claudekit-skills**:
 ```bash
 ls "$AGENT_KIT_ROOT/skills/claudekit-skills/.claude/skills/"
 ```
@@ -34,6 +39,17 @@ If empty/missing:
 > claudekit-skills submodule not initialized. Run first:
 > ```bash
 > python3 "$AGENT_KIT_ROOT/scripts/install.py" --init-submodule
+> ```
+
+**anthropics/skills**:
+```bash
+ls "$AGENT_KIT_ROOT/skills/anthropics-skills/skills/"
+```
+
+If empty/missing:
+> anthropics/skills submodule not initialized. Run:
+> ```bash
+> git submodule update --init --recursive
 > ```
 
 ---
@@ -59,18 +75,44 @@ Read project files to understand stack:
 
 ---
 
-## Step 5: Recommend Skills
+## Step 5: Recommended Skills
 
-**Always install** (every project):
-- `debugging`, `code-review`, `skill-creator`
-- `mcp-management` (MCP server lifecycle via Gemini)
-- `problem-solving`, `docs-seeker`, `mermaidjs-v11`, `sequential-thinking`
+### Always Install (Every Project)
 
-**Frontend**: `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks`
+**From claudekit-skills:**
+- `debugging` — Structured debugging workflows
+- `code-review` — Pre-commit review automation
+- `skill-creator` — Create and optimize skills
+- `mcp-management` — MCP server lifecycle (run via Gemini to save tokens)
+- `problem-solving` — General problem-solving framework
+- `docs-seeker` — Find and read documentation
+- `mermaidjs-v11` — Create diagrams and flowcharts
+- `sequential-thinking` — Complex reasoning and planning
 
-**Backend**: `backend-development`, `better-auth`, `databases`
+**From anthropics/skills:**
+- `claude-api` — Build apps with Claude API / Anthropic SDK
+- `mcp-builder` — Create MCP servers for external APIs/services
+- `skill-creator` — Official Anthropic skill creator
+- `pdf` — Read and analyze PDF documents
+- `docx` / `xlsx` / `pptx` — Work with Office documents
 
-**AI/ML**: `ai-multimodal`, `context-engineering`, `google-adk-python`
+### Frontend Projects
+**claudekit-skills:** `frontend-design`, `frontend-development`, `ui-styling`, `web-frameworks`
+**anthropics/skills:** `frontend-design`, `web-artifacts-builder`, `canvas-design`, `brand-guidelines`, `theme-factory`
+
+### Backend Projects
+**claudekit-skills:** `backend-development`, `better-auth`, `databases`, `devops`
+**anthropics/skills:** `mcp-builder` (for API integrations)
+
+### AI/ML Projects
+**claudekit-skills:** `ai-multimodal`, `context-engineering`, `google-adk-python`
+**anthropics/skills:** `claude-api` (Anthropic SDK integration)
+
+### Data/Analysis
+**anthropics/skills:** `docx`, `xlsx`, `pdf`, `doc-coauthoring`
+
+### Internal/Business
+**anthropics/skills:** `internal-comms`, `slack-gif-creator`, `brand-guidelines`
 
 If arguments provided, install those specific skills. Otherwise, recommend based on stack.
 
@@ -78,9 +120,14 @@ If arguments provided, install those specific skills. Otherwise, recommend based
 
 ## Step 6: Install Skills
 
-For each skill to install:
+**From claudekit-skills:**
 ```bash
 npx skills add "$AGENT_KIT_ROOT/skills/claudekit-skills/.claude/skills/{skill-name}" -a claude-code -y
+```
+
+**From anthropics/skills:**
+```bash
+npx skills add "$AGENT_KIT_ROOT/skills/anthropics-skills/skills/{skill-name}" -a claude-code -y
 ```
 
 Install project-level by default. Ask user if they want global installation.

@@ -99,6 +99,8 @@ Note key skills: `mcp-management`, `debugging`, `code-review`, `skill-creator`, 
 
 ### Skills — When to Use
 
+#### Core Skills (Always Available)
+
 **mcp-management** — Use when:
 - Adding/removing MCP servers from config
 - MCP server misbehaving or not responding
@@ -123,26 +125,133 @@ Note key skills: `mcp-management`, `debugging`, `code-review`, `skill-creator`, 
 - Running evals to test skill effectiveness
 - **Trigger:** User says "create a skill for...", "automate this workflow"
 
-**research** — Use when:
-- Need deep research with multiple sources
-- Gathering information for complex decisions
-- User asks for comprehensive analysis
-- **Trigger:** "research the best way to...", "compare X vs Y for..."
+**sequential-thinking** — Use when:
+- Complex reasoning with multiple steps
+- Architectural decisions and planning
+- Breaking down ambiguous problems
+- **Trigger:** "how should I approach...", "plan out..."
 
-**create-command** — Use when:
-- User wants a new slash command
-- Automating a recurring workflow
-- **Trigger:** "create a command that...", "make /foo do..."
+**problem-solving** — Use when:
+- General problem-solving framework needed
+- Breaking down complex issues
+- Systematic analysis required
 
-**create-subagent** — Use when:
-- Need a specialized AI assistant for a domain
-- Building a reusable expert agent
-- **Trigger:** "create an agent for...", "specialized in..."
+**docs-seeker** — Use when:
+- Need to find documentation quickly
+- Looking for API references or guides
+- **Trigger:** "how do I...", "what's the way to..."
 
-**spec:*** — Use when:
-- User provides a feature request without details
-- Need to break down requirements into tasks
-- **Trigger:** "implement X feature", "add Y functionality"
+**mermaidjs-v11** — Use when:
+- Need to create diagrams or flowcharts
+- Visualizing system architecture
+- **Trigger:** "draw a diagram...", "show the flow..."
+
+#### Anthropic Official Skills
+
+**claude-api** — Use when:
+- Building apps with Claude API or Anthropic SDK
+- Code imports `anthropic`, `@anthropic-ai/sdk`, `claude_agent_sdk`
+- **Trigger:** Working with Claude API, Agent SDK
+
+**mcp-builder** — Use when:
+- Building MCP servers to integrate external APIs/services
+- Creating FastMCP servers in Python
+- **Trigger:** "create an MCP server...", "integrate with..."
+
+**pdf** — Use when:
+- Reading or analyzing PDF documents
+- Extracting information from PDFs
+- **Trigger:** User uploads PDF, "read this PDF..."
+
+**docx** — Use when:
+- Creating or editing Word documents
+- Working with .docx files programmatically
+
+**xlsx** — Use when:
+- Creating or editing Excel spreadsheets
+- Working with .xlsx files programmatically
+
+**pptx** — Use when:
+- Creating or editing PowerPoint presentations
+- Working with .pptx files programmatically
+
+**doc-coauthoring** — Use when:
+- Collaborative document writing
+- Iterative document improvement
+
+**web-artifacts-builder** — Use when:
+- Building interactive web artifacts
+- Creating React components for artifacts
+- **Trigger:** "build a web app...", "create an interactive..."
+
+**webapp-testing** — Use when:
+- Testing web applications
+- Browser automation and testing
+
+**canvas-design** — Use when:
+- Designing canvas-based visualizations
+- Working with HTML5 canvas or design tools
+
+**frontend-design** — Use when:
+- UI/UX design work
+- Creating visually appealing interfaces
+- **Trigger:** "make it look nice...", "design a..."
+
+**brand-guidelines** — Use when:
+- Ensuring brand consistency
+- Following corporate identity guidelines
+
+**theme-factory** — Use when:
+- Creating or applying themes
+- Styling variations for components
+
+**internal-comms** — Use when:
+- Internal team communications
+- Drafting announcements, updates
+
+**slack-gif-creator** — Use when:
+- Creating animated GIFs for Slack
+- Fun/engaging team communications
+
+#### Specialized Skills (Stack-Specific)
+
+**frontend-development** — Use when:
+- Building frontend features
+- React, Vue, Angular development
+- **Trigger:** Working on UI components
+
+**backend-development** — Use when:
+- Building backend services
+- API development, database work
+
+**ai-multimodal** — Use when:
+- Working with AI/ML features
+- Multimodal inputs (images, text)
+
+**context-engineering** — Use when:
+- Optimizing context window usage
+- Managing long conversations
+
+**better-auth** — Use when:
+- Implementing authentication
+- Working with Better-Auth library
+
+**databases** — Use when:
+- Database schema design
+- Query optimization
+
+**devops** — Use when:
+- CI/CD pipelines
+- Infrastructure automation
+- **Trigger:** Docker, Kubernetes, GitHub Actions
+
+**google-adk-python** — Use when:
+- Working with Google ADK
+- Python agent development
+
+**code-search** — Use when:
+- Searching codebases
+- Finding definitions and references
 
 ---
 
