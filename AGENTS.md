@@ -27,7 +27,7 @@ python3 tests/test_kit.py               # integrity tests only
 global/commands/          # slash commands installed to ~/.claude/commands/
 global/settings.json      # MCP server definitions
 custom/commands/          # 3 custom commands (code-review, research, validate-and-fix)
-custom/hooks/hooks.json   # 2 security hooks (check-secrets, block-dangerous-bash)
+custom/hooks/hooks.json   # 3 security hooks (check-secrets, block-dangerous-bash, graphify-auto-rebuild)
 skills/
   claudekit-skills/       # Git submodule — 30+ community skills
   anthropics-skills/      # Git submodule — 17 official Anthropic skills
@@ -50,9 +50,10 @@ tests/
 | Server | Package | Purpose |
 |--------|---------|---------|
 | `context7` | `@upstash/context7-mcp` | Up-to-date library docs |
-| `gitnexus` | `gitnexus@latest` | Semantic code search |
 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
 | `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
+
+**Note:** GitNexus was replaced with **graphify** — a knowledge graph tool. Graphify runs via hook (auto-rebuild on code changes) instead of MCP server.
 
 ## Skills
 
@@ -60,11 +61,13 @@ tests/
 
 **Anthropic Official Skills** (17 from anthropics/skills): `claude-api`, `mcp-builder`, `pdf`, `docx`, `xlsx`, `pptx`, `web-artifacts-builder`, `frontend-design`, `canvas-design`, `internal-comms`
 
+**Custom Skills** (from custom/skills/): Project-specific skills defined with `SKILL.md`
+
 Installed per-project via `/ak:setup-skills` with user selection.
 
 ## Do Not Modify
 
 - `~/.claude/commands/` — managed by `install.py`
 - `~/.claude/settings.json` — managed by `install.py`
-- Any `.gitnexus/` directories — auto-generated index
+- Any `graphify-out/` directories — auto-generated knowledge graph
 - `skills/claudekit-skills/` and `skills/anthropics-skills/` — git submodules

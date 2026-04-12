@@ -1,2 +1,16 @@
-# GitNexus index
+# GitNexus index (deprecated - kept for backwards compatibility)
 .gitnexus/
+
+# Graphify output
+graphify-out/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Build/IDE
+.DS_Store
+*.egg-info/
+.eggs/

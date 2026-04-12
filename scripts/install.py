@@ -141,12 +141,12 @@ if CHECK_ONLY:
 
 CLAUDE_DIR.mkdir(parents=True, exist_ok=True)
 AGENT_KIT_PATH_FILE.write_text(str(REPO_ROOT) + "\n")
-print(f"[0/4] Saved agent-kit path → {AGENT_KIT_PATH_FILE}")
+print(f"[0/6] Saved agent-kit path → {AGENT_KIT_PATH_FILE}")
 
 # ── 1. Install global commands ────────────────────────────────────────────────
 
 print()
-print("[1/4] Installing global Claude Code commands...")
+print("[1/6] Installing global Claude Code commands...")
 CLAUDE_COMMANDS_DIR.mkdir(parents=True, exist_ok=True)
 
 for old_name in OLD_COMMAND_NAMES:
@@ -167,7 +167,7 @@ print(f"  {installed} command(s) installed to {CLAUDE_COMMANDS_DIR}")
 # ── 2. Register user-scoped MCP servers ───────────────────────────────────────
 
 print()
-print("[2/4] Registering user-scoped MCP servers...")
+print("[2/6] Registering user-scoped MCP servers...")
 
 if not claude_available():
     print("  ✗ claude CLI not found — skipping MCP setup")
@@ -190,7 +190,7 @@ else:
 # ── 3. Enable MCP permissions globally in ~/.claude/settings.json ─────────────
 
 print()
-print("[3/4] Enabling MCP permissions globally in ~/.claude/settings.json...")
+print("[3/6] Enabling MCP permissions globally in ~/.claude/settings.json...")
 
 source = load_json(GLOBAL_DIR / "settings.json")
 incoming = source.get("mcpPermissions", [])
@@ -241,15 +241,37 @@ else:
 print()
 print("[5/6] Custom assets directory...")
 
-skill_count = len(list((CUSTOM_DIR / "skills").rglob("SKILL.md")))
-cmd_count = len([f for f in (CUSTOM_DIR / "commands").glob("*.md")
-                 if f.name != "README.md"])
-hooks_file = CUSTOM_DIR / "hooks" / "hooks.json"
-hook_count = len(load_json(hooks_file)) if hooks_file.exists() else 0
+# Check if CUSTOM_DIR exists before accessing
+if not CUSTOM_DIR.exists():
+    print(f"  ! custom/ directory not found at {CUSTOM_DIR}")
+    print(f"  → Create it and add skills/commands/hooks as needed")
+    skill_count = cmd_count = hook_count = 0
+else:
+    skill_count = len(list((CUSTOM_DIR / "skills").rglob("SKILL.md"))) if (CUSTOM_DIR / "skills").exists() else 0
+    cmd_count = len([f for f in (CUSTOM_DIR / "commands").glob("*.md") if f.name != "README.md"]) if (CUSTOM_DIR / "commands").exists() else 0
+    hooks_file = CUSTOM_DIR / "hooks" / "hooks.json"
+    hook_count = len(load_json(hooks_file)) if hooks_file.exists() else 0
 
 print(f"  skills:   {skill_count}")
 print(f"  commands: {cmd_count}")
 print(f"  hooks:    {hook_count}")
+
+# ── 6. Install @fission-ai/openspec globally ──────────────────────────────────
+
+print()
+print("[6/6] Install @fission-ai/openspec globally?")
+print("  OpenSpec — AI-powered API specification & design tool")
+response = input("  Install now? (y/N): ").strip().lower()
+
+if response in ("y", "yes"):
+    result = run(["npm", "install", "-g", "@fission-ai/openspec@latest"])
+    if result.returncode == 0:
+        print("  + @fission-ai/openspec installed globally")
+    else:
+        print(f"  ! installation failed: {result.stderr.strip()}")
+        print("  → Try running manually: npm install -g @fission-ai/openspec@latest")
+else:
+    print("  = skipped (you can install later with: npm install -g @fission-ai/openspec@latest)")
 
 # ── Done ──────────────────────────────────────────────────────────────────────
 

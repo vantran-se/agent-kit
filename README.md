@@ -21,7 +21,7 @@ python3 scripts/install.py --init-submodule  # clone skills submodules
 
 Then in any project:
 ```
-/ak:init-project    # generate CLAUDE.md, AGENTS.md, hooks, GitNexus index
+/ak:init-project    # generate CLAUDE.md, AGENTS.md, hooks, graphify rebuild
 /ak:setup-skills    # install community skills (debugging, code-review, etc.)
 /ak:setup-custom    # install custom skills, commands, and hooks from custom/
 ```
@@ -30,7 +30,7 @@ Then in any project:
 
 | Command | Purpose |
 |---------|---------|
-| `/ak:init-project` | Per-project setup wizard — CLAUDE.md, AGENTS.md, hooks, GitNexus |
+| `/ak:init-project` | Per-project setup wizard — CLAUDE.md, AGENTS.md, hooks, graphify |
 | `/ak:setup-skills` | Install community skills from claudekit-skills + anthropics/skills submodules |
 | `/ak:setup-custom` | Install custom skills, commands, and hooks from `custom/` |
 | `/ak:update` | Sync MCP permissions to global settings |
@@ -43,9 +43,10 @@ Installed globally via `global/settings.json`:
 | Server | Package | Purpose |
 |--------|---------|---------|
 | `context7` | `@upstash/context7-mcp` | Up-to-date library docs |
-| `gitnexus` | `gitnexus@latest` | Semantic code search |
 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
 | `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
+
+**Note:** GitNexus was replaced with **graphify** — a knowledge graph tool that creates `graphify-out/` for semantic code navigation. Graphify runs via hook (auto-rebuild on code changes) instead of MCP server.
 
 ## Skills Sources
 
@@ -67,12 +68,13 @@ Private project-specific skills. Add a directory with `SKILL.md` to create one.
 
 ## Custom Hooks
 
-2 hooks in `custom/hooks/hooks.json`:
+3 hooks in `custom/hooks/hooks.json`:
 
 | Hook | Trigger | Description |
 |------|---------|-------------|
 | `check-secrets` | PreToolUse / Write\|Edit\|MultiEdit | Block writing hardcoded secrets or API keys |
 | `block-dangerous-bash` | PreToolUse / Bash | Block dangerous bash commands (rm -rf, force push, DROP TABLE, etc.) |
+| `graphify-auto-rebuild` | PostToolUse / Write\|Edit\|MultiEdit | Auto-rebuild graphify knowledge graph after code changes |
 
 ## Project Structure
 
@@ -91,7 +93,7 @@ agent-kit/
 │   │   ├── research.md
 │   │   └── validate-and-fix.md
 │   └── hooks/
-│       └── hooks.json               # 2 hooks (check-secrets, block-dangerous-bash)
+│       └── hooks.json               # 3 hooks (check-secrets, block-dangerous-bash, graphify-auto-rebuild)
 ├── skills/
 │   ├── claudekit-skills/            # Git submodule — 30+ community skills
 │   └── anthropics-skills/           # Git submodule — 17 official Anthropic skills
@@ -120,7 +122,39 @@ agent-kit/
 
 ## Requirements
 
-- Node.js 18+
-- Python 3
-- Claude Code
-- Git (for submodules)
+| Tool | Version | Purpose | Install |
+|------|---------|---------|---------|
+| **Node.js** | 18+ | MCP servers (npx), skills | `brew install node` |
+| **Python** | 3.10+ | Scripts, graphify | `brew install python@3.12` |
+| **Claude Code** | Latest | Main AI agent | `npm install -g @anthropic/claude-code` |
+| **Git** | Latest | Submodules, version control | `brew install git` |
+
+### Optional Tools
+
+| Tool | Purpose | Install |
+|------|---------|---------|
+| **Graphify** | Knowledge graph for codebase | `pip install graphify-ai` (if available) |
+| **npx** | Run MCP servers | Comes with Node.js/npm |
+
+### Post-Install Setup
+
+```bash
+# 1. Install Agent Kit globally
+cd agent-kit
+python3 scripts/install.py
+
+# 2. Initialize submodules (clone skills)
+python3 scripts/install.py --init-submodule
+
+# 3. Verify installation
+python3 scripts/install.py --check
+```
+
+### Per-Project Setup
+
+```bash
+# In any project directory
+/ak:init-project    # Generate CLAUDE.md, AGENTS.md, hooks
+/ak:setup-skills    # Install skills (debugging, code-review, etc.)
+/ak:setup-custom    # Install custom skills, commands, and hooks from custom/
+```

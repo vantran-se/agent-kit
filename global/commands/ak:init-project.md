@@ -1,5 +1,5 @@
 ---
-description: Per-project setup wizard — generates CLAUDE.md, AGENTS.md, configures hooks, indexes code with GitNexus
+description: Per-project setup wizard — generates CLAUDE.md, AGENTS.md, configures hooks, graphify rebuild
 category: workflow
 allowed-tools: Read, Write, Edit, Bash(python3:*, npx:*, ls:*, cat:*)
 ---
@@ -25,9 +25,8 @@ python3 "$AGENT_KIT_PATH/scripts/init-project.py" --cwd . --pretty
 
 Store output as `SETUP_DATA`. You get:
 - `.gitignore` status
-- GitNexus indexing status
+- Graphify rebuild status
 - Existing files (CLAUDE.md, AGENTS.md, .claude/settings.json)
-- Detected formatter
 - MCP permissions from agent-kit
 
 ---
@@ -58,7 +57,6 @@ ls ~/.claude/skills/ 2>/dev/null
 
 From `SETUP_DATA.mcp_permissions`, map to MCP servers:
 - `mcp__context7__*` → context7
-- `mcp__gitnexus__*` → gitnexus (already indexed)
 - `mcp__sequential-thinking__*` → sequential-thinking
 - `mcp__memory__*` → memory
 
@@ -75,13 +73,6 @@ Note key skills: `mcp-management`, `debugging`, `code-review`, `skill-creator`, 
 - Debugging library-specific issues
 - **Trigger:** Importing `anthropic`, `@anthropic-ai/sdk`, `prisma`, `tailwindcss`, etc.
 
-**gitnexus** — Use when:
-- Need to find where a function/class is defined
-- Understanding how a feature works across the codebase
-- Tracing execution flows or call chains
-- Investigating bugs or finding all callers of a function
-- Before modifying shared code — check blast radius with `impact()`
-
 **sequential-thinking** — Use when:
 - Architectural decisions with multiple trade-offs
 - Debugging complex multi-step issues
@@ -94,6 +85,11 @@ Note key skills: `mcp-management`, `debugging`, `code-review`, `skill-creator`, 
 - After making decisions that should persist across sessions
 - User explicitly asks you to "remember" something
 - Retrieving context from previous work sessions
+
+**graphify** — Use when (via hook, not MCP):
+- Need to find where a function/class is defined — read `graphify-out/GRAPH_REPORT.md` first
+- Understanding how a feature works across the codebase — use graph communities
+- Before searching raw files with Glob/Grep — the PreToolUse hook will remind you
 
 ---
 
@@ -134,12 +130,16 @@ See `global/commands/ak:setup-skills.md` for full list with detailed "When to Us
 
 ## Step 4: Analyze Project Stack
 
-Use gitnexus MCP `search_code`:
-- Search key files: `package.json`, `requirements.txt`, `pyproject.toml`, `go.mod`, `Cargo.toml`
-- Find entry points, routing, database models, API handlers
-- Identify test structure, CI/CD config
+Read project files to understand stack:
+- `package.json` → Node.js/TypeScript
+- `requirements.txt` or `pyproject.toml` → Python
+- `go.mod` → Go
+- `Cargo.toml` → Rust
+- `CLAUDE.md` → existing conventions
 
 Summarize stack in 2-3 lines.
+
+Note: If `graphify-out/GRAPH_REPORT.md` exists, read it first for codebase structure before analyzing raw files.
 
 ---
 
@@ -194,10 +194,10 @@ Ask in a **single message**. Skip what's clear from Step 4:
 - User asks about latest features or migration guides
 - You're unsure about current best practices
 
-**gitnexus** — Use `search_code` when:
-- Need to find where something is defined
-- Need to understand how a feature works across the codebase
-- Investigating bugs or tracing execution flows
+**graphify** — Read `graphify-out/GRAPH_REPORT.md` when:
+- Need to find where something is defined — check community hubs first
+- Understanding codebase structure — use god nodes and edges
+- Before running Glob/Grep searches — the PreToolUse hook will remind you
 
 **sequential-thinking** — Use when:
 - Making architectural decisions
@@ -275,7 +275,7 @@ Universal config for ALL AI assistants (Cursor, Copilot, Gemini). Under 150 line
 
 **context7** — Fetch up-to-date docs for [libraries]. Use when APIs change frequently or user asks about latest features.
 
-**gitnexus** — Semantic code search across this repo. Use to find definitions, trace flows, understand existing code.
+**graphify** — Graphify knowledge graph for codebase structure. Read `graphify-out/GRAPH_REPORT.md` before searching files.
 
 **sequential-thinking** — Complex reasoning, architectural planning, multi-step debugging.
 
@@ -298,48 +298,13 @@ Universal config for ALL AI assistants (Cursor, Copilot, Gemini). Under 150 line
 
 ---
 
-## Step 8: Configure Hooks
-
-Using `SETUP_DATA.formatter`:
-
-If formatter detected, ask: "Set up auto-format hooks? (Recommended)"
-
-If yes, merge into `.claude/settings.json`:
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write|MultiEdit",
-        "hooks": [{
-          "type": "command",
-          "command": "[SETUP_DATA.formatter.hook_command]"
-        }]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [{
-          "type": "command",
-          "command": "osascript -e 'display notification \"Task complete\" with title \"Claude Code\"' 2>/dev/null || notify-send 'Claude Code' 'Task complete' 2>/dev/null || true"
-        }]
-      }
-    ]
-  }
-}
-```
-
-Merge carefully — don't duplicate existing hooks.
-
----
-
-## Step 9: Install Custom Assets
+## Step 8: Install Custom Assets
 
 If `SETUP_DATA.agent_kit_path` exists, run `/ak:setup-custom`.
 
 ---
 
-## Step 10: Install Submodule Skills
+## Step 9: Install Submodule Skills
 
 Run `/ak:setup-skills` to:
 1. Detect project stack automatically
@@ -349,7 +314,7 @@ Run `/ak:setup-skills` to:
 
 ---
 
-## Step 11: Update Docs After Setup
+## Step 10: Update Docs After Setup
 
 After `/ak:setup-custom` and `/ak:setup-skills` complete:
 
@@ -359,14 +324,15 @@ Tell user: "CLAUDE.md and AGENTS.md updated with installed skills."
 
 ---
 
-## Step 12: Summary
+## Step 11: Summary
 
 Report:
 - Files created/updated: CLAUDE.md, AGENTS.md, .claude/settings.json (hooks)
-- GitNexus: `SETUP_DATA.gitnexus.status`
-- MCP servers enabled: list from permissions
+- Graphify: `SETUP_DATA.graphify.status`
+- MCP servers enabled: list from permissions (context7, sequential-thinking, memory)
 - Skills installed: list
-- Hooks configured: formatter + notification
+- Hooks configured: check-secrets, block-dangerous-bash, graphify-auto-rebuild
 - **Important:** Tell user to use these MCP servers and skills when working on this project:
-  - MCP: context7, gitnexus, sequential-thinking, memory
+  - MCP: context7, sequential-thinking, memory
   - Skills: debugging, code-review, mcp-management, skill-creator, etc.
+  - Graphify: Read `graphify-out/GRAPH_REPORT.md` before searching files

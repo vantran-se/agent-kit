@@ -75,7 +75,7 @@ Skip skills already in `.claude/skills/` or `~/.claude/skills/`.
 
 ---
 
-## Step 5: Detect Stack & Recommend Skills
+## Step 4: Detect Stack & Recommend Skills
 
 Read project files to understand stack:
 - `package.json` → Node.js/TypeScript
@@ -84,52 +84,127 @@ Read project files to understand stack:
 - `Cargo.toml` → Rust
 - `CLAUDE.md` → existing conventions
 
-Based on detected stack, prepare recommendations:
+### Skill Categories
 
-**Core Skills** (recommend for all projects):
-- `debugging`, `code-review`, `skill-creator`, `mcp-management`
-- `sequential-thinking`, `problem-solving`
+Skills are organized into **3 categories**:
 
-**Frontend**: `frontend-design`, `frontend-development`, `web-artifacts-builder`, `canvas-design`
-**Backend**: `backend-development`, `databases`, `mcp-builder`
-**AI/ML**: `claude-api`, `ai-multimodal`, `context-engineering`
-**Data/Docs**: `pdf`, `docx`, `xlsx`, `doc-coauthoring`
+#### List 1: Generic Skills (Core — recommended for ALL projects)
+
+These skills are useful regardless of tech stack:
+
+| Skill | When to Use |
+|-------|-------------|
+| `debugging` | Bug, test failure, unexpected behavior — systematic 4-phase debugging |
+| `code-review` | Pre-commit/PR review — 6 aspects: architecture, security, performance, testing, docs |
+| `skill-creator` | Tạo/evaluate skills mới |
+| `sequential-thinking` | Complex reasoning, architectural planning |
+| `problem-solving` | Creative problem-solving frameworks (inversion, pattern recognition) |
+| `docs-seeker` | Search docs via llms.txt, GitHub via Repomix |
+| `mermaidjs-v11` | Diagrams: flowcharts, sequence, architecture, ERD |
+| `doc-coauthoring` | Collaborative document writing |
+| `mcp-executor` | Execute MCP tools via subagent — saves tokens, keeps main context clean |
+| `codebase-scanner` | Scan codebase using graphify + subagents — understand structure quickly |
+
+#### List 2: Stack-Specific Skills (auto-suggest based on detected stack)
+
+| Stack | Skills |
+|-------|--------|
+| **Node.js/TypeScript** | `backend-development`, `frontend-development`, `frontend-design`, `ui-styling`, `web-frameworks`, `web-testing`, `better-auth`, `databases` |
+| **Python** | `backend-development`, `databases`, `ai-multimodal`, `google-adk-python`, `media-processing`, `pdf`, `docx`, `xlsx` |
+| **Go** | `backend-development`, `devops`, `databases` |
+| **Rust** | `backend-development`, `devops` |
+| **Frontend-heavy** | `frontend-design`, `frontend-development`, `ui-styling`, `webapp-testing`, `threejs`, `aesthetic`, `canvas-design` |
+| **Backend-heavy** | `backend-development`, `databases`, `devops`, `better-auth`, `payment-integration`, `mcp-builder` |
+| **AI/ML** | `claude-api`, `ai-multimodal`, `context-engineering`, `google-adk-python` |
+
+#### List 3: Nice-to-Have Skills (optional, less frequently used)
+
+| Skill | Purpose |
+|-------|---------|
+| `mcp-management` | Discover/analyze/execute MCP tools — tích hợp Gemini CLI (chỉ cần nếu dùng MCP servers) |
+| `shopify` | Shopify apps, checkout extensions, Liquid themes |
+| `payment-integration` | Stripe, SePay (VietQR), Polar, Paddle, Creem.io |
+| `repomix` | Package codebase thành 1 file AI-friendly |
+| `chrome-devtools` | Browser automation với Puppeteer |
+| `theme-factory` | Generate design themes |
+| `brand-guidelines` | Brand consistency |
+| `canvas-design` | Canvas-based visual designs |
+| `internal-comms` | Team communication tools |
+| `slack-gif-creator` | Create GIFs for Slack |
+| `algorithmic-art` | Generative art |
+| `web-artifacts-builder` | Build interactive web apps trong artifact |
 
 ---
 
-## Step 6: Ask User to Select Skills (REQUIRED — DO NOT SKIP)
+## Step 5: Ask User to Select Skills (REQUIRED — DO NOT SKIP)
 
 **CRITICAL: You MUST ask user before installing any skills. Never install automatically.**
 
-Present recommendations and **wait for user confirmation**:
+Present recommendations using `AskUserQuestion` with **checkboxes** for better UX:
 
-> "Based on your project stack, here are recommended skills:
+### Step 5.1: Generic Skills (Checkbox List)
+
+Present generic skills as a **multi-select checklist**:
+
+> "**List 1: Generic Skills (Core)** — recommended for ALL projects:
 >
-> **Core** (recommended for all):
-> - debugging, code-review, skill-creator, mcp-management, sequential-thinking
+> Select skills to install (multi-select):
+> - [ ] `debugging` — Bug, test failure, unexpected behavior
+> - [ ] `code-review` — Pre-commit/PR review
+> - [ ] `skill-creator` — Create/evaluate new skills
+> - [ ] `sequential-thinking` — Complex reasoning, architectural planning
+> - [ ] `problem-solving` — Creative problem-solving frameworks
+> - [ ] `docs-seeker` — Search docs via llms.txt, GitHub
+> - [ ] `mermaidjs-v11` — Diagrams: flowcharts, sequence, architecture
+> - [ ] `doc-coauthoring` — Collaborative document writing
+> - [ ] `mcp-executor` — Execute MCP tools via subagent (saves tokens)
+> - [ ] `codebase-scanner` — Scan codebase using graphify + subagents
 >
-> **For your stack** [adjust based on detection]:
-> - [stack-specific skills]
+> Press Enter to skip all."
+
+### Step 5.2: Stack-Specific Skills (Checkbox List)
+
+Present stack-specific skills as a **multi-select checklist**:
+
+> "**List 2: Stack-Specific Skills** — detected stack: **[Stack Name]**
 >
-> **Available from claudekit-skills**: [list 10-15 popular]
-> **Available from anthropics/skills**: [list 10-15 popular]
+> Select skills to install (multi-select):
+> - [ ] `backend-development`
+> - [ ] `frontend-development`
+> - [ ] `databases`
+> - [ ] [other stack-specific skills]
 >
-> Which skills would you like to install?
-> - Type skill names separated by space, or
-> - Type 'all-core' for core skills only, or
-> - Type 'all-recommended' for core + stack-specific, or
-> - Press Enter to skip
+> Press Enter to skip."
+
+### Step 5.3: Nice-to-Have Skills (Checkbox List)
+
+> "**List 3: Nice-to-Have Skills** (optional):
 >
-> ⚠️ I will not install anything until you confirm."
+> Select any skills you want (multi-select):
+> - [ ] `mcp-management` — MCP server management (chỉ cần nếu dùng MCP servers)
+> - [ ] `shopify`
+> - [ ] `payment-integration`
+> - [ ] `repomix`
+> - [ ] `chrome-devtools`
+> - [ ] `theme-factory`
+> - [ ] `brand-guidelines`
+> - [ ] `canvas-design`
+> - [ ] `internal-comms`
+> - [ ] `slack-gif-creator`
+> - [ ] `algorithmic-art`
+> - [ ] `doc-coauthoring`
+> - [ ] `web-artifacts-builder`
+>
+> Press Enter to skip."
 
 **If arguments provided** (`ak:setup-skills debugging code-review`), still confirm:
 > "You requested: debugging, code-review. Install these now? (y/n)"
 
-**DO NOT proceed to Step 7 until user explicitly confirms.**
+**DO NOT proceed to Step 6 until user explicitly confirms.**
 
 ---
 
-## Step 7: Install Selected Skills
+## Step 6: Install Selected Skills
 
 For each selected skill:
 
@@ -148,7 +223,7 @@ Ask: "Install globally (~/.claude/skills/) or project-only (.claude/skills/)?" D
 
 ---
 
-## Step 8: Update CLAUDE.md and AGENTS.md
+## Step 7: Update CLAUDE.md and AGENTS.md
 
 **After installing**, read CLAUDE.md and AGENTS.md if they exist.
 
@@ -170,7 +245,7 @@ Tell user: "Updated CLAUDE.md and AGENTS.md with newly installed skills."
 
 ---
 
-## Step 9: Summary
+## Step 8: Summary
 
 Report:
 - Skills installed: list

@@ -12,14 +12,15 @@ agent-kit/
 │   │   ├── ak:setup-custom.md
 │   │   ├── ak:setup-skills.md
 │   │   └── ak:update.md
-│   └── settings.json                # MCP server definitions (4 servers) + mcpPermissions
+│   └── settings.json                # MCP server definitions (3 servers) + mcpPermissions
 ├── custom/
 │   ├── commands/
 │   │   ├── code-review.md
 │   │   ├── research.md
 │   │   └── validate-and-fix.md
-│   └── hooks/
-│       └── hooks.json               # 2 active hooks (check-secrets, block-dangerous-bash)
+│   ├── hooks/
+│   │   └── hooks.json               # 3 active hooks
+│   └── skills/
 ├── skills/
 │   ├── claudekit-skills/            # Git submodule — 30+ community skills
 │   └── anthropics-skills/           # Git submodule — 17 official Anthropic skills
@@ -58,9 +59,10 @@ agent-kit/
 | Server | Package | Purpose |
 |--------|---------|---------|
 | `context7` | `@upstash/context7-mcp` | Up-to-date library docs |
-| `gitnexus` | `gitnexus@latest` | Semantic code search |
 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
 | `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
+
+**Note:** GitNexus was replaced with **graphify** — a knowledge graph tool that creates `graphify-out/` for semantic code navigation.
 
 ## Custom Commands (custom/commands/)
 
@@ -70,11 +72,16 @@ agent-kit/
 | `research` | Deep research with parallel subagents and automatic citations |
 | `validate-and-fix` | Run quality checks and automatically fix issues |
 
+## Custom Skills (custom/skills/)
+
+Private project-specific skills. Add a directory with `SKILL.md` to create one.
+
 ## Custom Hooks (custom/hooks/hooks.json)
 
-2 active hooks:
+3 active hooks:
 - `check-secrets` — Block writing hardcoded secrets/API keys
 - `block-dangerous-bash` — Block dangerous bash commands (rm -rf, force push, DROP TABLE, etc.)
+- `graphify-auto-rebuild` — Auto-rebuild graphify knowledge graph after code changes (PostToolUse hook)
 
 Hook input: JSON via stdin — use `jq -r '.tool_input.field_name'`.
 
@@ -88,3 +95,13 @@ Hook input: JSON via stdin — use `jq -r '.tool_input.field_name'`.
 - The `skill-creator` skill in `.claude/skills/` is for developing and evaluating new skills
 
 **Before implementing any Claude Code feature** — use the `claude-code-guide` subagent to verify the correct API/behavior first.
+
+## graphify
+
+This project has a graphify knowledge graph at graphify-out/.
+
+Rules:
+- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
+- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
+- After modifying code files in this session, the `graphify-auto-rebuild` hook automatically rebuilds the graph
+- Manual rebuild: `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"`

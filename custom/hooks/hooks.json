@@ -20,5 +20,16 @@
       "matcher": "Write|Edit|MultiEdit",
       "command": "INPUT=$(cat); CONTENT=$(echo \"$INPUT\" | jq -r '(.tool_input.new_string // \"\") + (.tool_input.content // \"\")'); if echo \"$CONTENT\" | grep -qE '(sk-[a-zA-Z0-9]{20,}|AKIA[A-Z0-9]{16}|ghp_[a-zA-Z0-9]{36,}|ghs_[a-zA-Z0-9]{36,}|-----BEGIN (RSA|EC|DSA|OPENSSH) PRIVATE KEY|AIza[0-9A-Za-z-_]{35}|xox[baprs]-[0-9A-Za-z]{10,})'; then echo \"BLOCK: Potential hardcoded secret detected. Use environment variables instead.\" >&2; exit 2; fi"
     }
+  },
+  {
+    "name": "graphify-auto-rebuild",
+    "description": "Auto-rebuild graphify knowledge graph after code changes",
+    "stacks": ["*"],
+    "scope": "global",
+    "hook": {
+      "event": "PostToolUse",
+      "matcher": "Write|Edit|MultiEdit",
+      "command": "python3 -c \"from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))\" 2>/dev/null || true"
+    }
   }
 ]

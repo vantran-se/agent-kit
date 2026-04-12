@@ -4,10 +4,6 @@
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@latest"]
     },
-    "gitnexus": {
-      "command": "npx",
-      "args": ["-y", "gitnexus@latest", "mcp"]
-    },
     "sequential-thinking": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
@@ -19,7 +15,6 @@
   },
   "mcpPermissions": [
     "mcp__context7__*",
-    "mcp__gitnexus__*",
     "mcp__sequential-thinking__*",
     "mcp__memory__*"
   ]
