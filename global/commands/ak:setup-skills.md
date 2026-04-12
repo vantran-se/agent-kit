@@ -102,8 +102,6 @@ These skills are useful regardless of tech stack:
 | `docs-seeker` | Search docs via llms.txt, GitHub via Repomix |
 | `mermaidjs-v11` | Diagrams: flowcharts, sequence, architecture, ERD |
 | `doc-coauthoring` | Collaborative document writing |
-| `mcp-executor` | Execute MCP tools via subagent — saves tokens, keeps main context clean |
-| `codebase-scanner` | Scan codebase using graphify + subagents — understand structure quickly |
 
 #### List 2: Stack-Specific Skills (auto-suggest based on detected stack)
 
@@ -157,8 +155,6 @@ Present generic skills as a **multi-select checklist**:
 > - [ ] `docs-seeker` — Search docs via llms.txt, GitHub
 > - [ ] `mermaidjs-v11` — Diagrams: flowcharts, sequence, architecture
 > - [ ] `doc-coauthoring` — Collaborative document writing
-> - [ ] `mcp-executor` — Execute MCP tools via subagent (saves tokens)
-> - [ ] `codebase-scanner` — Scan codebase using graphify + subagents
 >
 > Press Enter to skip all."
 
