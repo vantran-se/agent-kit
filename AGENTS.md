@@ -53,8 +53,6 @@ tests/
 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
 | `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
 
-**Note:** GitNexus was replaced with **graphify** — a knowledge graph tool. Graphify runs via hook (auto-rebuild on code changes) instead of MCP server.
-
 ## Skills
 
 **Community Skills** (30+ from claudekit-skills): `debugging`, `code-review`, `skill-creator`, `mcp-management`, `frontend-development`, `backend-development`, `ai-multimodal`, `context-engineering`, `databases`, `devops`

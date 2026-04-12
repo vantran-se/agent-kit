@@ -46,8 +46,6 @@ Installed globally via `global/settings.json`:
 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
 | `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
 
-**Note:** GitNexus was replaced with **graphify** — a knowledge graph tool that creates `graphify-out/` for semantic code navigation. Graphify runs via hook (auto-rebuild on code changes) instead of MCP server.
-
 ## Skills Sources
 
 ### claudekit-skills (skills/claudekit-skills/)

@@ -58,9 +58,9 @@ def run_cmd(cmd: list[str], cwd: Path | None = None,
 # ── Step 1: Update .gitignore ─────────────────────────────────────────────────
 
 def update_gitignore(project: Path) -> dict:
-  """Add .gitnexus/ and graphify-out/ to .gitignore if not already present."""
+  """Add graphify-out/ to .gitignore if not already present."""
   gitignore = project / ".gitignore"
-  entries = [(".gitnexus/", "# GitNexus index"), ("graphify-out/", "# Graphify output")]
+  entries = [("graphify-out/", "# Graphify output")]
 
   if gitignore.exists():
     content = gitignore.read_text()
@@ -75,7 +75,7 @@ def update_gitignore(project: Path) -> dict:
     return {"updated": updated, "already_had_entries": not updated}
 
   # No .gitignore — create one
-  lines = ["# GitNexus index", ".gitnexus/", "", "# Graphify output", "graphify-out/"]
+  lines = ["# Graphify output", "graphify-out/"]
   gitignore.write_text("\n".join(lines) + "\n")
   return {"updated": True, "already_had_entries": False}
 
@@ -213,9 +213,9 @@ def print_pretty(data: dict):
   # Gitignore
   gi = data["gitignore"]
   if gi.get("already_had_entries"):
-    print("  ✓ .gitignore already has .gitnexus/ and graphify-out/")
+    print("  ✓ .gitignore already has graphify-out/")
   elif gi.get("updated"):
-    print("  + .gitignore updated with .gitnexus/ and graphify-out/")
+    print("  + .gitignore updated with graphify-out/")
 
   # Graphify
   gn = data["graphify"]

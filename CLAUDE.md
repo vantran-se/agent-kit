@@ -62,8 +62,6 @@ agent-kit/
 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
 | `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
 
-**Note:** GitNexus was replaced with **graphify** — a knowledge graph tool that creates `graphify-out/` for semantic code navigation.
-
 ## Custom Commands (custom/commands/)
 
 | Command | Purpose |
