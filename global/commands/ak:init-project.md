@@ -35,9 +35,13 @@ Store output as `SETUP_DATA`. You get:
 
 Using `SETUP_DATA.existing`:
 
-- `claude_md.exists` → read content, plan to update (never overwrite blindly)
+- `claude_md.exists` → read content and **identify sections to preserve**:
+  - Extract: project name, Quick Start commands, Environment vars, custom Gotchas
+  - Mark for update: MCP Tools, Skills Available (will merge new data)
 - `claude_settings.exists` → read and merge hooks/permissions later
-- `agents_md.exists` → read for context
+- `agents_md.exists` → read content and **identify sections to preserve**:
+  - Extract: Project Overview, Tech Stack, Commands, custom Gotchas
+  - Mark for update: Tools Available section (will merge new data)
 
 ---
 
@@ -160,6 +164,24 @@ Ask in a **single message**. Skip what's clear from Step 4:
 
 **Goal:** Actively instruct Claude to use available tools. Under 100 lines.
 
+### Merge Strategy (if CLAUDE.md exists)
+
+If `SETUP_DATA.existing.claude_md.exists`:
+1. **Preserve** these sections from existing file (if present):
+   - Project name and description (Step 1 of template)
+   - Quick Start commands
+   - Environment variables
+   - Any custom "Gotchas" not covered elsewhere
+2. **Update/Merge** these sections:
+   - MCP Tools section → use new template with discovered servers
+   - Skills Available → add newly installed skills
+   - Conventions → merge, deduplicate
+3. **Use `Edit` tool** to update specific sections, not `Write` to replace whole file
+
+If file doesn't exist, create with full template below.
+
+### CLAUDE.md Template (for new files or missing sections)
+
 ```markdown
 # [Project Name]
 
@@ -227,11 +249,43 @@ Ask in a **single message**. Skip what's clear from Step 4:
 - Use `@path/to/file` for related docs instead of copy-paste
 - For each MCP/skill, specify **WHEN** to use it
 
+### Merge Implementation (CLAUDE.md)
+
+If file already exists, use this approach:
+
+1. **Read existing file** and identify section boundaries (headers starting with `##`)
+2. **For each existing section:**
+   - Keep: `Quick Start`, `Environment`, `Gotchas` (user-customized content)
+   - Replace/Merge: `MCP Tools`, `Skills Available` (template-managed content)
+   - Preserve: `Conventions` — append new conventions that don't conflict
+3. **Use `Edit` tool** with targeted `old_string`/`new_string` replacements:
+   - If `## MCP Tools` exists: replace entire section
+   - If `## Skills Available` exists: merge new skills into list
+   - If section missing: add it before `## Gotchas` or at end
+4. **Never use `Write`** to replace entire file when merging
+
 ---
 
 ## Step 7: Generate AGENTS.md
 
 Universal config for ALL AI assistants (Cursor, Copilot, Gemini). Under 150 lines.
+
+### Merge Strategy (if AGENTS.md exists)
+
+If `SETUP_DATA.existing.agents_md.exists`:
+1. **Preserve** these sections from existing file (if present):
+   - Project Overview
+   - Tech Stack
+   - Commands
+   - Gotchas specific to this project
+2. **Update/Merge** these sections:
+   - Tools Available (Claude Code) → add newly discovered MCP servers and skills
+   - Conventions → merge, deduplicate
+3. **Use `Edit` tool** to update specific sections, not `Write` to replace whole file
+
+If file doesn't exist, create with full template below.
+
+### AGENTS.md Template (for new files or missing sections)
 
 ```markdown
 # AI Assistant Configuration — [Project Name]
@@ -296,6 +350,19 @@ Universal config for ALL AI assistants (Cursor, Copilot, Gemini). Under 150 line
 - Standalone — no MCP-specific syntax other assistants can't use
 - Include skills/MCP info so any AI knows what's available
 
+### Merge Implementation (AGENTS.md)
+
+If file already exists, use this approach:
+
+1. **Read existing file** and identify section boundaries (headers starting with `##`)
+2. **For each existing section:**
+   - Keep: `Project Overview`, `Tech Stack`, `Commands`, `Gotchas` (user-customized content)
+   - Replace/Merge: `Tools Available (Claude Code)` — add newly discovered MCP servers and skills
+3. **Use `Edit` tool** with targeted `old_string`/`new_string` replacements:
+   - If `## Tools Available (Claude Code)` exists: replace entire section with updated version
+   - If section missing: add it before `## Do Not Modify` or at end
+4. **Never use `Write`** to replace entire file when merging
+
 ---
 
 ## Step 8: Install Custom Assets
@@ -320,7 +387,11 @@ After `/ak:setup-custom` and `/ak:setup-skills` complete:
 
 **Re-read CLAUDE.md and AGENTS.md** — update "Skills Available" sections with what was actually installed.
 
-Tell user: "CLAUDE.md and AGENTS.md updated with installed skills."
+**Merge strategy:**
+- If CLAUDE.md existed before Step 6: preserve custom sections user had, only add/update MCP Tools and Skills Available sections
+- If AGENTS.md existed before Step 7: preserve custom sections user had, only add/update Tools Available section
+
+Tell user: "CLAUDE.md and AGENTS.md updated with installed skills (merged with existing content)."
 
 ---
 
