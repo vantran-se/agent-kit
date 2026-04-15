@@ -22,14 +22,14 @@
     }
   },
   {
-    "name": "graphify-auto-rebuild",
-    "description": "Auto-rebuild graphify knowledge graph after code changes",
+    "name": "gitnexus-auto-rebuild",
+    "description": "Auto-rebuild GitNexus knowledge graph after code changes",
     "stacks": ["*"],
     "scope": "global",
     "hook": {
       "event": "PostToolUse",
       "matcher": "Write|Edit|MultiEdit",
-      "command": "python3 -c \"from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))\" 2>/dev/null || true"
+      "command": "npx gitnexus analyze 2>/dev/null || true"
     }
   }
 ]

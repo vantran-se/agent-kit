@@ -21,7 +21,7 @@ python3 scripts/install.py --init-submodule  # clone skills submodules
 
 Then in any project:
 ```
-/ak:init-project    # generate CLAUDE.md, AGENTS.md, hooks, graphify rebuild
+/ak:init-project    # generate CLAUDE.md, AGENTS.md, hooks, gitnexus rebuild
 /ak:setup-skills    # install community skills (debugging, code-review, etc.)
 /ak:setup-custom    # install custom skills, commands, and hooks from custom/
 ```
@@ -30,7 +30,7 @@ Then in any project:
 
 | Command | Purpose |
 |---------|---------|
-| `/ak:init-project` | Per-project setup wizard — CLAUDE.md, AGENTS.md, hooks, graphify |
+| `/ak:init-project` | Per-project setup wizard — CLAUDE.md, AGENTS.md, hooks, gitnexus |
 | `/ak:setup-skills` | Install community skills from claudekit-skills + anthropics/skills submodules |
 | `/ak:setup-custom` | Install custom skills, commands, and hooks from `custom/` |
 | `/ak:update` | Sync MCP permissions to global settings |
@@ -72,7 +72,7 @@ Private project-specific skills. Add a directory with `SKILL.md` to create one.
 |------|---------|-------------|
 | `check-secrets` | PreToolUse / Write\|Edit\|MultiEdit | Block writing hardcoded secrets or API keys |
 | `block-dangerous-bash` | PreToolUse / Bash | Block dangerous bash commands (rm -rf, force push, DROP TABLE, etc.) |
-| `graphify-auto-rebuild` | PostToolUse / Write\|Edit\|MultiEdit | Auto-rebuild graphify knowledge graph after code changes |
+| `gitnexus-auto-rebuild` | PostToolUse / Write\|Edit\|MultiEdit | Auto-rebuild gitnexus knowledge graph after code changes |
 
 ## Project Structure
 
@@ -91,7 +91,7 @@ agent-kit/
 │   │   ├── research.md
 │   │   └── validate-and-fix.md
 │   └── hooks/
-│       └── hooks.json               # 3 hooks (check-secrets, block-dangerous-bash, graphify-auto-rebuild)
+│       └── hooks.json               # 3 hooks (check-secrets, block-dangerous-bash, gitnexus-auto-rebuild)
 ├── skills/
 │   ├── claudekit-skills/            # Git submodule — 30+ community skills
 │   └── anthropics-skills/           # Git submodule — 17 official Anthropic skills
@@ -123,7 +123,7 @@ agent-kit/
 | Tool | Version | Purpose | Install |
 |------|---------|---------|---------|
 | **Node.js** | 18+ | MCP servers (npx), skills | `brew install node` |
-| **Python** | 3.10+ | Scripts, graphify | `brew install python@3.12` |
+| **Python** | 3.10+ | Scripts | `brew install python@3.12` |
 | **Claude Code** | Latest | Main AI agent | `npm install -g @anthropic/claude-code` |
 | **Git** | Latest | Submodules, version control | `brew install git` |
 
@@ -131,7 +131,7 @@ agent-kit/
 
 | Tool | Purpose | Install |
 |------|---------|---------|
-| **Graphify** | Knowledge graph for codebase | `pip install graphify-ai` (if available) |
+| **GitNexus** | Knowledge graph for codebase | `npm install -g gitnexus` |
 | **npx** | Run MCP servers | Comes with Node.js/npm |
 
 ### Post-Install Setup

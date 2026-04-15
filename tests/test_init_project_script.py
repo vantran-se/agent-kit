@@ -25,12 +25,12 @@ class TestInitProjectScript(unittest.TestCase):
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return json.loads(result.stdout)
 
-    def test_creates_gitignore_with_graphify(self):
+    def test_creates_gitignore_with_gitnexus(self):
         data = self.run_script()
         gitignore = self.tmp_dir / '.gitignore'
 
         self.assertTrue(gitignore.exists())
-        self.assertIn('graphify-out/', gitignore.read_text())
+        self.assertIn('.gitnexus/', gitignore.read_text())
         self.assertTrue(data['gitignore']['updated'])
         self.assertFalse(data['gitignore']['already_had_entries'])
 
@@ -42,12 +42,12 @@ class TestInitProjectScript(unittest.TestCase):
 
         content = gitignore.read_text()
         self.assertIn('node_modules/', content)
-        self.assertIn('graphify-out/', content)
+        self.assertIn('.gitnexus/', content)
         self.assertTrue(data['gitignore']['updated'])
 
-    def test_recognizes_existing_graphify_in_gitignore(self):
+    def test_recognizes_existing_gitnexus_in_gitignore(self):
         gitignore = self.tmp_dir / '.gitignore'
-        gitignore.write_text("graphify-out/\n")
+        gitignore.write_text(".gitnexus/\n")
 
         data = self.run_script()
         self.assertFalse(data['gitignore']['updated'])

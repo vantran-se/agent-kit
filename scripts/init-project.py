@@ -8,7 +8,7 @@ have to check & execute each one individually. Saves tokens significantly.
 Usage:
   python3 scripts/init-project.py                          # run in current dir
   python3 scripts/init-project.py --cwd /path/to/project   # specify project
-  python3 scripts/init-project.py --skip-graphify           # skip graphify rebuild
+  python3 scripts/init-project.py --skip-gitnexus           # skip gitnexus rebuild
   python3 scripts/init-project.py --pretty                  # human-readable output
 """
 
@@ -58,9 +58,9 @@ def run_cmd(cmd: list[str], cwd: Path | None = None,
 # ── Step 1: Update .gitignore ─────────────────────────────────────────────────
 
 def update_gitignore(project: Path) -> dict:
-  """Add graphify-out/ to .gitignore if not already present."""
+  """Add .gitnexus/ to .gitignore if not already present."""
   gitignore = project / ".gitignore"
-  entries = [("graphify-out/", "# Graphify output")]
+  entries = [(".gitnexus/", "# GitNexus output")]
 
   if gitignore.exists():
     content = gitignore.read_text()
@@ -75,32 +75,32 @@ def update_gitignore(project: Path) -> dict:
     return {"updated": updated, "already_had_entries": not updated}
 
   # No .gitignore — create one
-  lines = ["# Graphify output", "graphify-out/"]
+  lines = ["# GitNexus output", ".gitnexus/"]
   gitignore.write_text("\n".join(lines) + "\n")
   return {"updated": True, "already_had_entries": False}
 
 
-# ── Step 2: Graphify Rebuild ──────────────────────────────────────────────────
+# ── Step 2: GitNexus Rebuild ──────────────────────────────────────────────────
 
-def run_graphify_rebuild(project: Path, skip: bool) -> dict:
-  """Run graphify rebuild if graphify is available and project has code."""
-  # Check if graphify-out/graph.json already exists (graphify was run before)
-  graphify_exists = (project / "graphify-out" / "graph.json").exists()
+def run_gitnexus_rebuild(project: Path, skip: bool) -> dict:
+  """Run gitnexus analyze if gitnexus is available and project has code."""
+  # Check if .gitnexus/ already exists (gitnexus was run before)
+  gitnexus_dir_exists = (project / ".gitnexus").exists()
 
-  if not graphify_exists:
-    return {"graphify_exists": False, "status": "skipped", "message": "graphify-out/ not found — run graphify first"}
+  if not gitnexus_dir_exists:
+    return {"status": "skipped", "message": ".gitnexus/ not found — run 'npx gitnexus analyze' first"}
 
   if skip:
-    return {"graphify_exists": True, "status": "skipped", "message": "--skip-graphify flag"}
+    return {"status": "skipped", "message": "--skip-gitnexus flag"}
 
-  # Try to rebuild graphify
+  # Try to rebuild using gitnexus CLI
   code, stdout, stderr = run_cmd(
-    ["python3", "-c", "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"],
+    ["npx", "gitnexus", "analyze"],
     cwd=project
   )
   if code == 0:
-    return {"graphify_exists": True, "status": "rebuilt"}
-  return {"graphify_exists": True, "status": "error", "message": stderr or stdout}
+    return {"status": "rebuilt"}
+  return {"status": "error", "message": stderr or stdout}
 
 
 # ── Step 3: Scan Existing Setup ───────────────────────────────────────────────
@@ -165,8 +165,8 @@ def main():
     help="Project directory (default: current dir)"
   )
   parser.add_argument(
-    "--skip-graphify", action="store_true",
-    help="Skip graphify rebuild"
+    "--skip-gitnexus", action="store_true",
+    help="Skip gitnexus rebuild"
   )
   parser.add_argument(
     "--pretty", action="store_true",
@@ -182,11 +182,11 @@ def main():
   # Run all steps in order
   result = {}
 
-  # 1. Update .gitignore (before graphify so graphify-out/ is ignored)
+  # 1. Update .gitignore (before gitnexus so .gitnexus/ is ignored)
   result["gitignore"] = update_gitignore(project)
 
-  # 2. Graphify rebuild (run early so AI can use graph immediately)
-  result["graphify"] = run_graphify_rebuild(project, skip=args.skip_graphify)
+  # 2. GitNexus rebuild (run early so AI can use graph immediately)
+  result["gitnexus"] = run_gitnexus_rebuild(project, skip=args.skip_gitnexus)
 
   # 3. Scan existing setup files
   result["existing"] = scan_existing(project)
@@ -213,14 +213,14 @@ def print_pretty(data: dict):
   # Gitignore
   gi = data["gitignore"]
   if gi.get("already_had_entries"):
-    print("  ✓ .gitignore already has graphify-out/")
+    print("  ✓ .gitignore already has .gitnexus/")
   elif gi.get("updated"):
-    print("  + .gitignore updated with graphify-out/")
+    print("  + .gitignore updated with .gitnexus/")
 
-  # Graphify
-  gn = data["graphify"]
+  # GitNexus
+  gn = data["gitnexus"]
   status_icon = {"rebuilt": "✓", "skipped": "—", "error": "✗"}
-  print(f"  {status_icon.get(gn.get('status', '?'), '?')} graphify: {gn.get('status', 'unknown')}", end="")
+  print(f"  {status_icon.get(gn.get('status', '?'), '?')} gitnexus: {gn.get('status', 'unknown')}", end="")
   if "message" in gn:
     print(f" ({gn['message']})", end="")
   print()

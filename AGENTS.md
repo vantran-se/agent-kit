@@ -27,7 +27,7 @@ python3 tests/test_kit.py               # integrity tests only
 global/commands/          # slash commands installed to ~/.claude/commands/
 global/settings.json      # MCP server definitions
 custom/commands/          # 3 custom commands (code-review, research, validate-and-fix)
-custom/hooks/hooks.json   # 3 security hooks (check-secrets, block-dangerous-bash, graphify-auto-rebuild)
+custom/hooks/hooks.json   # 3 security hooks (check-secrets, block-dangerous-bash, gitnexus-auto-rebuild)
 skills/
   claudekit-skills/       # Git submodule — 30+ community skills
   anthropics-skills/      # Git submodule — 17 official Anthropic skills
@@ -67,5 +67,5 @@ Installed per-project via `/ak:setup-skills` with user selection.
 
 - `~/.claude/commands/` — managed by `install.py`
 - `~/.claude/settings.json` — managed by `install.py`
-- Any `graphify-out/` directories — auto-generated knowledge graph
+- Any `.gitnexus/` directories — auto-generated GitNexus knowledge graph
 - `skills/claudekit-skills/` and `skills/anthropics-skills/` — git submodules

@@ -79,7 +79,7 @@ Private project-specific skills. Add a directory with `SKILL.md` to create one.
 3 active hooks:
 - `check-secrets` — Block writing hardcoded secrets/API keys
 - `block-dangerous-bash` — Block dangerous bash commands (rm -rf, force push, DROP TABLE, etc.)
-- `graphify-auto-rebuild` — Auto-rebuild graphify knowledge graph after code changes (PostToolUse hook)
+- `gitnexus-auto-rebuild` — Auto-rebuild gitnexus knowledge graph after code changes (PostToolUse hook)
 
 Hook input: JSON via stdin — use `jq -r '.tool_input.field_name'`.
 
@@ -94,12 +94,16 @@ Hook input: JSON via stdin — use `jq -r '.tool_input.field_name'`.
 
 **Before implementing any Claude Code feature** — use the `claude-code-guide` subagent to verify the correct API/behavior first.
 
-## graphify
+## gitnexus
 
-This project has a graphify knowledge graph at graphify-out/.
+This project has a GitNexus knowledge graph in `.gitnexus/`.
+
+GitNexus is a zero-server code intelligence engine that builds a knowledge graph of any codebase.
+Install: `npm install -g gitnexus` | CLI: `gitnexus analyze` | Web UI: gitnexus.vercel.app
 
 Rules:
-- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
-- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
-- After modifying code files in this session, the `graphify-auto-rebuild` hook automatically rebuilds the graph
-- Manual rebuild: `python3 -c "from graphify.watch import _rebuild_code; from pathlib import Path; _rebuild_code(Path('.'))"`
+- Before answering architecture or codebase questions, read `.gitnexus/` for codebase structure
+- If `.gitnexus/` contains wiki or graph files, use them to understand community hubs and god nodes
+- After modifying code files in this session, the `gitnexus-auto-rebuild` hook automatically rebuilds the graph
+- Manual rebuild: `npx gitnexus analyze` (or `npx gitnexus analyze --force` for full re-index)
+- GitNexus also provides an MCP server with 16 tools via `gitnexus mcp`

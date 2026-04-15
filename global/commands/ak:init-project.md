@@ -1,5 +1,5 @@
 ---
-description: Per-project setup wizard — generates CLAUDE.md, AGENTS.md, configures hooks, graphify rebuild
+description: Per-project setup wizard — generates CLAUDE.md, AGENTS.md, configures hooks, gitnexus rebuild
 category: workflow
 allowed-tools: Read, Write, Edit, Bash(python3:*, npx:*, ls:*, cat:*)
 ---
@@ -25,7 +25,7 @@ python3 "$AGENT_KIT_PATH/scripts/init-project.py" --cwd . --pretty
 
 Store output as `SETUP_DATA`. You get:
 - `.gitignore` status
-- Graphify rebuild status
+- GitNexus rebuild status
 - Existing files (CLAUDE.md, AGENTS.md, .claude/settings.json)
 - MCP permissions from agent-kit
 
@@ -90,10 +90,11 @@ Note key skills: `mcp-management`, `debugging`, `code-review`, `skill-creator`, 
 - User explicitly asks you to "remember" something
 - Retrieving context from previous work sessions
 
-**graphify** — Use when (via hook, not MCP):
-- Need to find where a function/class is defined — read `graphify-out/GRAPH_REPORT.md` first
-- Understanding how a feature works across the codebase — use graph communities
-- Before searching raw files with Glob/Grep — the PreToolUse hook will remind you
+**gitnexus** — Use when you need codebase structure awareness. GitNexus is a zero-server code intelligence engine (install: `npm install -g gitnexus`, web UI: gitnexus.vercel.app).
+- Need to find where a function/class is defined — check `.gitnexus/` for indexed structure
+- Understanding how a feature works across the codebase — use GitNexus MCP tools or graph data
+- Before searching raw files with Glob/Grep — the PreToolUse hook will remind you if `.gitnexus/` exists
+- GitNexus provides 16 MCP tools via `gitnexus mcp` (query, context, impact, cypher, etc.)
 
 ---
 
@@ -143,7 +144,7 @@ Read project files to understand stack:
 
 Summarize stack in 2-3 lines.
 
-Note: If `graphify-out/GRAPH_REPORT.md` exists, read it first for codebase structure before analyzing raw files.
+Note: If `.gitnexus/` exists, read its contents first for codebase structure before analyzing raw files.
 
 ---
 
@@ -216,9 +217,9 @@ If file doesn't exist, create with full template below.
 - User asks about latest features or migration guides
 - You're unsure about current best practices
 
-**graphify** — Read `graphify-out/GRAPH_REPORT.md` when:
-- Need to find where something is defined — check community hubs first
-- Understanding codebase structure — use god nodes and edges
+**gitnexus** — Codebase knowledge graph (zero-server, runs locally). Check `.gitnexus/` when:
+- Need to find where something is defined — use indexed structure
+- Understanding codebase architecture — use god nodes and edges
 - Before running Glob/Grep searches — the PreToolUse hook will remind you
 
 **sequential-thinking** — Use when:
@@ -329,7 +330,7 @@ If file doesn't exist, create with full template below.
 
 **context7** — Fetch up-to-date docs for [libraries]. Use when APIs change frequently or user asks about latest features.
 
-**graphify** — Graphify knowledge graph for codebase structure. Read `graphify-out/GRAPH_REPORT.md` before searching files.
+**gitnexus** — Zero-server codebase knowledge graph. Check `.gitnexus/` before searching files.
 
 **sequential-thinking** — Complex reasoning, architectural planning, multi-step debugging.
 
@@ -399,11 +400,11 @@ Tell user: "CLAUDE.md and AGENTS.md updated with installed skills (merged with e
 
 Report:
 - Files created/updated: CLAUDE.md, AGENTS.md, .claude/settings.json (hooks)
-- Graphify: `SETUP_DATA.graphify.status`
+- GitNexus: `SETUP_DATA.gitnexus.status`
 - MCP servers enabled: list from permissions (context7, sequential-thinking, memory)
 - Skills installed: list
-- Hooks configured: check-secrets, block-dangerous-bash, graphify-auto-rebuild
+- Hooks configured: check-secrets, block-dangerous-bash, gitnexus-auto-rebuild
 - **Important:** Tell user to use these MCP servers and skills when working on this project:
   - MCP: context7, sequential-thinking, memory
   - Skills: debugging, code-review, mcp-management, skill-creator, etc.
-  - Graphify: Read `graphify-out/GRAPH_REPORT.md` before searching files
+  - GitNexus: Check `.gitnexus/` before searching files
