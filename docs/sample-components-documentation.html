@@ -6,6 +6,9 @@
   <title>HTML Doc Components Sample</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape@3.30.2/dist/cytoscape.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
   <style>
     body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     .doc-prose p { margin: 0.65rem 0; line-height: 1.7; }
@@ -17,8 +20,10 @@
     .doc-prose ol { list-style: decimal; }
     .doc-prose li { margin: 0.35rem 0; }
     .doc-prose blockquote { border-left: 4px solid #60a5fa; color: #475569; padding-left: 1rem; margin: 1rem 0; }
-    .code-wrap { border: 1px solid #e2e8f0; border-radius: 1rem; background: #fff; padding: 1rem; box-shadow: 0 1px 2px rgb(15 23 42 / 0.04); }
-    .code-wrap pre { overflow-x: auto; border-radius: 0.75rem; background: #0f172a; color: #e2e8f0; padding: 1rem; font-size: 0.875rem; line-height: 1.6; }
+    .code-wrap { border: 1px solid #1e293b; border-radius: 1rem; background: #0f172a; padding: 1rem; box-shadow: 0 1px 2px rgb(15 23 42 / 0.08); }
+    .code-wrap pre { overflow-x: auto; border-radius: 0.75rem; background: #020617; color: #e2e8f0; padding: 1rem; font-size: 0.875rem; line-height: 1.6; }
+    .cloud-diagram canvas { border-radius: 1rem; }
+    .cloud-diagram:fullscreen { height: 100vh !important; border-radius: 0; background: #f8fafc; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50/60 to-violet-50 text-slate-900">
@@ -26,14 +31,14 @@
     <aside class="relative overflow-hidden bg-slate-950 px-6 py-8 text-white lg:sticky lg:top-0 lg:h-screen lg:w-80 lg:shrink-0 lg:overflow-y-auto">
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.45),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(168,85,247,0.35),transparent_30%)]"></div>
       <div class="relative">
-        <div class="flex flex-wrap gap-2"><span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90">Sample</span><span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90">Component Gallery</span><span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90">HTML Export</span></div>
+        <div class="flex flex-wrap gap-2"><span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90">Sample</span><span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90">All Components</span><span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90">HTML Export</span><span class="rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white/90">Cloud Diagrams</span></div>
         <h1 class="mt-6 text-3xl font-black tracking-tight">HTML Doc Components Sample</h1>
         <p class="mt-3 text-sm leading-6 text-slate-300">A gallery document showing every supported component in the html-doc-coauthoring skill.</p>
         <div class="mt-4 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-slate-300"><span class="font-semibold text-white">Audience:</span> Anyone who wants to see what visual documentation blocks Agent Kit can generate.</div>
-        <div class="mt-5 flex flex-wrap gap-2"><a class="inline-flex items-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-blue-50" href="#markdown">Markdown</a><a class="inline-flex items-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-blue-50" href="#visual-blocks">Visual blocks</a><a class="inline-flex items-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-blue-50" href="#charts">Charts</a></div>
+        <div class="mt-5 flex flex-wrap gap-2"><a class="inline-flex items-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-blue-50" href="#component-index">Component index</a><a class="inline-flex items-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-blue-50" href="#charts">Charts</a><a class="inline-flex items-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-blue-50" href="#cloud-topology">Cloud topology</a><a class="inline-flex items-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-950 shadow-sm transition hover:bg-blue-50" href="#review-and-reference-blocks">Reference blocks</a></div>
         <nav class="mt-8 space-y-1 border-t border-white/10 pt-5">
           <div class="mb-2 px-3 text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Sections</div>
-          <a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#document-shell">Document Shell</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#markdown">Markdown</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#visual-blocks">Visual Blocks</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#callouts">Callouts</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#process-blocks">Process Blocks</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#charts">Charts</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#aws-infrastructure-example">AWS Infrastructure Example</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#code">Code</a>
+          <a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#document-shell">Document Shell</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#component-index">Component Index</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#markdown">Markdown</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#card-layouts">Card Layouts</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#data-blocks">Data Blocks</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#callouts">Callouts</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#process-blocks">Process Blocks</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#charts">Charts</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#cloud-topology">Cloud Topology</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#images">Images</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#review-and-reference-blocks">Review and Reference Blocks</a><a class="block rounded-xl px-3 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white" href="#code">Code</a>
         </nav>
       </div>
     </aside>
@@ -42,7 +47,7 @@
         <header class="mb-8 rounded-3xl border border-white bg-white/80 p-8 shadow-sm backdrop-blur">
           <h2 class="mt-5 text-4xl font-black tracking-tight text-slate-950">HTML Doc Components Sample</h2>
           <p class="mt-3 max-w-3xl text-xl text-slate-500">A gallery document showing every supported component in the html-doc-coauthoring skill.</p>
-          <p class="mt-5 max-w-3xl text-lg leading-8 text-slate-600">This sample demonstrates the document shell plus every supported block type: markdown, cards, metrics, table, callouts, flow, timeline, charts, steps, and code.</p>
+          <p class="mt-5 max-w-3xl text-lg leading-8 text-slate-600">This sample demonstrates the document shell plus every supported block type: markdown, cards, metrics, table, callout, image, cloud, flow, timeline, chart, steps, code, checklist, resources, and details.</p>
         </header>
         <div class="space-y-8">
           <section id="document-shell" class="scroll-mt-8 rounded-3xl border border-blue-200 bg-white/90 p-6 shadow-sm ring-4 ring-blue-100">
@@ -53,6 +58,12 @@
 <p class="mt-2 max-w-3xl text-slate-600">Top-level metadata controls the title, subtitle, audience note, badges, summary, navigation, and hero actions.</p>
 </div></div>
 <div class="mt-6 space-y-5">
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+<div class="rounded-2xl border border-blue-200 bg-white p-5 shadow-sm ring-4 ring-blue-100"><div class="mb-4 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">Block types</div><div class="text-3xl font-black tracking-tight text-slate-950">15</div><div class="mt-2 text-sm text-slate-500">All renderable content components</div></div>
+<div class="rounded-2xl border border-violet-200 bg-white p-5 shadow-sm ring-4 ring-violet-100"><div class="mb-4 inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-violet-700">Chart variants</div><div class="text-3xl font-black tracking-tight text-slate-950">6</div><div class="mt-2 text-sm text-slate-500">Bar, line, pie, doughnut, radar, polar area</div></div>
+<div class="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm ring-4 ring-emerald-100"><div class="mb-4 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">Callout tones</div><div class="text-3xl font-black tracking-tight text-slate-950">4</div><div class="mt-2 text-sm text-slate-500">Info, success, warning, danger</div></div>
+<div class="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm ring-4 ring-amber-100"><div class="mb-4 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">Cloud node kinds</div><div class="text-3xl font-black tracking-tight text-slate-950">15</div><div class="mt-2 text-sm text-slate-500">Built-in topology styles</div></div>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 <article class="overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm ring-4 ring-blue-100"><div class="h-1.5 bg-blue-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Title and subtitle</h3><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">Header</span></div><div class="doc-prose text-sm text-slate-600"><p>Shown in the sidebar and main hero area.</p></div></div></article>
 <article class="overflow-hidden rounded-2xl border border-violet-200 bg-white shadow-sm ring-4 ring-violet-100"><div class="h-1.5 bg-violet-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Audience and summary</h3><span class="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">Context</span></div><div class="doc-prose text-sm text-slate-600"><p>Helps a new reader understand whether the document is for them.</p></div></div></article>
@@ -95,20 +106,118 @@
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p>Clickable hero links</p></td>
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">#charts</code></p></td>
 </tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">sections</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Ordered content sections</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">[{title, intro, blocks}]</code></p></td>
+</tr>
 </tbody></table></div></div>
-</div></section><section id="markdown" class="scroll-mt-8 rounded-3xl border border-violet-200 bg-white/90 p-6 shadow-sm ring-4 ring-violet-100">
+</div></section><section id="component-index" class="scroll-mt-8 rounded-3xl border border-violet-200 bg-white/90 p-6 shadow-sm ring-4 ring-violet-100">
 <div class="flex items-start gap-4">
 <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-violet-500 text-sm font-black text-white shadow-sm">2</div>
 <div>
+<h2 class="text-2xl font-black tracking-tight text-slate-950">Component Index</h2>
+<p class="mt-2 max-w-3xl text-slate-600">A quick inventory of every block supported by the generator and the variants worth testing.</p>
+</div></div>
+<div class="mt-6 space-y-5">
+<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div class="overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
+<thead class="bg-gradient-to-r from-blue-50 via-violet-50 to-cyan-50"><tr>
+<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-700">Block</th>
+<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-700">Best for</th>
+<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-700">Variants and fields shown here</th>
+</tr></thead>
+<tbody class="divide-y divide-slate-100">
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">markdown</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Prose, lists, quotes, and inline formatting</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Headings, bold, italic, links, inline code, code fences, bullets, numbers, quotes, string shorthand</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">cards</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Feature groups and option summaries</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Columns <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">1</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">2</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">3</code>, and <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">4</code>, optional badges</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">metrics</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Memorable numeric facts</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Label, value, and hint</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">table</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Structured comparisons</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Headers, rows, and markdown inside cells</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">callout</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Important context</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Tones: <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">info</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">success</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">warning</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">danger</code></p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">image</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Screenshots and visual assets</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Source, alt text, title, caption</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">cloud</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Infrastructure topology</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Groups, nested groups, node kinds, edge labels, layout, source disclosure</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">flow</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Reader journeys and handoffs</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Sequential visual cards</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">timeline</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Roadmaps and milestones</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Date, title, body</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">chart</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Quantitative visuals</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Chart.js <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">bar</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">line</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">pie</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">doughnut</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">radar</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">polarArea</code>, plus options</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">steps</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Procedures</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Numbered implementation sequence</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">code</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Copyable commands and snippets</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Language labels and copy button</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">checklist</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Acceptance criteria and readiness</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Checked, unchecked, object items, and string shorthand</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">resources</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Related links and references</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Label, href, description</p></td>
+</tr>
+<tr class="transition hover:bg-blue-50/40">
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">details</code> / <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">accordion</code></p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Optional deep dives</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Expandable disclosure rows</p></td>
+</tr>
+</tbody></table></div></div>
+<aside class="rounded-2xl border p-5 shadow-sm border-blue-200 bg-blue-50 text-blue-950"><div class="mb-1 font-semibold">Aliases</div><div class="doc-prose text-sm"><p>The cloud renderer also accepts <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">cloud-diagram</code>, <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">infrastructure</code>, and <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">infra</code>. The details renderer also accepts <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">accordion</code>. This sample uses canonical names plus an accordion alias example.</p></div></aside>
+</div></section><section id="markdown" class="scroll-mt-8 rounded-3xl border border-emerald-200 bg-white/90 p-6 shadow-sm ring-4 ring-emerald-100">
+<div class="flex items-start gap-4">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-sm font-black text-white shadow-sm">3</div>
+<div>
 <h2 class="text-2xl font-black tracking-tight text-slate-950">Markdown</h2>
-<p class="mt-2 max-w-3xl text-slate-600">Use markdown blocks for concise prose, bullets, numbered lists, headings, inline formatting, and quotes.</p>
+<p class="mt-2 max-w-3xl text-slate-600">Use markdown blocks for concise prose, bullets, numbered lists, headings, inline formatting, code fences, and quotes.</p>
 </div></div>
 <div class="mt-6 space-y-5">
 <div class="doc-prose"><h3>Markdown block</h3>
-<p>This paragraph shows <strong>bold text</strong>, <em>italic text</em>, and inline <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">code</code>. Keep paragraphs short so the generated HTML stays scannable.</p>
+<p>This paragraph shows <strong>bold text</strong>, <em>italic text</em>, inline <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">code</code>, and an inline link to <a class="font-medium text-blue-700 underline decoration-blue-300 underline-offset-2" href="#charts">Charts</a>. Keep paragraphs short so the generated HTML stays scannable.</p>
+<h4>Lists</h4>
 <ul>
 <li>Bullet items are supported</li>
-<li>Inline links can point to anchors like <a class="font-medium text-blue-700 underline decoration-blue-300 underline-offset-2" href="#charts">Charts</a></li>
+<li>Inline links can point to anchors</li>
 <li>Use lists when readers need quick scanning</li>
 </ul>
 <ol>
@@ -116,26 +225,49 @@
 <li>Second numbered step</li>
 <li>Third numbered step</li>
 </ol>
+<h4>Code fence inside markdown</h4>
+<div class="code-wrap" data-code-block><div class="mb-2 flex items-center justify-between gap-3"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">bash</span><button class="copy-code rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-600" type="button">Copy</button></div><pre><code>python3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py docs/raw/sample-components-documentation.json</code></pre></div>
 <blockquote>Blockquotes work well for short notes or memorable guidance.</blockquote></div>
-</div></section><section id="visual-blocks" class="scroll-mt-8 rounded-3xl border border-emerald-200 bg-white/90 p-6 shadow-sm ring-4 ring-emerald-100">
+<div class="doc-prose"><p>String blocks render as markdown too. Use them for small prose-only notes when an explicit <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">{&quot;type&quot;: &quot;markdown&quot;}</code> wrapper would be noisy.</p></div>
+</div></section><section id="card-layouts" class="scroll-mt-8 rounded-3xl border border-amber-200 bg-white/90 p-6 shadow-sm ring-4 ring-amber-100">
 <div class="flex items-start gap-4">
-<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-sm font-black text-white shadow-sm">3</div>
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-sm font-black text-white shadow-sm">4</div>
 <div>
-<h2 class="text-2xl font-black tracking-tight text-slate-950">Visual Blocks</h2>
-<p class="mt-2 max-w-3xl text-slate-600">Cards, metrics, and tables turn structured facts into quick visual summaries.</p>
+<h2 class="text-2xl font-black tracking-tight text-slate-950">Card Layouts</h2>
+<p class="mt-2 max-w-3xl text-slate-600">Cards can render in one, two, three, or four columns depending on the `columns` value.</p>
 </div></div>
 <div class="mt-6 space-y-5">
-<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-<div class="rounded-2xl border border-blue-200 bg-white p-5 shadow-sm ring-4 ring-blue-100"><div class="mb-4 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">Block types</div><div class="text-3xl font-black tracking-tight text-slate-950">9</div><div class="mt-2 text-sm text-slate-500">Core content components</div></div>
-<div class="rounded-2xl border border-violet-200 bg-white p-5 shadow-sm ring-4 ring-violet-100"><div class="mb-4 inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-violet-700">Callout tones</div><div class="text-3xl font-black tracking-tight text-slate-950">4</div><div class="mt-2 text-sm text-slate-500">Info, success, warning, danger</div></div>
-<div class="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm ring-4 ring-emerald-100"><div class="mb-4 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">Chart variants</div><div class="text-3xl font-black tracking-tight text-slate-950">6</div><div class="mt-2 text-sm text-slate-500">Chart.js chart types shown below</div></div>
-<div class="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm ring-4 ring-amber-100"><div class="mb-4 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">Source format</div><div class="text-3xl font-black tracking-tight text-slate-950">JSON</div><div class="mt-2 text-sm text-slate-500">Stored under docs/raw/</div></div>
+<div class="grid grid-cols-1 gap-4">
+<article class="overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm ring-4 ring-blue-100"><div class="h-1.5 bg-blue-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">One-column card</h3><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">Focused</span></div><div class="doc-prose text-sm text-slate-600"><p>Use one column when a single idea needs room for a longer explanation.</p></div></div></article>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<article class="overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm ring-4 ring-blue-100"><div class="h-1.5 bg-blue-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Two-column card</h3><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">Compare</span></div><div class="doc-prose text-sm text-slate-600"><p>Good for trade-offs, choices, owner pairs, or before-and-after summaries.</p></div></div></article>
+<article class="overflow-hidden rounded-2xl border border-violet-200 bg-white shadow-sm ring-4 ring-violet-100"><div class="h-1.5 bg-violet-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Second card</h3><span class="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">Pair</span></div><div class="doc-prose text-sm text-slate-600"><p>Cards support markdown bodies like <strong>bold emphasis</strong> and inline <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">code</code>.</p></div></div></article>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 <article class="overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm ring-4 ring-blue-100"><div class="h-1.5 bg-blue-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Cards</h3><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">Concepts</span></div><div class="doc-prose text-sm text-slate-600"><p>Use cards for features, benefits, risks, options, responsibilities, or takeaways.</p></div></div></article>
 <article class="overflow-hidden rounded-2xl border border-violet-200 bg-white shadow-sm ring-4 ring-violet-100"><div class="h-1.5 bg-violet-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Metrics</h3><span class="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">Numbers</span></div><div class="doc-prose text-sm text-slate-600"><p>Use metrics for memorable numeric facts such as counts, timelines, budgets, or KPIs.</p></div></div></article>
 <article class="overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-sm ring-4 ring-emerald-100"><div class="h-1.5 bg-emerald-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Tables</h3><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Structure</span></div><div class="doc-prose text-sm text-slate-600"><p>Use tables when readers need exact comparisons or compact reference data.</p></div></div></article>
-<article class="overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-sm ring-4 ring-amber-100"><div class="h-1.5 bg-amber-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Callouts</h3><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">Attention</span></div><div class="doc-prose text-sm text-slate-600"><p>Use callouts for decisions, warnings, constraints, or important next actions.</p></div></div></article>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+<article class="overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm ring-4 ring-blue-100"><div class="h-1.5 bg-blue-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Info</h3><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">Tone</span></div><div class="doc-prose text-sm text-slate-600"><p>Neutral context.</p></div></div></article>
+<article class="overflow-hidden rounded-2xl border border-violet-200 bg-white shadow-sm ring-4 ring-violet-100"><div class="h-1.5 bg-violet-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Success</h3><span class="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">Tone</span></div><div class="doc-prose text-sm text-slate-600"><p>Approved or completed path.</p></div></div></article>
+<article class="overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-sm ring-4 ring-emerald-100"><div class="h-1.5 bg-emerald-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Warning</h3><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Tone</span></div><div class="doc-prose text-sm text-slate-600"><p>Important constraints.</p></div></div></article>
+<article class="overflow-hidden rounded-2xl border border-amber-200 bg-white shadow-sm ring-4 ring-amber-100"><div class="h-1.5 bg-amber-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Danger</h3><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">Tone</span></div><div class="doc-prose text-sm text-slate-600"><p>High-risk issues.</p></div></div></article>
+</div>
+</div></section><section id="data-blocks" class="scroll-mt-8 rounded-3xl border border-rose-200 bg-white/90 p-6 shadow-sm ring-4 ring-rose-100">
+<div class="flex items-start gap-4">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-500 text-sm font-black text-white shadow-sm">5</div>
+<div>
+<h2 class="text-2xl font-black tracking-tight text-slate-950">Data Blocks</h2>
+<p class="mt-2 max-w-3xl text-slate-600">Metrics and tables turn structured facts into quick visual summaries.</p>
+</div></div>
+<div class="mt-6 space-y-5">
+<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+<div class="rounded-2xl border border-blue-200 bg-white p-5 shadow-sm ring-4 ring-blue-100"><div class="mb-4 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">Setup time</div><div class="text-3xl font-black tracking-tight text-slate-950">5 min</div><div class="mt-2 text-sm text-slate-500">Typical sample-doc regeneration</div></div>
+<div class="rounded-2xl border border-violet-200 bg-white p-5 shadow-sm ring-4 ring-violet-100"><div class="mb-4 inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-violet-700">Sections</div><div class="text-3xl font-black tracking-tight text-slate-950">11</div><div class="mt-2 text-sm text-slate-500">Gallery sections in this sample</div></div>
+<div class="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm ring-4 ring-emerald-100"><div class="mb-4 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">Source format</div><div class="text-3xl font-black tracking-tight text-slate-950">JSON</div><div class="mt-2 text-sm text-slate-500">Stored under docs/raw/</div></div>
+<div class="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm ring-4 ring-amber-100"><div class="mb-4 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">Output</div><div class="text-3xl font-black tracking-tight text-slate-950">HTML</div><div class="mt-2 text-sm text-slate-500">Generated under docs/</div></div>
 </div>
 <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div class="overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
 <thead class="bg-gradient-to-r from-blue-50 via-violet-50 to-cyan-50"><tr>
@@ -151,23 +283,23 @@
 </tr>
 <tr class="transition hover:bg-blue-50/40">
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p>Metrics</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Highlighting numbers</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Highlighting numbers like <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">15</code> supported blocks</p></td>
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p>The value is not meaningful by itself</p></td>
 </tr>
 <tr class="transition hover:bg-blue-50/40">
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p>Table</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Comparisons and references</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Comparisons, matrices, and compact reference data</p></td>
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p>The content is long prose</p></td>
 </tr>
 <tr class="transition hover:bg-blue-50/40">
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p>Callout</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Critical notes</p></td>
+<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Critical notes, decisions, warnings, and constraints</p></td>
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p>Everything feels equally important</p></td>
 </tr>
 </tbody></table></div></div>
-</div></section><section id="callouts" class="scroll-mt-8 rounded-3xl border border-amber-200 bg-white/90 p-6 shadow-sm ring-4 ring-amber-100">
+</div></section><section id="callouts" class="scroll-mt-8 rounded-3xl border border-cyan-200 bg-white/90 p-6 shadow-sm ring-4 ring-cyan-100">
 <div class="flex items-start gap-4">
-<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-sm font-black text-white shadow-sm">4</div>
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-500 text-sm font-black text-white shadow-sm">6</div>
 <div>
 <h2 class="text-2xl font-black tracking-tight text-slate-950">Callouts</h2>
 <p class="mt-2 max-w-3xl text-slate-600">Callouts support four tones for different kinds of emphasis.</p>
@@ -177,9 +309,9 @@
 <aside class="rounded-2xl border p-5 shadow-sm border-emerald-200 bg-emerald-50 text-emerald-950"><div class="mb-1 font-semibold">Success</div><div class="doc-prose text-sm"><p>Use <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">success</code> for approved decisions, completed milestones, or recommended paths.</p></div></aside>
 <aside class="rounded-2xl border p-5 shadow-sm border-amber-200 bg-amber-50 text-amber-950"><div class="mb-1 font-semibold">Warning</div><div class="doc-prose text-sm"><p>Use <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">warning</code> for constraints, trade-offs, or things a reader should verify before acting.</p></div></aside>
 <aside class="rounded-2xl border p-5 shadow-sm border-rose-200 bg-rose-50 text-rose-950"><div class="mb-1 font-semibold">Danger</div><div class="doc-prose text-sm"><p>Use <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">danger</code> for high-risk issues such as security concerns, data loss, or irreversible actions.</p></div></aside>
-</div></section><section id="process-blocks" class="scroll-mt-8 rounded-3xl border border-rose-200 bg-white/90 p-6 shadow-sm ring-4 ring-rose-100">
+</div></section><section id="process-blocks" class="scroll-mt-8 rounded-3xl border border-blue-200 bg-white/90 p-6 shadow-sm ring-4 ring-blue-100">
 <div class="flex items-start gap-4">
-<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-500 text-sm font-black text-white shadow-sm">5</div>
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-500 text-sm font-black text-white shadow-sm">7</div>
 <div>
 <h2 class="text-2xl font-black tracking-tight text-slate-950">Process Blocks</h2>
 <p class="mt-2 max-w-3xl text-slate-600">Flow, timeline, and steps blocks explain motion through time or sequence.</p>
@@ -201,9 +333,9 @@
 <li class="flex gap-4 rounded-2xl border border-violet-200 bg-white p-5 shadow-sm"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-500 text-sm font-bold text-white shadow-sm">2</div><div><h3 class="font-semibold text-slate-950">Run generator</h3><div class="doc-prose mt-1 text-sm text-slate-600"><p>Run <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">python3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py docs/raw/&lt;doc-name&gt;.json</code>.</p></div></div></li>
 <li class="flex gap-4 rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white shadow-sm">3</div><div><h3 class="font-semibold text-slate-950">Open HTML</h3><div class="doc-prose mt-1 text-sm text-slate-600"><p>Review <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">docs/&lt;doc-name&gt;.html</code> in a browser.</p></div></div></li>
 </ol>
-</div></section><section id="charts" class="scroll-mt-8 rounded-3xl border border-cyan-200 bg-white/90 p-6 shadow-sm ring-4 ring-cyan-100">
+</div></section><section id="charts" class="scroll-mt-8 rounded-3xl border border-violet-200 bg-white/90 p-6 shadow-sm ring-4 ring-violet-100">
 <div class="flex items-start gap-4">
-<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-500 text-sm font-black text-white shadow-sm">6</div>
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-violet-500 text-sm font-black text-white shadow-sm">8</div>
 <div>
 <h2 class="text-2xl font-black tracking-tight text-slate-950">Charts</h2>
 <p class="mt-2 max-w-3xl text-slate-600">The chart block uses Chart.js. This sample shows all supported chart variants from the skill guide.</p>
@@ -215,96 +347,268 @@
 <div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm ring-4 ring-blue-50"><div class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Doughnut chart</div><div class="h-80"><canvas id="chart-4"></canvas></div></div>
 <div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm ring-4 ring-blue-50"><div class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Radar chart</div><div class="h-80"><canvas id="chart-5"></canvas></div></div>
 <div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm ring-4 ring-blue-50"><div class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Polar area chart</div><div class="h-80"><canvas id="chart-6"></canvas></div></div>
-</div></section><section id="aws-infrastructure-example" class="scroll-mt-8 rounded-3xl border border-blue-200 bg-white/90 p-6 shadow-sm ring-4 ring-blue-100">
+</div></section><section id="cloud-topology" class="scroll-mt-8 rounded-3xl border border-emerald-200 bg-white/90 p-6 shadow-sm ring-4 ring-emerald-100">
 <div class="flex items-start gap-4">
-<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-blue-500 text-sm font-black text-white shadow-sm">7</div>
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-emerald-500 text-sm font-black text-white shadow-sm">9</div>
 <div>
-<h2 class="text-2xl font-black tracking-tight text-slate-950">AWS Infrastructure Example</h2>
-<p class="mt-2 max-w-3xl text-slate-600">A realistic sample architecture section using the same visual components for cloud infrastructure documentation.</p>
+<h2 class="text-2xl font-black tracking-tight text-slate-950">Cloud Topology</h2>
+<p class="mt-2 max-w-3xl text-slate-600">Cloud blocks render Cytoscape topology diagrams with groups, nested groups, node kinds, edge labels, layout direction, and optional source disclosure.</p>
 </div></div>
 <div class="mt-6 space-y-5">
-<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-<div class="rounded-2xl border border-blue-200 bg-white p-5 shadow-sm ring-4 ring-blue-100"><div class="mb-4 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700">Availability zones</div><div class="text-3xl font-black tracking-tight text-slate-950">3</div><div class="mt-2 text-sm text-slate-500">Public and private subnets per AZ</div></div>
-<div class="rounded-2xl border border-violet-200 bg-white p-5 shadow-sm ring-4 ring-violet-100"><div class="mb-4 inline-flex rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-violet-700">Entry points</div><div class="text-3xl font-black tracking-tight text-slate-950">2</div><div class="mt-2 text-sm text-slate-500">CloudFront and Application Load Balancer</div></div>
-<div class="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm ring-4 ring-emerald-100"><div class="mb-4 inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">Compute layer</div><div class="text-3xl font-black tracking-tight text-slate-950">ECS</div><div class="mt-2 text-sm text-slate-500">Fargate services behind ALB</div></div>
-<div class="rounded-2xl border border-amber-200 bg-white p-5 shadow-sm ring-4 ring-amber-100"><div class="mb-4 inline-flex rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">Data layer</div><div class="text-3xl font-black tracking-tight text-slate-950">RDS</div><div class="mt-2 text-sm text-slate-500">Multi-AZ PostgreSQL plus S3 assets</div></div>
-</div>
-<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h3 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Request path</h3><div class="grid gap-4 lg:grid-cols-4">
-<div class="relative"><div class="h-full rounded-2xl border border-blue-200 bg-blue-50 p-4"><div class="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white">1</div><div class="font-semibold text-slate-950">User</div><div class="doc-prose mt-1 text-sm text-slate-600"><p>Browser or mobile client sends HTTPS traffic to the public edge.</p></div></div></div>
-<div class="relative"><div class="h-full rounded-2xl border border-violet-200 bg-violet-50 p-4"><div class="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-violet-500 text-sm font-bold text-white">2</div><div class="font-semibold text-slate-950">CloudFront + WAF</div><div class="doc-prose mt-1 text-sm text-slate-600"><p>Static assets are cached, and WAF blocks common abusive traffic before it reaches origin.</p></div></div></div>
-<div class="relative"><div class="h-full rounded-2xl border border-emerald-200 bg-emerald-50 p-4"><div class="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white">3</div><div class="font-semibold text-slate-950">ALB</div><div class="doc-prose mt-1 text-sm text-slate-600"><p>Application Load Balancer terminates traffic for dynamic API requests and routes to ECS.</p></div></div></div>
-<div class="relative"><div class="h-full rounded-2xl border border-amber-200 bg-amber-50 p-4"><div class="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white">4</div><div class="font-semibold text-slate-950">ECS service</div><div class="doc-prose mt-1 text-sm text-slate-600"><p>Fargate tasks run the application inside private subnets with autoscaling.</p></div></div></div>
-<div class="relative"><div class="h-full rounded-2xl border border-rose-200 bg-rose-50 p-4"><div class="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-rose-500 text-sm font-bold text-white">5</div><div class="font-semibold text-slate-950">Data stores</div><div class="doc-prose mt-1 text-sm text-slate-600"><p>RDS stores relational data, ElastiCache handles hot keys, and S3 stores durable objects.</p></div></div></div>
-</div></div>
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-<article class="overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm ring-4 ring-blue-100"><div class="h-1.5 bg-blue-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Network</h3><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">VPC</span></div><div class="doc-prose text-sm text-slate-600"><p>One VPC with public subnets for ingress and private subnets for compute, cache, and database tiers.</p></div></div></article>
-<article class="overflow-hidden rounded-2xl border border-violet-200 bg-white shadow-sm ring-4 ring-violet-100"><div class="h-1.5 bg-violet-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Security</h3><span class="rounded-full bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">IAM</span></div><div class="doc-prose text-sm text-slate-600"><p>Least-privilege task roles, security groups by tier, secrets in AWS Secrets Manager, and WAF at the edge.</p></div></div></article>
-<article class="overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-sm ring-4 ring-emerald-100"><div class="h-1.5 bg-emerald-500"></div><div class="p-5"><div class="mb-3 flex items-center justify-between gap-3"><h3 class="text-base font-semibold text-slate-950">Observability</h3><span class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">CloudWatch</span></div><div class="doc-prose text-sm text-slate-600"><p>Service logs, ALB metrics, RDS alarms, dashboards, and distributed tracing for request latency.</p></div></div></article>
-</div>
-<div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><div class="overflow-x-auto"><table class="min-w-full divide-y divide-slate-200">
-<thead class="bg-gradient-to-r from-blue-50 via-violet-50 to-cyan-50"><tr>
-<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-700">Layer</th>
-<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-700">AWS services</th>
-<th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-slate-700">Responsibility</th>
-</tr></thead>
-<tbody class="divide-y divide-slate-100">
-<tr class="transition hover:bg-blue-50/40">
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Edge</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>CloudFront, WAF, ACM</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>TLS, caching, edge protection, and static delivery.</p></td>
-</tr>
-<tr class="transition hover:bg-blue-50/40">
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Ingress</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>ALB, Route 53</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>DNS routing, health checks, and dynamic request distribution.</p></td>
-</tr>
-<tr class="transition hover:bg-blue-50/40">
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Compute</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>ECS Fargate, ECR</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Container deployment, scaling, and image storage.</p></td>
-</tr>
-<tr class="transition hover:bg-blue-50/40">
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Data</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>RDS PostgreSQL, ElastiCache, S3</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Relational storage, cache acceleration, and object storage.</p></td>
-</tr>
-<tr class="transition hover:bg-blue-50/40">
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Operations</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>CloudWatch, X-Ray, Secrets Manager</p></td>
-<td class="px-4 py-3 align-top text-sm text-slate-700"><p>Logs, metrics, traces, alarms, and secret retrieval.</p></td>
-</tr>
-</tbody></table></div></div>
-<aside class="rounded-2xl border p-5 shadow-sm border-amber-200 bg-amber-50 text-amber-950"><div class="mb-1 font-semibold">Production guardrail</div><div class="doc-prose text-sm"><p>Keep ECS tasks, RDS, and ElastiCache in private subnets. Only CloudFront and ALB should be internet-facing.</p></div></aside>
-<div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm ring-4 ring-blue-50"><div class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Illustrative monthly cost split</div><div class="h-80"><canvas id="chart-7"></canvas></div></div>
-<ol class="space-y-4">
-<li class="flex gap-4 rounded-2xl border border-blue-200 bg-white p-5 shadow-sm"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-500 text-sm font-bold text-white shadow-sm">1</div><div><h3 class="font-semibold text-slate-950">Provision foundation</h3><div class="doc-prose mt-1 text-sm text-slate-600"><p>Create VPC, subnets, route tables, security groups, KMS keys, and baseline IAM roles.</p></div></div></li>
-<li class="flex gap-4 rounded-2xl border border-violet-200 bg-white p-5 shadow-sm"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-500 text-sm font-bold text-white shadow-sm">2</div><div><h3 class="font-semibold text-slate-950">Deploy application</h3><div class="doc-prose mt-1 text-sm text-slate-600"><p>Push container image to ECR, create ECS task definition, service, target group, and ALB listener rules.</p></div></div></li>
-<li class="flex gap-4 rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white shadow-sm">3</div><div><h3 class="font-semibold text-slate-950">Attach data services</h3><div class="doc-prose mt-1 text-sm text-slate-600"><p>Create RDS, ElastiCache, S3 buckets, secrets, and application environment variables.</p></div></div></li>
-<li class="flex gap-4 rounded-2xl border border-amber-200 bg-white p-5 shadow-sm"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white shadow-sm">4</div><div><h3 class="font-semibold text-slate-950">Enable operations</h3><div class="doc-prose mt-1 text-sm text-slate-600"><p>Add CloudWatch dashboards, alarms, log retention, tracing, backup policies, and runbooks.</p></div></div></li>
-</ol>
-<div class="code-wrap"><div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">text</div><pre><code>Internet
-  -&gt; Route 53
-  -&gt; CloudFront + WAF
-  -&gt; ALB (public subnets)
-  -&gt; ECS Fargate services (private subnets)
-  -&gt; RDS / ElastiCache / S3</code></pre></div>
-</div></section><section id="code" class="scroll-mt-8 rounded-3xl border border-violet-200 bg-white/90 p-6 shadow-sm ring-4 ring-violet-100">
+<div class="rounded-2xl border border-cyan-200 bg-white p-5 shadow-sm ring-4 ring-cyan-50"><h3 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">AWS production infrastructure</h3><div class="mb-4 flex flex-wrap items-center justify-between gap-3"><div class="flex flex-wrap items-center gap-2"><span class="inline-flex rounded-full bg-cyan-50 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-700">Cloud topology · AWS</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#ede9fe;border-color:#a78bfa;color:#4c1d95"><span>👤</span>client</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#dbeafe;border-color:#60a5fa;color:#1e3a8a"><span>🌐</span>internet</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#f8fafc;border-color:#94a3b8;color:#334155"><span>▣</span>service</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#fee2e2;border-color:#ef4444;color:#991b1b"><span>🔐</span>security</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#e0f2fe;border-color:#38bdf8;color:#075985"><span>⚖️</span>load-balancer</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#dbeafe;border-color:#3b82f6;color:#1d4ed8"><span>⚙️</span>api</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#f1f5f9;border-color:#94a3b8;color:#334155"><span>🖥️</span>compute</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#f1f5f9;border-color:#94a3b8;color:#334155"><span>🖥️</span>server</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#fff7ed;border-color:#fb923c;color:#9a3412"><span>λ</span>function</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#fce7f3;border-color:#ec4899;color:#9d174d"><span>📬</span>queue</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#dcfce7;border-color:#22c55e;color:#166534"><span>🗄️</span>database</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#fef3c7;border-color:#f59e0b;color:#92400e"><span>⚡</span>cache</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#ccfbf1;border-color:#14b8a6;color:#115e59"><span>🪣</span>storage</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#e0e7ff;border-color:#6366f1;color:#3730a3"><span>📈</span>observability</span><span class="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold" style="background:#f0fdf4;border-color:#22c55e;color:#166534"><span>🚀</span>ci</span></div><div class="flex gap-2"><button class="cloud-reset rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-sm hover:bg-slate-50" data-cloud-target="cloud-diagram-1" type="button">Reset view</button><button class="cloud-fullscreen rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-700" data-cloud-target="cloud-diagram-1" type="button">Fullscreen</button></div></div><div id="cloud-diagram-1" class="cloud-diagram h-[620px] rounded-2xl border border-cyan-100 bg-gradient-to-br from-white via-slate-50 to-cyan-50"></div><div class="mt-4 flex flex-wrap gap-2"><span class="text-xs font-bold uppercase tracking-wide text-slate-400">Groups</span><span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">AWS Edge</span><span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">Application VPC</span><span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">Public Subnets</span><span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">Private App Subnets</span><span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">Private Data Subnets</span><span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">Operations</span><span class="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600">Delivery Pipeline</span></div><div class="mt-3 text-sm text-slate-500">This single diagram demonstrates every built-in cloud node kind while keeping a realistic AWS request and delivery path.</div><details class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4"><summary class="cursor-pointer font-semibold text-slate-800">Topology source</summary><div class="mt-3"><div class="code-wrap" data-code-block><div class="mb-2 flex items-center justify-between gap-3"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">json</span><button class="copy-code rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-600" type="button">Copy</button></div><pre><code>{
+  &quot;groups&quot;: [
+    {
+      &quot;id&quot;: &quot;edge&quot;,
+      &quot;title&quot;: &quot;AWS Edge&quot;
+    },
+    {
+      &quot;id&quot;: &quot;vpc&quot;,
+      &quot;title&quot;: &quot;Application VPC&quot;
+    },
+    {
+      &quot;id&quot;: &quot;public&quot;,
+      &quot;title&quot;: &quot;Public Subnets&quot;,
+      &quot;parent&quot;: &quot;vpc&quot;
+    },
+    {
+      &quot;id&quot;: &quot;private_app&quot;,
+      &quot;title&quot;: &quot;Private App Subnets&quot;,
+      &quot;parent&quot;: &quot;vpc&quot;
+    },
+    {
+      &quot;id&quot;: &quot;private_data&quot;,
+      &quot;title&quot;: &quot;Private Data Subnets&quot;,
+      &quot;parent&quot;: &quot;vpc&quot;
+    },
+    {
+      &quot;id&quot;: &quot;ops&quot;,
+      &quot;title&quot;: &quot;Operations&quot;
+    },
+    {
+      &quot;id&quot;: &quot;delivery&quot;,
+      &quot;title&quot;: &quot;Delivery Pipeline&quot;
+    }
+  ],
+  &quot;nodes&quot;: [
+    {
+      &quot;id&quot;: &quot;users&quot;,
+      &quot;label&quot;: &quot;Users&quot;,
+      &quot;type&quot;: &quot;client&quot;
+    },
+    {
+      &quot;id&quot;: &quot;internet&quot;,
+      &quot;label&quot;: &quot;Public Internet&quot;,
+      &quot;type&quot;: &quot;internet&quot;
+    },
+    {
+      &quot;id&quot;: &quot;route53&quot;,
+      &quot;label&quot;: &quot;Route 53&quot;,
+      &quot;type&quot;: &quot;service&quot;,
+      &quot;group&quot;: &quot;edge&quot;
+    },
+    {
+      &quot;id&quot;: &quot;cloudfront&quot;,
+      &quot;label&quot;: &quot;CloudFront&quot;,
+      &quot;type&quot;: &quot;service&quot;,
+      &quot;group&quot;: &quot;edge&quot;
+    },
+    {
+      &quot;id&quot;: &quot;waf&quot;,
+      &quot;label&quot;: &quot;AWS WAF&quot;,
+      &quot;type&quot;: &quot;security&quot;,
+      &quot;group&quot;: &quot;edge&quot;
+    },
+    {
+      &quot;id&quot;: &quot;alb&quot;,
+      &quot;label&quot;: &quot;Application Load Balancer&quot;,
+      &quot;type&quot;: &quot;load-balancer&quot;,
+      &quot;group&quot;: &quot;public&quot;
+    },
+    {
+      &quot;id&quot;: &quot;api&quot;,
+      &quot;label&quot;: &quot;API Gateway&quot;,
+      &quot;type&quot;: &quot;api&quot;,
+      &quot;group&quot;: &quot;private_app&quot;
+    },
+    {
+      &quot;id&quot;: &quot;ecs&quot;,
+      &quot;label&quot;: &quot;ECS Fargate Service&quot;,
+      &quot;type&quot;: &quot;compute&quot;,
+      &quot;group&quot;: &quot;private_app&quot;
+    },
+    {
+      &quot;id&quot;: &quot;worker&quot;,
+      &quot;label&quot;: &quot;Worker Service&quot;,
+      &quot;type&quot;: &quot;server&quot;,
+      &quot;group&quot;: &quot;private_app&quot;
+    },
+    {
+      &quot;id&quot;: &quot;lambda&quot;,
+      &quot;label&quot;: &quot;Lambda Jobs&quot;,
+      &quot;type&quot;: &quot;function&quot;,
+      &quot;group&quot;: &quot;private_app&quot;
+    },
+    {
+      &quot;id&quot;: &quot;queue&quot;,
+      &quot;label&quot;: &quot;SQS Queue&quot;,
+      &quot;type&quot;: &quot;queue&quot;,
+      &quot;group&quot;: &quot;private_app&quot;
+    },
+    {
+      &quot;id&quot;: &quot;rds&quot;,
+      &quot;label&quot;: &quot;RDS PostgreSQL&quot;,
+      &quot;type&quot;: &quot;database&quot;,
+      &quot;group&quot;: &quot;private_data&quot;
+    },
+    {
+      &quot;id&quot;: &quot;cache&quot;,
+      &quot;label&quot;: &quot;ElastiCache Redis&quot;,
+      &quot;type&quot;: &quot;cache&quot;,
+      &quot;group&quot;: &quot;private_data&quot;
+    },
+    {
+      &quot;id&quot;: &quot;s3&quot;,
+      &quot;label&quot;: &quot;S3 Object Storage&quot;,
+      &quot;type&quot;: &quot;storage&quot;,
+      &quot;group&quot;: &quot;private_data&quot;
+    },
+    {
+      &quot;id&quot;: &quot;cloudwatch&quot;,
+      &quot;label&quot;: &quot;CloudWatch&quot;,
+      &quot;type&quot;: &quot;observability&quot;,
+      &quot;group&quot;: &quot;ops&quot;
+    },
+    {
+      &quot;id&quot;: &quot;ci&quot;,
+      &quot;label&quot;: &quot;GitHub Actions&quot;,
+      &quot;type&quot;: &quot;ci&quot;,
+      &quot;group&quot;: &quot;delivery&quot;
+    }
+  ],
+  &quot;connections&quot;: [
+    {
+      &quot;from&quot;: &quot;users&quot;,
+      &quot;to&quot;: &quot;internet&quot;,
+      &quot;label&quot;: &quot;HTTPS&quot;
+    },
+    {
+      &quot;from&quot;: &quot;internet&quot;,
+      &quot;to&quot;: &quot;route53&quot;,
+      &quot;label&quot;: &quot;DNS&quot;
+    },
+    {
+      &quot;from&quot;: &quot;route53&quot;,
+      &quot;to&quot;: &quot;cloudfront&quot;
+    },
+    {
+      &quot;from&quot;: &quot;cloudfront&quot;,
+      &quot;to&quot;: &quot;waf&quot;,
+      &quot;label&quot;: &quot;filter&quot;
+    },
+    {
+      &quot;from&quot;: &quot;waf&quot;,
+      &quot;to&quot;: &quot;alb&quot;
+    },
+    {
+      &quot;from&quot;: &quot;alb&quot;,
+      &quot;to&quot;: &quot;api&quot;
+    },
+    {
+      &quot;from&quot;: &quot;api&quot;,
+      &quot;to&quot;: &quot;ecs&quot;
+    },
+    {
+      &quot;from&quot;: &quot;ecs&quot;,
+      &quot;to&quot;: &quot;queue&quot;,
+      &quot;label&quot;: &quot;async&quot;
+    },
+    {
+      &quot;from&quot;: &quot;queue&quot;,
+      &quot;to&quot;: &quot;worker&quot;
+    },
+    {
+      &quot;from&quot;: &quot;worker&quot;,
+      &quot;to&quot;: &quot;lambda&quot;
+    },
+    {
+      &quot;from&quot;: &quot;ecs&quot;,
+      &quot;to&quot;: &quot;rds&quot;
+    },
+    {
+      &quot;from&quot;: &quot;ecs&quot;,
+      &quot;to&quot;: &quot;cache&quot;
+    },
+    {
+      &quot;from&quot;: &quot;ecs&quot;,
+      &quot;to&quot;: &quot;s3&quot;
+    },
+    {
+      &quot;from&quot;: &quot;ecs&quot;,
+      &quot;to&quot;: &quot;cloudwatch&quot;,
+      &quot;label&quot;: &quot;logs&quot;
+    },
+    {
+      &quot;from&quot;: &quot;ci&quot;,
+      &quot;to&quot;: &quot;ecs&quot;,
+      &quot;label&quot;: &quot;deploy&quot;
+    }
+  ]
+}</code></pre></div></div></details></div>
+<aside class="rounded-2xl border p-5 shadow-sm border-amber-200 bg-amber-50 text-amber-950"><div class="mb-1 font-semibold">Production guardrail</div><div class="doc-prose text-sm"><p>Keep compute, databases, queues, and cache services in private subnets. Only edge and load-balancing services should be internet-facing.</p></div></aside>
+</div></section><section id="images" class="scroll-mt-8 rounded-3xl border border-amber-200 bg-white/90 p-6 shadow-sm ring-4 ring-amber-100">
 <div class="flex items-start gap-4">
-<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-violet-500 text-sm font-black text-white shadow-sm">8</div>
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-sm font-black text-white shadow-sm">10</div>
+<div>
+<h2 class="text-2xl font-black tracking-tight text-slate-950">Images</h2>
+<p class="mt-2 max-w-3xl text-slate-600">Image blocks are useful for screenshots, diagrams exported from other tools, and local visual assets.</p>
+</div></div>
+<div class="mt-6 space-y-5">
+<figure class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h3 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Local image block</h3><img class="w-full rounded-2xl border border-slate-100 bg-slate-50 object-contain" src="./sample-doc-illustration.svg" alt="Abstract sample documentation dashboard illustration"><div class="mt-3 text-sm text-slate-500">Images support safe local or web paths, alt text, an optional title, and a caption.</div></figure>
+</div></section><section id="review-and-reference-blocks" class="scroll-mt-8 rounded-3xl border border-rose-200 bg-white/90 p-6 shadow-sm ring-4 ring-rose-100">
+<div class="flex items-start gap-4">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-rose-500 text-sm font-black text-white shadow-sm">11</div>
+<div>
+<h2 class="text-2xl font-black tracking-tight text-slate-950">Review and Reference Blocks</h2>
+<p class="mt-2 max-w-3xl text-slate-600">Checklist, resources, and details blocks support review workflows, related links, and optional depth.</p>
+</div></div>
+<div class="mt-6 space-y-5">
+<div class="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm ring-4 ring-emerald-50"><h3 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Launch readiness checklist</h3><div class="space-y-3">
+<div class="flex gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3"><div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs font-bold bg-emerald-500 text-white border-emerald-500">✓</div><div><div class="font-medium text-slate-900">All supported block types are represented</div><div class="doc-prose mt-1 text-sm text-slate-500"><p>Includes the explicit <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">markdown</code> block and string shorthand.</p></div></div></div>
+<div class="flex gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3"><div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs font-bold bg-emerald-500 text-white border-emerald-500">✓</div><div><div class="font-medium text-slate-900">Cloud nodes use `type` or `kind` for styling</div><div class="doc-prose mt-1 text-sm text-slate-500"><p>The topology legend now shows meaningful node kinds instead of generic services.</p></div></div></div>
+<div class="flex gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3"><div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs font-bold bg-white text-white border-slate-300"></div><div><div class="font-medium text-slate-900">Generated HTML reviewed in a browser</div><div class="doc-prose mt-1 text-sm text-slate-500"><p>Open the generated page and inspect the interactive chart and cloud blocks.</p></div></div></div>
+<div class="flex gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3"><div class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs font-bold bg-white text-white border-slate-300"></div><div><div class="font-medium text-slate-900">String checklist item shorthand</div></div></div>
+</div></div>
+<div class="rounded-2xl border border-violet-200 bg-white p-5 shadow-sm ring-4 ring-violet-50"><h3 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Useful resources</h3><div class="grid gap-3 md:grid-cols-2">
+<a class="block rounded-xl border border-blue-200 bg-blue-50 p-4 transition hover:-translate-y-0.5 hover:shadow-sm" href="../custom/skills/html-doc-coauthoring/references/html-doc-guide.md"><div class="font-semibold text-blue-700">HTML doc guide</div><div class="mt-1 text-sm text-slate-600">Reference for the JSON shape and block guidance.</div></a>
+<a class="block rounded-xl border border-violet-200 bg-violet-50 p-4 transition hover:-translate-y-0.5 hover:shadow-sm" href="../custom/skills/html-doc-coauthoring/scripts/build_html_doc.py"><div class="font-semibold text-violet-700">Generator script</div><div class="mt-1 text-sm text-slate-600">Renderer implementation for every supported component.</div></a>
+<a class="block rounded-xl border border-emerald-200 bg-emerald-50 p-4 transition hover:-translate-y-0.5 hover:shadow-sm" href="#charts"><div class="font-semibold text-emerald-700">Charts section</div><div class="mt-1 text-sm text-slate-600">Jump to all Chart.js examples in this sample.</div></a>
+<a class="block rounded-xl border border-amber-200 bg-amber-50 p-4 transition hover:-translate-y-0.5 hover:shadow-sm" href="#cloud-topology"><div class="font-semibold text-amber-700">Cloud topology section</div><div class="mt-1 text-sm text-slate-600">Jump to the Cytoscape cloud diagram example.</div></a>
+</div></div>
+<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h3 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Details block</h3><div class="space-y-3">
+<details class="group rounded-xl border border-slate-200 bg-slate-50 p-4 open:bg-white"><summary class="cursor-pointer select-none font-semibold text-slate-900">When should I use details?</summary><div class="doc-prose mt-3 text-sm text-slate-600"><p>Use details for optional background, caveats, implementation notes, or long explanations that should not distract from the main path.</p></div></details>
+<details class="group rounded-xl border border-slate-200 bg-slate-50 p-4 open:bg-white"><summary class="cursor-pointer select-none font-semibold text-slate-900">Can details contain markdown?</summary><div class="doc-prose mt-3 text-sm text-slate-600"><p>Yes. Details bodies support <strong>bold</strong>, <em>italic</em>, inline <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">code</code>, lists, and links like <a class="font-medium text-blue-700 underline decoration-blue-300 underline-offset-2" href="#component-index">Component index</a>.</p></div></details>
+</div></div>
+<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><h3 class="mb-4 text-sm font-bold uppercase tracking-wide text-slate-600">Accordion alias</h3><div class="space-y-3">
+<details class="group rounded-xl border border-slate-200 bg-slate-50 p-4 open:bg-white"><summary class="cursor-pointer select-none font-semibold text-slate-900">Alias support</summary><div class="doc-prose mt-3 text-sm text-slate-600"><p>The generator treats <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">accordion</code> as an alias for <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">details</code>, so both render as expandable disclosure panels.</p></div></details>
+</div></div>
+</div></section><section id="code" class="scroll-mt-8 rounded-3xl border border-cyan-200 bg-white/90 p-6 shadow-sm ring-4 ring-cyan-100">
+<div class="flex items-start gap-4">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-500 text-sm font-black text-white shadow-sm">12</div>
 <div>
 <h2 class="text-2xl font-black tracking-tight text-slate-950">Code</h2>
-<p class="mt-2 max-w-3xl text-slate-600">Code blocks are for exact commands or snippets that readers may copy.</p>
+<p class="mt-2 max-w-3xl text-slate-600">Code blocks are for exact commands, config, API examples, or snippets that readers may copy.</p>
 </div></div>
 <div class="mt-6 space-y-5">
-<div class="code-wrap"><div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">bash</div><pre><code>mkdir -p docs/raw
+<div class="code-wrap" data-code-block><div class="mb-2 flex items-center justify-between gap-3"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">bash</span><button class="copy-code rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-600" type="button">Copy</button></div><pre><code>mkdir -p docs/raw
 python3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py docs/raw/sample-components-documentation.json</code></pre></div>
-<div class="code-wrap"><div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">json</div><pre><code>{
+<div class="code-wrap" data-code-block><div class="mb-2 flex items-center justify-between gap-3"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">json</span><button class="copy-code rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-600" type="button">Copy</button></div><pre><code>{
   &quot;type&quot;: &quot;cards&quot;,
   &quot;columns&quot;: 3,
   &quot;items&quot;: [
     {&quot;title&quot;: &quot;Example&quot;, &quot;body&quot;: &quot;Card body&quot;}
   ]
 }</code></pre></div>
+<div class="code-wrap" data-code-block><div class="mb-2 flex items-center justify-between gap-3"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">text</span><button class="copy-code rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-600" type="button">Copy</button></div><pre><code>Internet -&gt; Edge -&gt; Load balancer -&gt; Private app -&gt; Data stores -&gt; Observability</code></pre></div>
 </div></section>
         </div>
         <footer class="px-2 py-8 text-sm text-slate-500">Generated as lightweight HTML documentation from a reusable JSON source.</footer>
@@ -312,8 +616,82 @@ python3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py docs/raw/sa
     </main>
   </div>
   <script>
-    const chartSpecs = [{"id": "chart-1", "type": "bar", "labels": ["Docs", "Commands", "Hooks", "Skills"], "datasets": [{"label": "Count", "data": [3, 7, 3, 2]}], "options": {}}, {"id": "chart-2", "type": "line", "labels": ["Week 1", "Week 2", "Week 3", "Week 4"], "datasets": [{"label": "Reader confidence", "data": [40, 58, 73, 88]}], "options": {}}, {"id": "chart-3", "type": "pie", "labels": ["Setup", "Skills", "Hooks", "Docs"], "datasets": [{"label": "Attention", "data": [30, 25, 20, 25]}], "options": {}}, {"id": "chart-4", "type": "doughnut", "labels": ["Global", "Custom", "Repo-local"], "datasets": [{"label": "Asset groups", "data": [4, 4, 3]}], "options": {}}, {"id": "chart-5", "type": "radar", "labels": ["Clarity", "Coverage", "Speed", "Safety", "Maintainability"], "datasets": [{"label": "Sample score", "data": [90, 85, 75, 88, 92]}], "options": {}}, {"id": "chart-6", "type": "polarArea", "labels": ["Markdown", "Cards", "Tables", "Charts", "Flows"], "datasets": [{"label": "Usage", "data": [18, 24, 16, 12, 20]}], "options": {}}, {"id": "chart-7", "type": "doughnut", "labels": ["Compute", "Database", "Network", "Storage", "Observability"], "datasets": [{"label": "Cost share", "data": [35, 30, 18, 7, 10]}], "options": {}}];
+    const chartSpecs = [{"id": "chart-1", "type": "bar", "labels": ["Docs", "Commands", "Hooks", "Skills"], "datasets": [{"label": "Current", "data": [3, 7, 3, 2]}, {"label": "Planned", "data": [4, 8, 4, 3]}], "options": {}}, {"id": "chart-2", "type": "line", "labels": ["Week 1", "Week 2", "Week 3", "Week 4"], "datasets": [{"label": "Reader confidence", "data": [40, 58, 73, 88]}, {"label": "Coverage", "data": [35, 52, 68, 91], "borderDash": [6, 4]}], "options": {"plugins": {"legend": {"position": "bottom"}, "tooltip": {"enabled": true}}}}, {"id": "chart-3", "type": "pie", "labels": ["Setup", "Skills", "Hooks", "Docs"], "datasets": [{"label": "Attention", "data": [30, 25, 20, 25]}], "options": {}}, {"id": "chart-4", "type": "doughnut", "labels": ["Global", "Custom", "Repo-local"], "datasets": [{"label": "Asset groups", "data": [4, 4, 3]}], "options": {}}, {"id": "chart-5", "type": "radar", "labels": ["Clarity", "Coverage", "Speed", "Safety", "Maintainability"], "datasets": [{"label": "Sample score", "data": [90, 96, 75, 88, 92]}], "options": {}}, {"id": "chart-6", "type": "polarArea", "labels": ["Markdown", "Cards", "Tables", "Charts", "Flows"], "datasets": [{"label": "Usage", "data": [18, 24, 16, 12, 20]}], "options": {}}];
+    const cloudDiagrams = [{"id": "cloud-diagram-1", "elements": [{"data": {"id": "users", "label": "Users", "displayLabel": "👤 Users", "kind": "client", "group": null, "groupLabel": "", "bg": "#ede9fe", "border": "#a78bfa", "textColor": "#4c1d95", "meta": ""}}, {"data": {"id": "internet", "label": "Public Internet", "displayLabel": "🌐 Public Internet", "kind": "internet", "group": null, "groupLabel": "", "bg": "#dbeafe", "border": "#60a5fa", "textColor": "#1e3a8a", "meta": ""}}, {"data": {"id": "route53", "label": "Route 53", "displayLabel": "▣ Route 53", "kind": "service", "group": "edge", "groupLabel": "AWS Edge", "bg": "#f8fafc", "border": "#94a3b8", "textColor": "#334155", "meta": ""}}, {"data": {"id": "cloudfront", "label": "CloudFront", "displayLabel": "▣ CloudFront", "kind": "service", "group": "edge", "groupLabel": "AWS Edge", "bg": "#f8fafc", "border": "#94a3b8", "textColor": "#334155", "meta": ""}}, {"data": {"id": "waf", "label": "AWS WAF", "displayLabel": "🔐 AWS WAF", "kind": "security", "group": "edge", "groupLabel": "AWS Edge", "bg": "#fee2e2", "border": "#ef4444", "textColor": "#991b1b", "meta": ""}}, {"data": {"id": "alb", "label": "Application Load Balancer", "displayLabel": "⚖️ Application Load Balancer", "kind": "load-balancer", "group": "public", "groupLabel": "Public Subnets", "bg": "#e0f2fe", "border": "#38bdf8", "textColor": "#075985", "meta": ""}}, {"data": {"id": "api", "label": "API Gateway", "displayLabel": "⚙️ API Gateway", "kind": "api", "group": "private_app", "groupLabel": "Private App Subnets", "bg": "#dbeafe", "border": "#3b82f6", "textColor": "#1d4ed8", "meta": ""}}, {"data": {"id": "ecs", "label": "ECS Fargate Service", "displayLabel": "🖥️ ECS Fargate Service", "kind": "compute", "group": "private_app", "groupLabel": "Private App Subnets", "bg": "#f1f5f9", "border": "#94a3b8", "textColor": "#334155", "meta": ""}}, {"data": {"id": "worker", "label": "Worker Service", "displayLabel": "🖥️ Worker Service", "kind": "server", "group": "private_app", "groupLabel": "Private App Subnets", "bg": "#f1f5f9", "border": "#94a3b8", "textColor": "#334155", "meta": ""}}, {"data": {"id": "lambda", "label": "Lambda Jobs", "displayLabel": "λ Lambda Jobs", "kind": "function", "group": "private_app", "groupLabel": "Private App Subnets", "bg": "#fff7ed", "border": "#fb923c", "textColor": "#9a3412", "meta": ""}}, {"data": {"id": "queue", "label": "SQS Queue", "displayLabel": "📬 SQS Queue", "kind": "queue", "group": "private_app", "groupLabel": "Private App Subnets", "bg": "#fce7f3", "border": "#ec4899", "textColor": "#9d174d", "meta": ""}}, {"data": {"id": "rds", "label": "RDS PostgreSQL", "displayLabel": "🗄️ RDS PostgreSQL", "kind": "database", "group": "private_data", "groupLabel": "Private Data Subnets", "bg": "#dcfce7", "border": "#22c55e", "textColor": "#166534", "meta": ""}}, {"data": {"id": "cache", "label": "ElastiCache Redis", "displayLabel": "⚡ ElastiCache Redis", "kind": "cache", "group": "private_data", "groupLabel": "Private Data Subnets", "bg": "#fef3c7", "border": "#f59e0b", "textColor": "#92400e", "meta": ""}}, {"data": {"id": "s3", "label": "S3 Object Storage", "displayLabel": "🪣 S3 Object Storage", "kind": "storage", "group": "private_data", "groupLabel": "Private Data Subnets", "bg": "#ccfbf1", "border": "#14b8a6", "textColor": "#115e59", "meta": ""}}, {"data": {"id": "cloudwatch", "label": "CloudWatch", "displayLabel": "📈 CloudWatch", "kind": "observability", "group": "ops", "groupLabel": "Operations", "bg": "#e0e7ff", "border": "#6366f1", "textColor": "#3730a3", "meta": ""}}, {"data": {"id": "ci", "label": "GitHub Actions", "displayLabel": "🚀 GitHub Actions", "kind": "ci", "group": "delivery", "groupLabel": "Delivery Pipeline", "bg": "#f0fdf4", "border": "#22c55e", "textColor": "#166534", "meta": ""}}, {"data": {"id": "edge_0_users_internet", "source": "users", "target": "internet", "label": "HTTPS"}}, {"data": {"id": "edge_1_internet_route53", "source": "internet", "target": "route53", "label": "DNS"}}, {"data": {"id": "edge_2_route53_cloudfront", "source": "route53", "target": "cloudfront", "label": ""}}, {"data": {"id": "edge_3_cloudfront_waf", "source": "cloudfront", "target": "waf", "label": "filter"}}, {"data": {"id": "edge_4_waf_alb", "source": "waf", "target": "alb", "label": ""}}, {"data": {"id": "edge_5_alb_api", "source": "alb", "target": "api", "label": ""}}, {"data": {"id": "edge_6_api_ecs", "source": "api", "target": "ecs", "label": ""}}, {"data": {"id": "edge_7_ecs_queue", "source": "ecs", "target": "queue", "label": "async"}}, {"data": {"id": "edge_8_queue_worker", "source": "queue", "target": "worker", "label": ""}}, {"data": {"id": "edge_9_worker_lambda", "source": "worker", "target": "lambda", "label": ""}}, {"data": {"id": "edge_10_ecs_rds", "source": "ecs", "target": "rds", "label": ""}}, {"data": {"id": "edge_11_ecs_cache", "source": "ecs", "target": "cache", "label": ""}}, {"data": {"id": "edge_12_ecs_s3", "source": "ecs", "target": "s3", "label": ""}}, {"data": {"id": "edge_13_ecs_cloudwatch", "source": "ecs", "target": "cloudwatch", "label": "logs"}}, {"data": {"id": "edge_14_ci_ecs", "source": "ci", "target": "ecs", "label": "deploy"}}], "groups": [{"id": "edge", "label": "AWS Edge", "parent": null}, {"id": "vpc", "label": "Application VPC", "parent": null}, {"id": "public", "label": "Public Subnets", "parent": "vpc"}, {"id": "private_app", "label": "Private App Subnets", "parent": "vpc"}, {"id": "private_data", "label": "Private Data Subnets", "parent": "vpc"}, {"id": "ops", "label": "Operations", "parent": null}, {"id": "delivery", "label": "Delivery Pipeline", "parent": null}], "layout": "LR"}];
     const palette = ["#2563eb", "#7c3aed", "#059669", "#dc2626", "#d97706", "#0891b2", "#be185d", "#4f46e5"];
+    document.querySelectorAll('[data-code-block]').forEach((block) => {
+      const button = block.querySelector('.copy-code');
+      const code = block.querySelector('code');
+      if (!button || !code) return;
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code.innerText);
+          const previous = button.innerText;
+          button.innerText = 'Copied';
+          setTimeout(() => button.innerText = previous, 1200);
+        } catch (error) {
+          button.innerText = 'Select code';
+        }
+      });
+    });
+    if (window.cytoscape && window.cytoscapeDagre) {
+      cytoscape.use(cytoscapeDagre);
+    }
+    for (const diagram of cloudDiagrams) {
+      const container = document.getElementById(diagram.id);
+      if (!container || !window.cytoscape) continue;
+      const cy = cytoscape({
+        container,
+        elements: diagram.elements,
+        layout: { name: 'dagre', rankDir: diagram.layout || 'LR', nodeSep: 95, rankSep: 150, padding: 55 },
+        wheelSensitivity: 0.18,
+        style: [
+          { selector: 'node', style: {
+            'shape': 'round-rectangle',
+            'background-color': 'data(bg)',
+            'border-color': 'data(border)',
+            'border-width': 2,
+            'label': 'data(displayLabel)',
+            'text-valign': 'center',
+            'text-halign': 'center',
+            'text-wrap': 'wrap',
+            'text-max-width': 132,
+            'font-size': 13,
+            'font-weight': 700,
+            'color': 'data(textColor)',
+            'width': 146,
+            'height': 86,
+            'padding': 12,
+            'overlay-opacity': 0,
+          } },
+          { selector: 'edge', style: {
+            'width': 2.5,
+            'line-color': '#38bdf8',
+            'target-arrow-color': '#38bdf8',
+            'target-arrow-shape': 'triangle',
+            'curve-style': 'bezier',
+            'label': 'data(label)',
+            'font-size': 10,
+            'font-weight': 700,
+            'color': '#0f766e',
+            'text-background-color': '#ffffff',
+            'text-background-opacity': 0.9,
+            'text-background-padding': 3,
+          } },
+          { selector: 'node:selected', style: { 'border-width': 4, 'border-color': '#2563eb' } },
+        ],
+      });
+      const fitCloud = () => { cy.fit(undefined, 48); cy.center(); };
+      fitCloud();
+      const resetButton = document.querySelector(`[data-cloud-target="${diagram.id}"].cloud-reset`);
+      const fullscreenButton = document.querySelector(`[data-cloud-target="${diagram.id}"].cloud-fullscreen`);
+      if (resetButton) resetButton.addEventListener('click', fitCloud);
+      if (fullscreenButton) fullscreenButton.addEventListener('click', async () => {
+        if (container.requestFullscreen) await container.requestFullscreen();
+        setTimeout(() => { cy.resize(); fitCloud(); }, 120);
+      });
+      document.addEventListener('fullscreenchange', () => { cy.resize(); fitCloud(); });
+    }
     for (const spec of chartSpecs) {
       const ctx = document.getElementById(spec.id);
       if (!ctx) continue;

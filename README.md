@@ -1,17 +1,16 @@
 # Agent Kit
 
-Shared AI agent setup toolkit for Claude Code. Install it once per machine, then bootstrap any project with consistent commands, MCP servers, skills, hooks, and assistant guidance.
+Shared AI agent setup toolkit for Claude Code. Install it once per machine, then bootstrap target projects with consistent commands, MCP servers, skills, hooks, and assistant guidance.
 
-## At a Glance
+## How It Works
 
-| Area | Source | Installed / used by |
-|------|--------|---------------------|
-| Global commands | `global/commands/` | `python3 scripts/install.py` copies them to `~/.claude/commands/` |
-| MCP settings | `global/settings.json` | Installer and `/ak:update` merge permissions into global Claude settings |
-| Community skills | `skills/claudekit-skills/` | `/ak:setup-skills` installs selected skills into projects |
-| Anthropic skills | `skills/anthropics-skills/` | `/ak:setup-skills` installs selected official skills into projects |
-| Custom assets | `custom/` | `/ak:setup-custom` installs selected commands, hooks, and skills |
-| Repo-local tooling | `.claude/` | Maintains this repository only |
+| Layer | Source | Installed / used by |
+|-------|--------|---------------------|
+| Global | `global/commands/`, `global/settings.json` | `python3 scripts/install.py` installs commands and MCP permissions globally |
+| Submodule | `skills/claudekit-skills/`, `skills/anthropics-skills/` | `/ak:setup-skills` installs selected community or official skills into target projects |
+| Custom | `custom/commands/`, `custom/hooks/`, `custom/skills/` | `/ak:setup-custom` installs selected reusable assets into target projects |
+| Repo-local | `.claude/commands/`, `.claude/skills/`, `.claude/settings.json` | Maintenance tooling for this repository |
+| Visual docs | `docs/raw/`, `docs/` | JSON sources rendered into reader-friendly HTML documentation |
 
 ## Quick Start
 
@@ -30,14 +29,6 @@ Then in any target project:
 /ak:setup-skills
 /ak:setup-custom
 ```
-
-## Main Workflow
-
-1. Run `python3 scripts/install.py` once on your machine.
-2. Open a target project and run `/ak:init-project`.
-3. Add stack-specific skills with `/ak:setup-skills`.
-4. Add personal reusable assets with `/ak:setup-custom`.
-5. Keep docs synchronized with `/ak:sync-docs` after asset changes.
 
 ## Commands
 
@@ -60,17 +51,17 @@ Available only in this repository through `.claude/commands/`.
 |---------|-------------|---------|
 | `/ak:sync-docs` | `.claude/commands/ak:sync-docs.md` | Regenerate `README.md`, `CLAUDE.md`, and `AGENTS.md` after assets change |
 | `/create-command` | `.claude/commands/create-command.md` | Create a Claude Code slash command with frontmatter and tool permissions |
-| `/create-subagent` | `.claude/commands/create-subagent.md` | Create a domain-expert Claude Code subagent |
+| `/create-subagent` | `.claude/commands/create-subagent.md` | Create a specialized domain-expert subagent |
 
 ### Custom Commands
 
 Installed selectively from `custom/commands/` by `/ak:setup-custom`.
 
-| Command | Purpose |
-|---------|---------|
-| `/code-review` | Multi-aspect code review using parallel code-review-expert agents |
-| `/research` | Deep research with parallel subagents and automatic citations |
-| `/validate-and-fix` | Run quality checks and automatically fix issues using concurrent agents |
+| Command | Source file | Purpose |
+|---------|-------------|---------|
+| `/code-review` | `custom/commands/code-review.md` | Multi-aspect code review using parallel code-review-expert agents |
+| `/research` | `custom/commands/research.md` | Deep research with parallel subagents and automatic citations |
+| `/validate-and-fix` | `custom/commands/validate-and-fix.md` | Run quality checks and automatically fix issues using concurrent agents |
 
 ## MCP Servers
 
@@ -94,10 +85,16 @@ mcp__memory__*
 
 ### Skills
 
-| Skill | Location | Description |
-|-------|----------|-------------|
-| `html-doc-coauthoring` | `custom/skills/html-doc-coauthoring/` | Co-author substantial documentation and generate reader-friendly HTML with visual blocks, charts, tables, and concise prose |
-| `skill-creator` | `.claude/skills/skill-creator/` | Repo-local skill for creating, evaluating, and optimizing skills |
+| Skill | Source | Description |
+|-------|--------|-------------|
+| `html-doc-coauthoring` | `custom/skills/html-doc-coauthoring/` | Co-author substantial documentation and generate reader-friendly HTML with markdown, cards, metrics, tables, callouts, images, cloud topology diagrams, flows, timelines, charts, steps, code, checklists, resources, and details blocks |
+
+### Repo-local Skills
+
+| Skill | Source | Description |
+|-------|--------|-------------|
+| `html-doc-coauthoring` | `.claude/skills/html-doc-coauthoring/` | Repo-local installed copy of the HTML documentation co-authoring skill |
+| `skill-creator` | `.claude/skills/skill-creator/` | Create, modify, evaluate, and optimize AI skills |
 
 ### Hooks
 
@@ -131,6 +128,10 @@ agent-kit/
 │   │   ├── scripts/
 │   │   └── tests/test_hooks.py
 │   └── skills/html-doc-coauthoring/
+│       ├── SKILL.md
+│       ├── LICENSE.txt
+│       ├── references/html-doc-guide.md
+│       └── scripts/build_html_doc.py
 ├── skills/
 │   ├── claudekit-skills/
 │   └── anthropics-skills/
@@ -140,10 +141,15 @@ agent-kit/
 │   │   ├── create-command.md
 │   │   └── create-subagent.md
 │   ├── settings.json
-│   └── skills/skill-creator/
+│   └── skills/
+│       ├── html-doc-coauthoring/
+│       └── skill-creator/
 ├── docs/
-│   ├── raw/agent-kit-project-documentation.json
-│   └── agent-kit-project-documentation.html
+│   ├── raw/
+│   │   ├── agent-kit-project-documentation.json
+│   │   └── sample-components-documentation.json
+│   ├── agent-kit-project-documentation.html
+│   └── sample-components-documentation.html
 ├── scripts/
 │   ├── init-project.py
 │   └── install.py
@@ -173,7 +179,7 @@ Do not edit `~/.claude/` directly. It is managed by the installer and setup comm
 
 | Tool | Version | Purpose |
 |------|---------|---------|
-| Python | 3.10+ | Installer, init script, hook tests, and repository test suites |
+| Python | 3.10+ | Installer, init script, HTML doc generation, hook tests, and repository test suites |
 | Node.js | 18+ | MCP servers through `npx`, GitNexus, and related tooling |
 | Claude Code | Latest | Slash command and assistant configuration runtime |
 | Git | Latest | Repository cloning, submodules, and version control |
@@ -190,4 +196,13 @@ python3 custom/hooks/tests/test_hooks.py
 
 ## Visual Documentation
 
-A reader-friendly HTML overview is available at `docs/agent-kit-project-documentation.html`. Its editable source is `docs/raw/agent-kit-project-documentation.json`.
+| Document | Source |
+|----------|--------|
+| `docs/agent-kit-project-documentation.html` | `docs/raw/agent-kit-project-documentation.json` |
+| `docs/sample-components-documentation.html` | `docs/raw/sample-components-documentation.json` |
+
+Regenerate all visual docs:
+
+```bash
+for file in docs/raw/*.json; do python3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py "$file"; done
+```

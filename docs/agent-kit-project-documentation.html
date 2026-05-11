@@ -6,6 +6,10 @@
   <title>Agent Kit Project Documentation</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'base', securityLevel: 'strict', architecture: { randomize: false } });
+  </script>
   <style>
     body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     .doc-prose p { margin: 0.65rem 0; line-height: 1.7; }
@@ -17,8 +21,8 @@
     .doc-prose ol { list-style: decimal; }
     .doc-prose li { margin: 0.35rem 0; }
     .doc-prose blockquote { border-left: 4px solid #60a5fa; color: #475569; padding-left: 1rem; margin: 1rem 0; }
-    .code-wrap { border: 1px solid #e2e8f0; border-radius: 1rem; background: #fff; padding: 1rem; box-shadow: 0 1px 2px rgb(15 23 42 / 0.04); }
-    .code-wrap pre { overflow-x: auto; border-radius: 0.75rem; background: #0f172a; color: #e2e8f0; padding: 1rem; font-size: 0.875rem; line-height: 1.6; }
+    .code-wrap { border: 1px solid #1e293b; border-radius: 1rem; background: #0f172a; padding: 1rem; box-shadow: 0 1px 2px rgb(15 23 42 / 0.08); }
+    .code-wrap pre { overflow-x: auto; border-radius: 0.75rem; background: #020617; color: #e2e8f0; padding: 1rem; font-size: 0.875rem; line-height: 1.6; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-blue-50/60 to-violet-50 text-slate-900">
@@ -79,12 +83,12 @@
 <li class="flex gap-4 rounded-2xl border border-amber-200 bg-white p-5 shadow-sm"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-500 text-sm font-bold text-white shadow-sm">4</div><div><h3 class="font-semibold text-slate-950">Check install status</h3><div class="doc-prose mt-1 text-sm text-slate-600"><p>Run <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">python3 scripts/install.py --check</code> to verify command and MCP setup.</p></div></div></li>
 <li class="flex gap-4 rounded-2xl border border-rose-200 bg-white p-5 shadow-sm"><div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-500 text-sm font-bold text-white shadow-sm">5</div><div><h3 class="font-semibold text-slate-950">Bootstrap a target project</h3><div class="doc-prose mt-1 text-sm text-slate-600"><p>In another project, run <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">/ak:init-project</code>, then <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">/ak:setup-skills</code> and <code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">/ak:setup-custom</code> as needed.</p></div></div></li>
 </ol>
-<div class="code-wrap"><div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">bash</div><pre><code>git clone &lt;this-repo&gt;
+<div class="code-wrap" data-code-block><div class="mb-2 flex items-center justify-between gap-3"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">bash</span><button class="copy-code rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-600" type="button">Copy</button></div><pre><code>git clone &lt;this-repo&gt;
 cd agent-kit
 python3 scripts/install.py
 python3 scripts/install.py --init-submodule
 python3 scripts/install.py --check</code></pre></div>
-<div class="code-wrap"><div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">text</div><pre><code>/ak:init-project
+<div class="code-wrap" data-code-block><div class="mb-2 flex items-center justify-between gap-3"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">text</span><button class="copy-code rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-600" type="button">Copy</button></div><pre><code>/ak:init-project
 /ak:setup-skills
 /ak:setup-custom</code></pre></div>
 </div></section><section id="how-the-pieces-fit-together" class="scroll-mt-8 rounded-3xl border border-emerald-200 bg-white/90 p-6 shadow-sm ring-4 ring-emerald-100">
@@ -245,7 +249,7 @@ python3 scripts/install.py --check</code></pre></div>
 <td class="px-4 py-3 align-top text-sm text-slate-700"><p><code class="rounded bg-slate-100 px-1.5 py-0.5 text-sm text-slate-900">python3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py docs/raw/&lt;name&gt;.json</code></p></td>
 </tr>
 </tbody></table></div></div>
-<div class="code-wrap"><div class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">bash</div><pre><code>python3 tests/run_all.py
+<div class="code-wrap" data-code-block><div class="mb-2 flex items-center justify-between gap-3"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">bash</span><button class="copy-code rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-slate-600" type="button">Copy</button></div><pre><code>python3 tests/run_all.py
 python3 tests/test_kit.py
 python3 tests/test_init_project_script.py
 python3 custom/hooks/tests/test_hooks.py</code></pre></div>
@@ -272,6 +276,21 @@ python3 custom/hooks/tests/test_hooks.py</code></pre></div>
   <script>
     const chartSpecs = [];
     const palette = ["#2563eb", "#7c3aed", "#059669", "#dc2626", "#d97706", "#0891b2", "#be185d", "#4f46e5"];
+    document.querySelectorAll('[data-code-block]').forEach((block) => {
+      const button = block.querySelector('.copy-code');
+      const code = block.querySelector('code');
+      if (!button || !code) return;
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(code.innerText);
+          const previous = button.innerText;
+          button.innerText = 'Copied';
+          setTimeout(() => button.innerText = previous, 1200);
+        } catch (error) {
+          button.innerText = 'Select code';
+        }
+      });
+    });
     for (const spec of chartSpecs) {
       const ctx = document.getElementById(spec.id);
       if (!ctx) continue;
