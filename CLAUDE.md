@@ -1,109 +1,111 @@
 # Agent Kit
 
-Shared AI agent setup toolkit. Run `python3 scripts/install.py` once per machine — then `/ak:init-project`, `/ak:setup-skills`, `/ak:setup-custom`, `/ak:update`, `/ak:sync-docs` are available in every project.
+Shared AI agent setup toolkit for Claude Code. Run `python3 scripts/install.py` once per machine, then use `/ak:init-project`, `/ak:setup-skills`, `/ak:setup-custom`, and `/ak:update` in target projects.
 
 ## Structure
 
-```
+```text
 agent-kit/
-├── global/                          # Installed into ~/.claude/ by install.py
+├── global/
 │   ├── commands/
 │   │   ├── ak:init-project.md
 │   │   ├── ak:setup-custom.md
 │   │   ├── ak:setup-skills.md
 │   │   └── ak:update.md
-│   └── settings.json                # MCP server definitions (3 servers) + mcpPermissions
+│   └── settings.json
 ├── custom/
 │   ├── commands/
 │   │   ├── code-review.md
 │   │   ├── research.md
 │   │   └── validate-and-fix.md
 │   ├── hooks/
-│   │   └── hooks.json               # 3 active hooks
-│   └── skills/
+│   │   ├── hooks.json
+│   │   ├── scripts/
+│   │   └── tests/test_hooks.py
+│   └── skills/html-doc-coauthoring/
 ├── skills/
-│   ├── claudekit-skills/            # Git submodule — 30+ community skills
-│   └── anthropics-skills/           # Git submodule — 17 official Anthropic skills
-├── tests/
-│   ├── run_all.py
-│   ├── test_init_project_script.py
-│   └── test_kit.py
+│   ├── claudekit-skills/
+│   └── anthropics-skills/
+├── .claude/
+│   ├── commands/
+│   │   ├── ak:sync-docs.md
+│   │   ├── create-command.md
+│   │   └── create-subagent.md
+│   ├── settings.json
+│   └── skills/skill-creator/
+├── docs/
+│   ├── raw/agent-kit-project-documentation.json
+│   └── agent-kit-project-documentation.html
 ├── scripts/
 │   ├── init-project.py
 │   └── install.py
-└── .claude/
-    ├── settings.json
-    ├── commands/
-    │   └── ak:sync-docs.md
-    └── skills/
-        └── skill-creator/
+└── tests/
 ```
 
-## Global Commands (installed to ~/.claude/commands/)
+## Global Commands
 
 | Command | File | Purpose |
 |---------|------|---------|
-| `/ak:init-project` | `global/commands/ak:init-project.md` | Per-project setup wizard |
-| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install from claudekit-skills + anthropics/skills |
-| `/ak:setup-custom` | `global/commands/ak:setup-custom.md` | Install custom skills/commands/hooks from custom/ |
-| `/ak:update` | `global/commands/ak:update.md` | Sync MCP permissions to global settings |
+| `/ak:init-project` | `global/commands/ak:init-project.md` | Per-project setup wizard for assistant docs, hooks, MCP permissions, and GitNexus guidance |
+| `/ak:setup-custom` | `global/commands/ak:setup-custom.md` | Install custom skills, commands, and hooks from `custom/` |
+| `/ak:setup-skills` | `global/commands/ak:setup-skills.md` | Install community and Anthropic skills from submodules |
+| `/ak:update` | `global/commands/ak:update.md` | Sync MCP permissions to global `~/.claude/settings.json` |
 
-## Project Commands (this repo only)
+## Project Commands
 
 | Command | File | Purpose |
 |---------|------|---------|
-| `/ak:sync-docs` | `.claude/commands/ak:sync-docs.md` | Regenerate README, CLAUDE.md, AGENTS.md |
+| `/ak:sync-docs` | `.claude/commands/ak:sync-docs.md` | Regenerate `README.md`, `CLAUDE.md`, and `AGENTS.md` |
+| `/create-command` | `.claude/commands/create-command.md` | Create a Claude Code slash command |
+| `/create-subagent` | `.claude/commands/create-subagent.md` | Create a domain-expert subagent |
 
-## MCP Servers (global/settings.json)
+## MCP Servers
 
 | Server | Package | Purpose |
 |--------|---------|---------|
-| `context7` | `@upstash/context7-mcp` | Up-to-date library docs |
+| `context7` | `@upstash/context7-mcp@latest` | Up-to-date library docs |
 | `sequential-thinking` | `@modelcontextprotocol/server-sequential-thinking` | Complex reasoning |
 | `memory` | `@modelcontextprotocol/server-memory` | Persistent knowledge |
 
-## Custom Commands (custom/commands/)
+## Custom Commands
 
 | Command | Purpose |
 |---------|---------|
 | `code-review` | Multi-aspect code review using parallel code-review-expert agents |
 | `research` | Deep research with parallel subagents and automatic citations |
-| `validate-and-fix` | Run quality checks and automatically fix issues |
+| `validate-and-fix` | Run quality checks and automatically fix issues using concurrent agents |
 
-## Custom Skills (custom/skills/)
+## Custom Skills
 
-Private project-specific skills. Add a directory with `SKILL.md` to create one.
+| Skill | Description |
+|-------|-------------|
+| `html-doc-coauthoring` | Co-author substantial documentation and produce reader-friendly HTML with visual structure, charts, cards, tables, flow blocks, timelines, and concise prose. |
 
-## Custom Hooks (custom/hooks/hooks.json)
+## Repo-local Skills
+
+| Skill | Description |
+|-------|-------------|
+| `skill-creator` | Create, modify, evaluate, and optimize AI skills. |
+
+## Custom Hooks
 
 3 active hooks:
-- `check-secrets` — Block writing hardcoded secrets/API keys
-- `block-dangerous-bash` — Block dangerous bash commands (rm -rf, force push, DROP TABLE, etc.)
-- `gitnexus-auto-rebuild` — Auto-rebuild gitnexus knowledge graph after code changes (PostToolUse hook)
-
-Hook input: JSON via stdin — use `jq -r '.tool_input.field_name'`.
+- `block-dangerous-bash` — Block dangerous bash commands, destructive deletes, force push, hard reset, database destruction, `kill`, and unsafe permissions
+- `check-secrets` — Block writing hardcoded secrets, API keys, tokens, or private keys
+- `gitnexus-auto-rebuild` — Auto-rebuild GitNexus knowledge graph after code changes
 
 ## Development Rules
 
-**After adding/removing skills, commands, or hooks — run `/ak:sync-docs` immediately.**
+**After adding/removing skills, commands, hooks, or MCP servers — run `/ak:sync-docs` immediately.**
 
-- Edit source in `global/commands/` or `custom/` — never edit `~/.claude/` directly
-- Re-run `python3 scripts/install.py` after changing `global/` to deploy globally
-- Hook scripts in `custom/hooks/scripts/` must be Python 3 — no shell scripts
-- The `skill-creator` skill in `.claude/skills/` is for developing and evaluating new skills
+- Edit source in `global/` or `custom/`; never edit `~/.claude/` directly
+- Re-run `python3 scripts/install.py` after changing `global/`
+- Install selected custom assets into projects with `/ak:setup-custom`
+- Hook scripts in `custom/hooks/scripts/` must be Python 3; no shell scripts
+- Do not edit `skills/claudekit-skills/` or `skills/anthropics-skills/`; they are Git submodules
+- Keep visual docs source in `docs/raw/` and generated HTML in `docs/`
+- Run `python3 tests/run_all.py` after documentation or toolkit changes
 
-**Before implementing any Claude Code feature** — use the `claude-code-guide` subagent to verify the correct API/behavior first.
+## GitNexus
 
-## gitnexus
-
-This project has a GitNexus knowledge graph in `.gitnexus/`.
-
-GitNexus is a zero-server code intelligence engine that builds a knowledge graph of any codebase.
-Install: `npm install -g gitnexus` | CLI: `gitnexus analyze` | Web UI: gitnexus.vercel.app
-
-Rules:
-- Before answering architecture or codebase questions, read `.gitnexus/` for codebase structure
-- If `.gitnexus/` contains wiki or graph files, use them to understand community hubs and god nodes
-- After modifying code files in this session, the `gitnexus-auto-rebuild` hook automatically rebuilds the graph
-- Manual rebuild: `npx gitnexus analyze` (or `npx gitnexus analyze --force` for full re-index)
-- GitNexus also provides an MCP server with 16 tools via `gitnexus mcp`
+This project may contain a `.gitnexus/` knowledge graph. Do not modify `.gitnexus/` manually; rebuild with `npx gitnexus analyze` if needed.

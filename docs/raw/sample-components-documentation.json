@@ -1,0 +1,268 @@
+{
+  "title": "HTML Doc Components Sample",
+  "subtitle": "A gallery document showing every supported component in the html-doc-coauthoring skill.",
+  "audience": "Anyone who wants to see what visual documentation blocks Agent Kit can generate.",
+  "summary": "This sample demonstrates the document shell plus every supported block type: markdown, cards, metrics, table, callouts, flow, timeline, charts, steps, and code.",
+  "theme": "slate",
+  "toc": true,
+  "badges": ["Sample", "Component Gallery", "HTML Export"],
+  "actions": [
+    {"label": "Markdown", "href": "#markdown"},
+    {"label": "Visual blocks", "href": "#visual-blocks"},
+    {"label": "Charts", "href": "#charts"}
+  ],
+  "sections": [
+    {
+      "title": "Document Shell",
+      "intro": "Top-level metadata controls the title, subtitle, audience note, badges, summary, navigation, and hero actions.",
+      "blocks": [
+        {
+          "type": "cards",
+          "columns": 3,
+          "items": [
+            {"title": "Title and subtitle", "badge": "Header", "body": "Shown in the sidebar and main hero area."},
+            {"title": "Audience and summary", "badge": "Context", "body": "Helps a new reader understand whether the document is for them."},
+            {"title": "Badges and actions", "badge": "Navigation", "body": "Badges summarize document type. Actions link to important sections or next steps."}
+          ]
+        },
+        {
+          "type": "table",
+          "headers": ["JSON field", "Purpose", "Example"],
+          "rows": [
+            ["`title`", "Main document name", "`HTML Doc Components Sample`"],
+            ["`subtitle`", "One-line context under the title", "`A gallery document...`"],
+            ["`audience`", "Reader profile shown in the sidebar", "`Developers and maintainers`"],
+            ["`summary`", "Hero summary", "`This sample demonstrates...`"],
+            ["`badges`", "Small labels in the sidebar", "`Sample`, `Gallery`"],
+            ["`actions`", "Clickable hero links", "`#charts`"]
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Markdown",
+      "intro": "Use markdown blocks for concise prose, bullets, numbered lists, headings, inline formatting, and quotes.",
+      "blocks": [
+        {
+          "type": "markdown",
+          "content": "## Markdown block\n\nThis paragraph shows **bold text**, *italic text*, and inline `code`. Keep paragraphs short so the generated HTML stays scannable.\n\n- Bullet items are supported\n- Inline links can point to anchors like [Charts](#charts)\n- Use lists when readers need quick scanning\n\n1. First numbered step\n2. Second numbered step\n3. Third numbered step\n\n> Blockquotes work well for short notes or memorable guidance."
+        }
+      ]
+    },
+    {
+      "title": "Visual Blocks",
+      "intro": "Cards, metrics, and tables turn structured facts into quick visual summaries.",
+      "blocks": [
+        {
+          "type": "metrics",
+          "items": [
+            {"label": "Block types", "value": "9", "hint": "Core content components"},
+            {"label": "Callout tones", "value": "4", "hint": "Info, success, warning, danger"},
+            {"label": "Chart variants", "value": "6", "hint": "Chart.js chart types shown below"},
+            {"label": "Source format", "value": "JSON", "hint": "Stored under docs/raw/"}
+          ]
+        },
+        {
+          "type": "cards",
+          "columns": 4,
+          "items": [
+            {"title": "Cards", "badge": "Concepts", "body": "Use cards for features, benefits, risks, options, responsibilities, or takeaways."},
+            {"title": "Metrics", "badge": "Numbers", "body": "Use metrics for memorable numeric facts such as counts, timelines, budgets, or KPIs."},
+            {"title": "Tables", "badge": "Structure", "body": "Use tables when readers need exact comparisons or compact reference data."},
+            {"title": "Callouts", "badge": "Attention", "body": "Use callouts for decisions, warnings, constraints, or important next actions."}
+          ]
+        },
+        {
+          "type": "table",
+          "headers": ["Component", "Best for", "Avoid when"],
+          "rows": [
+            ["Cards", "Grouping concepts and options", "The reader needs exact tabular comparison"],
+            ["Metrics", "Highlighting numbers", "The value is not meaningful by itself"],
+            ["Table", "Comparisons and references", "The content is long prose"],
+            ["Callout", "Critical notes", "Everything feels equally important"]
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Callouts",
+      "intro": "Callouts support four tones for different kinds of emphasis.",
+      "blocks": [
+        {"type": "callout", "tone": "info", "title": "Info", "content": "Use `info` for neutral context, helpful notes, or reader orientation."},
+        {"type": "callout", "tone": "success", "title": "Success", "content": "Use `success` for approved decisions, completed milestones, or recommended paths."},
+        {"type": "callout", "tone": "warning", "title": "Warning", "content": "Use `warning` for constraints, trade-offs, or things a reader should verify before acting."},
+        {"type": "callout", "tone": "danger", "title": "Danger", "content": "Use `danger` for high-risk issues such as security concerns, data loss, or irreversible actions."}
+      ]
+    },
+    {
+      "title": "Process Blocks",
+      "intro": "Flow, timeline, and steps blocks explain motion through time or sequence.",
+      "blocks": [
+        {
+          "type": "flow",
+          "title": "Flow block",
+          "items": [
+            {"title": "Collect context", "body": "Gather audience, goal, source material, and constraints."},
+            {"title": "Draft structure", "body": "Choose sections and visual blocks that fit the reader journey."},
+            {"title": "Generate HTML", "body": "Save compact JSON under `docs/raw/` and run the generator."},
+            {"title": "Review", "body": "Open the generated HTML and check that the document is clear."}
+          ]
+        },
+        {
+          "type": "timeline",
+          "title": "Timeline block",
+          "items": [
+            {"date": "Day 1", "title": "Outline", "body": "Agree on the document purpose and audience."},
+            {"date": "Day 2", "title": "Draft", "body": "Write concise section content and choose visuals."},
+            {"date": "Day 3", "title": "Publish", "body": "Generate HTML and share the output path."}
+          ]
+        },
+        {
+          "type": "steps",
+          "items": [
+            {"title": "Write JSON", "body": "Create `docs/raw/<doc-name>.json` with title, summary, sections, and blocks."},
+            {"title": "Run generator", "body": "Run `python3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py docs/raw/<doc-name>.json`."},
+            {"title": "Open HTML", "body": "Review `docs/<doc-name>.html` in a browser."}
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Charts",
+      "intro": "The chart block uses Chart.js. This sample shows all supported chart variants from the skill guide.",
+      "blocks": [
+        {
+          "type": "chart",
+          "chartType": "bar",
+          "title": "Bar chart",
+          "labels": ["Docs", "Commands", "Hooks", "Skills"],
+          "datasets": [{"label": "Count", "data": [3, 7, 3, 2]}]
+        },
+        {
+          "type": "chart",
+          "chartType": "line",
+          "title": "Line chart",
+          "labels": ["Week 1", "Week 2", "Week 3", "Week 4"],
+          "datasets": [{"label": "Reader confidence", "data": [40, 58, 73, 88]}]
+        },
+        {
+          "type": "chart",
+          "chartType": "pie",
+          "title": "Pie chart",
+          "labels": ["Setup", "Skills", "Hooks", "Docs"],
+          "datasets": [{"label": "Attention", "data": [30, 25, 20, 25]}]
+        },
+        {
+          "type": "chart",
+          "chartType": "doughnut",
+          "title": "Doughnut chart",
+          "labels": ["Global", "Custom", "Repo-local"],
+          "datasets": [{"label": "Asset groups", "data": [4, 4, 3]}]
+        },
+        {
+          "type": "chart",
+          "chartType": "radar",
+          "title": "Radar chart",
+          "labels": ["Clarity", "Coverage", "Speed", "Safety", "Maintainability"],
+          "datasets": [{"label": "Sample score", "data": [90, 85, 75, 88, 92]}]
+        },
+        {
+          "type": "chart",
+          "chartType": "polarArea",
+          "title": "Polar area chart",
+          "labels": ["Markdown", "Cards", "Tables", "Charts", "Flows"],
+          "datasets": [{"label": "Usage", "data": [18, 24, 16, 12, 20]}]
+        }
+      ]
+    },
+    {
+      "title": "AWS Infrastructure Example",
+      "intro": "A realistic sample architecture section using the same visual components for cloud infrastructure documentation.",
+      "blocks": [
+        {
+          "type": "metrics",
+          "items": [
+            {"label": "Availability zones", "value": "3", "hint": "Public and private subnets per AZ"},
+            {"label": "Entry points", "value": "2", "hint": "CloudFront and Application Load Balancer"},
+            {"label": "Compute layer", "value": "ECS", "hint": "Fargate services behind ALB"},
+            {"label": "Data layer", "value": "RDS", "hint": "Multi-AZ PostgreSQL plus S3 assets"}
+          ]
+        },
+        {
+          "type": "flow",
+          "title": "Request path",
+          "items": [
+            {"title": "User", "body": "Browser or mobile client sends HTTPS traffic to the public edge."},
+            {"title": "CloudFront + WAF", "body": "Static assets are cached, and WAF blocks common abusive traffic before it reaches origin."},
+            {"title": "ALB", "body": "Application Load Balancer terminates traffic for dynamic API requests and routes to ECS."},
+            {"title": "ECS service", "body": "Fargate tasks run the application inside private subnets with autoscaling."},
+            {"title": "Data stores", "body": "RDS stores relational data, ElastiCache handles hot keys, and S3 stores durable objects."}
+          ]
+        },
+        {
+          "type": "cards",
+          "columns": 3,
+          "items": [
+            {"title": "Network", "badge": "VPC", "body": "One VPC with public subnets for ingress and private subnets for compute, cache, and database tiers."},
+            {"title": "Security", "badge": "IAM", "body": "Least-privilege task roles, security groups by tier, secrets in AWS Secrets Manager, and WAF at the edge."},
+            {"title": "Observability", "badge": "CloudWatch", "body": "Service logs, ALB metrics, RDS alarms, dashboards, and distributed tracing for request latency."}
+          ]
+        },
+        {
+          "type": "table",
+          "headers": ["Layer", "AWS services", "Responsibility"],
+          "rows": [
+            ["Edge", "CloudFront, WAF, ACM", "TLS, caching, edge protection, and static delivery."],
+            ["Ingress", "ALB, Route 53", "DNS routing, health checks, and dynamic request distribution."],
+            ["Compute", "ECS Fargate, ECR", "Container deployment, scaling, and image storage."],
+            ["Data", "RDS PostgreSQL, ElastiCache, S3", "Relational storage, cache acceleration, and object storage."],
+            ["Operations", "CloudWatch, X-Ray, Secrets Manager", "Logs, metrics, traces, alarms, and secret retrieval." ]
+          ]
+        },
+        {
+          "type": "callout",
+          "tone": "warning",
+          "title": "Production guardrail",
+          "content": "Keep ECS tasks, RDS, and ElastiCache in private subnets. Only CloudFront and ALB should be internet-facing."
+        },
+        {
+          "type": "chart",
+          "chartType": "doughnut",
+          "title": "Illustrative monthly cost split",
+          "labels": ["Compute", "Database", "Network", "Storage", "Observability"],
+          "datasets": [{"label": "Cost share", "data": [35, 30, 18, 7, 10]}]
+        },
+        {
+          "type": "steps",
+          "items": [
+            {"title": "Provision foundation", "body": "Create VPC, subnets, route tables, security groups, KMS keys, and baseline IAM roles."},
+            {"title": "Deploy application", "body": "Push container image to ECR, create ECS task definition, service, target group, and ALB listener rules."},
+            {"title": "Attach data services", "body": "Create RDS, ElastiCache, S3 buckets, secrets, and application environment variables."},
+            {"title": "Enable operations", "body": "Add CloudWatch dashboards, alarms, log retention, tracing, backup policies, and runbooks."}
+          ]
+        },
+        {
+          "type": "code",
+          "language": "text",
+          "content": "Internet\n  -> Route 53\n  -> CloudFront + WAF\n  -> ALB (public subnets)\n  -> ECS Fargate services (private subnets)\n  -> RDS / ElastiCache / S3"
+        }
+      ]
+    },
+    {
+      "title": "Code",
+      "intro": "Code blocks are for exact commands or snippets that readers may copy.",
+      "blocks": [
+        {
+          "type": "code",
+          "language": "bash",
+          "content": "mkdir -p docs/raw\npython3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py docs/raw/sample-components-documentation.json"
+        },
+        {
+          "type": "code",
+          "language": "json",
+          "content": "{\n  \"type\": \"cards\",\n  \"columns\": 3,\n  \"items\": [\n    {\"title\": \"Example\", \"body\": \"Card body\"}\n  ]\n}"
+        }
+      ]
+    }
+  ]
+}

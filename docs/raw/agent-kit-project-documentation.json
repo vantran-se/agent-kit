@@ -1,0 +1,185 @@
+{
+  "title": "Agent Kit Project Documentation",
+  "subtitle": "Shared setup toolkit for Claude Code commands, MCP servers, skills, hooks, and assistant docs.",
+  "audience": "Developers and AI assistants maintaining Agent Kit or using it to bootstrap target projects.",
+  "summary": "Agent Kit centralizes reusable Claude Code setup assets. Install once globally, then use project commands to initialize assistant guidance, install skills, and apply custom workflows consistently across repositories.",
+  "theme": "slate",
+  "toc": true,
+  "badges": ["Claude Code", "MCP", "Skills", "Hooks"],
+  "actions": [
+    {"label": "Quick start", "href": "#quick-start"},
+    {"label": "Project map", "href": "#project-map"},
+    {"label": "Maintenance", "href": "#maintenance"}
+  ],
+  "sections": [
+    {
+      "title": "What Agent Kit Provides",
+      "intro": "A single repository for reusable AI-agent setup assets and the scripts that install them.",
+      "blocks": [
+        {
+          "type": "metrics",
+          "items": [
+            {"label": "Global commands", "value": "4", "hint": "Installed into ~/.claude/commands/"},
+            {"label": "MCP servers", "value": "3", "hint": "context7, sequential-thinking, memory"},
+            {"label": "Custom hooks", "value": "3", "hint": "Safety, secret checks, GitNexus rebuild"},
+            {"label": "Custom skills", "value": "1", "hint": "html-doc-coauthoring"}
+          ]
+        },
+        {
+          "type": "cards",
+          "columns": 3,
+          "items": [
+            {
+              "title": "Consistent project bootstrap",
+              "badge": "Setup",
+              "body": "`/ak:init-project` prepares target repositories with assistant docs, settings guidance, and GitNexus-aware setup."
+            },
+            {
+              "title": "Reusable AI capabilities",
+              "badge": "Skills",
+              "body": "`/ak:setup-skills` and `/ak:setup-custom` install curated skills, commands, and hooks without copying assets manually."
+            },
+            {
+              "title": "Safer automation",
+              "badge": "Hooks",
+              "body": "Custom hooks block dangerous shell actions, catch hardcoded secrets, and refresh GitNexus after edits."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Quick Start",
+      "intro": "Install Agent Kit once, then run the setup commands inside each target repository.",
+      "blocks": [
+        {
+          "type": "steps",
+          "items": [
+            {"title": "Clone and enter Agent Kit", "body": "Clone this repository and run commands from the repository root."},
+            {"title": "Install global assets", "body": "Run `python3 scripts/install.py` to copy global commands and register MCP permissions."},
+            {"title": "Initialize submodules", "body": "Run `python3 scripts/install.py --init-submodule` or `git submodule update --init --recursive` to prepare skill sources."},
+            {"title": "Check install status", "body": "Run `python3 scripts/install.py --check` to verify command and MCP setup."},
+            {"title": "Bootstrap a target project", "body": "In another project, run `/ak:init-project`, then `/ak:setup-skills` and `/ak:setup-custom` as needed."}
+          ]
+        },
+        {
+          "type": "code",
+          "language": "bash",
+          "content": "git clone <this-repo>\ncd agent-kit\npython3 scripts/install.py\npython3 scripts/install.py --init-submodule\npython3 scripts/install.py --check"
+        },
+        {
+          "type": "code",
+          "language": "text",
+          "content": "/ak:init-project\n/ak:setup-skills\n/ak:setup-custom"
+        }
+      ]
+    },
+    {
+      "title": "How the Pieces Fit Together",
+      "intro": "Agent Kit separates source assets from installed assets so updates remain traceable.",
+      "blocks": [
+        {
+          "type": "flow",
+          "title": "Asset lifecycle",
+          "items": [
+            {"title": "Source", "body": "Maintain commands in `global/`, reusable private assets in `custom/`, and project-maintenance assets in `.claude/`."},
+            {"title": "Install", "body": "`scripts/install.py` installs global commands and MCP permissions into the user's Claude configuration."},
+            {"title": "Bootstrap", "body": "Target projects use `/ak:init-project` to generate assistant-facing guidance and settings."},
+            {"title": "Extend", "body": "Optional skills, commands, and hooks are installed through `/ak:setup-skills` and `/ak:setup-custom`."}
+          ]
+        },
+        {
+          "type": "table",
+          "headers": ["Layer", "Path", "Role"],
+          "rows": [
+            ["Global source", "`global/commands/`, `global/settings.json`", "Canonical source for globally installed commands and MCP definitions."],
+            ["Custom reusable assets", "`custom/commands/`, `custom/hooks/`, `custom/skills/`", "Personal or team assets installed selectively into target projects."],
+            ["Skill submodules", "`skills/claudekit-skills/`, `skills/anthropics-skills/`", "External skill libraries; do not edit directly."],
+            ["Repo-local tooling", "`.claude/commands/`, `.claude/skills/`", "Maintenance commands and skills for this repository only."],
+            ["Visual docs", "`docs/raw/`, `docs/`", "JSON source plus generated HTML documentation."],
+            ["Tests and scripts", "`scripts/`, `tests/`", "Installer, project initializer, and validation suites."]
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Commands, MCP Servers, and Hooks",
+      "intro": "The main operational surface of Agent Kit: slash commands, MCP servers, custom commands, and safety hooks.",
+      "blocks": [
+        {
+          "type": "table",
+          "headers": ["Global command", "Purpose"],
+          "rows": [
+            ["`/ak:init-project`", "Per-project setup wizard for assistant docs, hooks, MCP permissions, and GitNexus guidance."],
+            ["`/ak:setup-custom`", "Install selected commands, skills, and hooks from `custom/`."],
+            ["`/ak:setup-skills`", "Install selected community and official Anthropic skills from submodules."],
+            ["`/ak:update`", "Sync Agent Kit MCP permissions into global `~/.claude/settings.json`."]
+          ]
+        },
+        {
+          "type": "table",
+          "headers": ["MCP server", "Package", "Use when"],
+          "rows": [
+            ["`context7`", "`@upstash/context7-mcp@latest`", "You need up-to-date library documentation or framework examples."],
+            ["`sequential-thinking`", "`@modelcontextprotocol/server-sequential-thinking`", "A task needs structured reasoning or multi-step planning."],
+            ["`memory`", "`@modelcontextprotocol/server-memory`", "Persistent knowledge should be stored or retrieved across sessions."]
+          ]
+        },
+        {
+          "type": "cards",
+          "columns": 3,
+          "items": [
+            {"title": "block-dangerous-bash", "badge": "PreToolUse", "body": "Blocks destructive shell patterns such as force push, hard reset, dangerous deletes, database destruction, `kill`, and unsafe permissions."},
+            {"title": "check-secrets", "badge": "PreToolUse", "body": "Blocks writes that appear to contain API keys, access tokens, or private keys."},
+            {"title": "gitnexus-auto-rebuild", "badge": "PostToolUse", "body": "Runs `npx gitnexus analyze` after writes and edits so the knowledge graph stays fresh."}
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Maintenance",
+      "intro": "Use these rules when changing Agent Kit itself.",
+      "blocks": [
+        {
+          "type": "callout",
+          "tone": "warning",
+          "title": "Source of truth",
+          "content": "Edit `global/` or `custom/`, not installed files under `~/.claude/`. Do not edit `skills/claudekit-skills/` or `skills/anthropics-skills/` because they are Git submodules."
+        },
+        {
+          "type": "table",
+          "headers": ["Change", "Edit", "Then run"],
+          "rows": [
+            ["Global commands", "`global/commands/*.md`", "`/ak:sync-docs`, then `python3 scripts/install.py`"],
+            ["MCP servers or permissions", "`global/settings.json`", "`/ak:sync-docs`, then `python3 scripts/install.py` or `/ak:update`"],
+            ["Custom commands", "`custom/commands/*.md`", "`/ak:sync-docs`, then `/ak:setup-custom` in target projects"],
+            ["Custom skills", "`custom/skills/<name>/SKILL.md`", "`/ak:sync-docs`, then `/ak:setup-custom` in target projects"],
+            ["Custom hooks", "`custom/hooks/hooks.json`", "`/ak:sync-docs`, then `/ak:setup-custom` in target projects"],
+            ["Visual documentation", "`docs/raw/*.json`", "`python3 custom/skills/html-doc-coauthoring/scripts/build_html_doc.py docs/raw/<name>.json`"]
+          ]
+        },
+        {
+          "type": "code",
+          "language": "bash",
+          "content": "python3 tests/run_all.py\npython3 tests/test_kit.py\npython3 tests/test_init_project_script.py\npython3 custom/hooks/tests/test_hooks.py"
+        }
+      ]
+    },
+    {
+      "title": "Reader Checklist",
+      "intro": "Use this section to orient quickly before making changes or installing assets.",
+      "blocks": [
+        {
+          "type": "cards",
+          "columns": 2,
+          "items": [
+            {"title": "If you are installing Agent Kit", "body": "Run `python3 scripts/install.py`, initialize submodules, and check status before using commands in target projects."},
+            {"title": "If you are modifying Agent Kit", "body": "Update source files, sync docs, regenerate visual documentation when needed, and run `python3 tests/run_all.py`."},
+            {"title": "If you are using it in another project", "body": "Run `/ak:init-project` first, then add skills and custom assets only after reviewing what will be installed."},
+            {"title": "If docs look stale", "body": "Trust source files over generated docs, then run `/ak:sync-docs` and regenerate HTML from `docs/raw/`."}
+          ]
+        }
+      ]
+    }
+  ]
+}
